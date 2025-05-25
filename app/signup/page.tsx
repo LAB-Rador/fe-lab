@@ -1,0 +1,302 @@
+"use client"
+
+import type React from "react"
+
+import { useState } from "react"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { EyeIcon, EyeOffIcon, CheckCircle, AlertCircle } from "lucide-react"
+
+export default function SignUpPage() {
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    institution: "",
+    password: "",
+    confirmPassword: "",
+    agreeToTerms: false,
+  })
+
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [passwordStrength, setPasswordStrength] = useState(0)
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }))
+
+    if (name === "password") {
+      calculatePasswordStrength(value)
+    }
+  }
+
+  const calculatePasswordStrength = (password: string) => {
+    let strength = 0
+    if (password.length >= 8) strength++
+    if (/[A-Z]/.test(password)) strength++
+    if (/[a-z]/.test(password)) strength++
+    if (/[0-9]/.test(password)) strength++
+    if (/[^A-Za-z0-9]/.test(password)) strength++
+    setPasswordStrength(strength)
+  }
+
+  const getPasswordStrengthColor = () => {
+    if (passwordStrength <= 2) return "bg-red-500"
+    if (passwordStrength <= 3) return "bg-yellow-500"
+    return "bg-green-500"
+  }
+
+  const getPasswordStrengthText = () => {
+    if (passwordStrength <= 2) return "Weak"
+    if (passwordStrength <= 3) return "Medium"
+    return "Strong"
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 2000))
+
+    setIsLoading(false)
+    // Handle successful signup
+  }
+
+  const isFormValid =
+    formData.firstName &&
+    formData.lastName &&
+    formData.email &&
+    formData.institution &&
+    formData.password &&
+    formData.confirmPassword &&
+    formData.password === formData.confirmPassword &&
+    formData.agreeToTerms &&
+    passwordStrength >= 3
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div>
+          <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-blue-600">
+            <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 7.172V5L8 4z"
+              />
+            </svg>
+          </div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Create your account</h2>
+          <p className="mt-2 text-center text-sm text-gray-600">Join the leading laboratory management platform</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+          <div className="space-y-4">
+            {/* Name Fields */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="firstName">First Name</Label>
+                <Input
+                  id="firstName"
+                  name="firstName"
+                  type="text"
+                  required
+                  placeholder="John"
+                  value={formData.firstName}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="lastName">Last Name</Label>
+                <Input
+                  id="lastName"
+                  name="lastName"
+                  type="text"
+                  required
+                  placeholder="Doe"
+                  value={formData.lastName}
+                  onChange={handleInputChange}
+                />
+              </div>
+            </div>
+
+            {/* Email */}
+            <div className="space-y-2">
+              <Label htmlFor="email">Email address</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                placeholder="john.doe@university.edu"
+                value={formData.email}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            {/* Institution */}
+            <div className="space-y-2">
+              <Label htmlFor="institution">Institution/Organization</Label>
+              <Input
+                id="institution"
+                name="institution"
+                type="text"
+                required
+                placeholder="University Research Center"
+                value={formData.institution}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            {/* Password */}
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  required
+                  placeholder="••••••••"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-500"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOffIcon className="h-5 w-5" aria-hidden="true" />
+                  ) : (
+                    <EyeIcon className="h-5 w-5" aria-hidden="true" />
+                  )}
+                </button>
+              </div>
+
+              {/* Password Strength Indicator */}
+              {formData.password && (
+                <div className="mt-2">
+                  <div className="flex items-center justify-between text-xs mb-1">
+                    <span className="text-gray-600">Password strength:</span>
+                    <span
+                      className={`font-medium ${
+                        passwordStrength <= 2
+                          ? "text-red-500"
+                          : passwordStrength <= 3
+                            ? "text-yellow-500"
+                            : "text-green-500"
+                      }`}
+                    >
+                      {getPasswordStrengthText()}
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-1.5">
+                    <div
+                      className={`h-1.5 rounded-full transition-all duration-300 ${getPasswordStrengthColor()}`}
+                      style={{ width: `${(passwordStrength / 5) * 100}%` }}
+                    ></div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Confirm Password */}
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <div className="relative">
+                <Input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  required
+                  placeholder="••••••••"
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-500"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOffIcon className="h-5 w-5" aria-hidden="true" />
+                  ) : (
+                    <EyeIcon className="h-5 w-5" aria-hidden="true" />
+                  )}
+                </button>
+              </div>
+
+              {/* Password Match Indicator */}
+              {formData.confirmPassword && (
+                <div className="mt-1 flex items-center text-xs">
+                  {formData.password === formData.confirmPassword ? (
+                    <>
+                      <CheckCircle className="h-3 w-3 text-green-500 mr-1" />
+                      <span className="text-green-500">Passwords match</span>
+                    </>
+                  ) : (
+                    <>
+                      <AlertCircle className="h-3 w-3 text-red-500 mr-1" />
+                      <span className="text-red-500">Passwords do not match</span>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Terms */}
+            <div className="flex items-start">
+              <input
+                type="checkbox"
+                id="agreeToTerms"
+                name="agreeToTerms"
+                checked={formData.agreeToTerms}
+                onChange={handleInputChange}
+                className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                required
+              />
+              <label htmlFor="agreeToTerms" className="ml-2 text-sm text-gray-700">
+                I agree to the{" "}
+                <Link href="/terms" className="text-blue-600 hover:text-blue-500 font-medium">
+                  Terms of Service
+                </Link>{" "}
+                and{" "}
+                <Link href="/privacy" className="text-blue-600 hover:text-blue-500 font-medium">
+                  Privacy Policy
+                </Link>
+              </label>
+            </div>
+          </div>
+
+          <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={!isFormValid || isLoading}>
+            {isLoading ? "Creating account..." : "Create account"}
+          </Button>
+
+          <div className="text-center">
+            <p className="text-sm text-gray-600">
+              Already have an account?{" "}
+              <Link href="/signin" className="font-medium text-blue-600 hover:text-blue-500">
+                Sign in here
+              </Link>
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
