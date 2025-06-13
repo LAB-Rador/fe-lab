@@ -33,6 +33,7 @@ export class AuthService {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify(dataSuccess),
       });
       
@@ -65,6 +66,7 @@ export class AuthService {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
+        credentials: 'include',
       });
       
       if (!response.ok) {

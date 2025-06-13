@@ -19,6 +19,7 @@ class ApiClient {
         ...(token && { Authorization: `Bearer ${token}` }),
         ...options.headers,
       },
+      credentials: 'include' as RequestCredentials,
       ...options,
     };
 
