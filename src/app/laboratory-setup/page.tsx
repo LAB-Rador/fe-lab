@@ -10,13 +10,13 @@ import { Textarea } from "@/src/components/ui/textarea"
 import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
+import React, { Suspense, useState } from "react"
 import { useAppDispatch } from "@/src/lib/hooks"
 import { apiClient } from "@/src/lib/apiClient"
 import { AuthService } from "@/src/lib/auth"
-import React, { useState } from "react"
 import { toast } from "sonner"
 
-export default function LaboratorySetupPage() {
+const LaboratorySetupPage = () => {
     const router = useRouter()
     const searchParams = useSearchParams()
     const tabFromUrl = searchParams.get('tab')
@@ -311,3 +311,11 @@ export default function LaboratorySetupPage() {
         </div>
     )
 }
+
+const Page = () => (
+    <Suspense fallback={<div>Загрузка...</div>}>
+      <LaboratorySetupPage />
+    </Suspense>
+  );
+  
+  export default Page;
