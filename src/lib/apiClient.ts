@@ -1,7 +1,7 @@
 import { AuthService } from "./auth";
 
 const BACKEND_URL =
-  process.env.DATABASE_URL || "https://be-lab-production.up.railway.app/";
+  process.env.DATABASE_URL || "https://be-lab-production.up.railway.app";
 
 class ApiClient {
   baseURL: string; // Объявите свойство baseURL
