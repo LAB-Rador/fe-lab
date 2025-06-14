@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from '../lib/hooks'
 import { updateUser } from "@/src/redux/slices/userSlice"
 import { AlertCircle, CheckCircle } from 'lucide-react'
 import type { RootState } from '../redux/store/store'
+import { CONFIRMED_EMAIL } from '../lib/variables'
 import { apiClient } from '../lib/apiClient'
 import React, { useState } from 'react'
 import { Button } from './ui/button'
@@ -35,7 +36,8 @@ export const EmailConfirmation = () => {
             })
             
             if(response.success) {
-                dispatch(updateUser({confirmedEmail: response.data.confirmedEmail}))
+                document.cookie = `${CONFIRMED_EMAIL}=${response.data.confirmedEmail}; path=/; max-age=3600`;
+                dispatch(updateUser({confirmedEmail: response.data.confirmedEmail}));
             }
           } catch (error) {
             console.error('Verification code failed:', error);
