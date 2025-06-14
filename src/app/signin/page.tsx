@@ -1,20 +1,23 @@
 "use client";
 
 import { EmailConfirmation } from "@/src/components/email-confirmation";
+import type { RootState } from "@/src/redux/store/store";
 import { LoginForm } from "@/src/components/login-form";
 import { CONFIRMED_EMAIL } from "@/src/lib/variables";
+import { useAppSelector } from "@/src/lib/hooks";
 import { getCookie } from "@/src/lib/cookie";
 import { useEffect, useState } from "react";
 
 export default function LoginPage() {
   const [confirmedEmail, setConfirmedEmail] = useState<boolean>(true);
+  const user = useAppSelector((state: RootState) => state.user);
 
   useEffect(() => {
     const email = getCookie(CONFIRMED_EMAIL);
     if (email) {
       setConfirmedEmail(email === "true" ? true : false);
     }
-  }, []);
+  }, [user]);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50">
