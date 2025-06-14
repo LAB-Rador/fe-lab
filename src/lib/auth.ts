@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 
-const BACKEND_URL = process.env.DATABASE_URL || 'https://be-lab-production.up.railway.app';
+const BACKEND_URL = process.env.NEXT_PUBLIC_DATABASE_URL || "http://localhost:3001";
 
 export class AuthService {
   static TOKEN_KEY = 'auth-token';
