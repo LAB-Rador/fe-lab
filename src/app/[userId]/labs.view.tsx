@@ -1,15 +1,15 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/src/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
-import { Badge } from "@/src/components/ui/badge"
-import { Avatar, AvatarFallback } from "@/src/components/ui/avatar"
 import { Building2, Plus, Users, Calendar, MapPin, Mail, User, ChevronRight, Search } from "lucide-react"
-import { Input } from "@/src/components/ui/input"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
 import type { LaboratoriesPageProps, Laboratory, UserInfo } from "./types"
+import { Avatar, AvatarFallback } from "@/src/components/ui/avatar"
+import { useState, useEffect, useCallback, useMemo } from "react"
+import { Button } from "@/src/components/ui/button"
+import { Input } from "@/src/components/ui/input"
+import { Badge } from "@/src/components/ui/badge"
 import { AuthService } from "@/src/lib/auth"
+import { useRouter } from "next/navigation"
 
 export default function LaboratoriesPage({ userLaboratories }: LaboratoriesPageProps) {
     const router = useRouter()
@@ -31,14 +31,17 @@ export default function LaboratoriesPage({ userLaboratories }: LaboratoriesPageP
         fetchData()
     }, [])
 
-    const filteredLaboratories = laboratories && laboratories.filter(
-        (lab) =>
-        lab.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        lab.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        lab.description?.toLowerCase().includes(searchTerm.toLowerCase()),
-    )
+    const filteredLaboratories = useMemo(() => 
+        laboratories?.filter(
+            (lab) =>
+            lab.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            lab.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            lab.description?.toLowerCase().includes(searchTerm.toLowerCase()),
+        ),
+        [laboratories, searchTerm]
+    );
 
-    const formatDate = (date: Date | string) => {
+    const formatDate = useCallback((date: Date | string) => {
         const dateObj = typeof date === 'string' ? new Date(date) : date;
         
         if (isNaN(dateObj.getTime())) {
@@ -50,23 +53,23 @@ export default function LaboratoriesPage({ userLaboratories }: LaboratoriesPageP
             month: "long", 
             day: "numeric",
         }).format(dateObj);
-    }
+    }, []);
 
-    const getInitials = (firstName: string, lastName: string) => {
+    const getInitials = useCallback((firstName: string, lastName: string) => {
         return `${firstName.charAt(0)}${lastName.charAt(0)}`
-    }
+    }, []);
 
-    const handleJoinLab = () => {
+    const handleJoinLab = useCallback(() => {
         router.push("/laboratory-setup?tab=join")
-    }
+    }, []);
 
-    const handleCreateLab = () => {
+    const handleCreateLab = useCallback(() => {
         router.push("/laboratory-setup?tab=create")
-    }
+    }, []);
 
-    const handleLabClick = (labId: string) => {
+    const handleLabClick = useCallback((labId: string) => {
         router.push(`/${userInfo?.userId}/${labId}/dashboard`)
-    }
+    }, [userInfo]);
 
     if (isLoading) {
         return (

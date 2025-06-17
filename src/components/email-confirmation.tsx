@@ -2,13 +2,13 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
 import { InputOTP, InputOTPGroup, InputOTPSlot } from './ui/input-otp'
+import React, { useCallback, useMemo, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../lib/hooks'
 import { updateUser } from "@/src/redux/slices/userSlice"
 import { AlertCircle, CheckCircle } from 'lucide-react'
 import type { RootState } from '../redux/store/store'
 import { CONFIRMED_EMAIL } from '../lib/variables'
 import { apiClient } from '../lib/apiClient'
-import React, { useState } from 'react'
 import { Button } from './ui/button'
 import { Label } from './ui/label'
 import { toast } from 'sonner'
@@ -20,7 +20,7 @@ export const EmailConfirmation = () => {
     const [confirmationCode, setConfirmationCode] = useState("")
     const user = useAppSelector((state: RootState) => state.user)
     const dispatch = useAppDispatch()
-    const handleConfirmEmail = async (e: React.FormEvent) => {
+    const handleConfirmEmail = useCallback(async (e: React.FormEvent) => {
         e.preventDefault()
         setIsLoading(true)
         setError("")
@@ -44,9 +44,11 @@ export const EmailConfirmation = () => {
           } finally {
             setIsLoading(false)
           }
-    }
+    }, []);
 
-    const isJoinFormValid = confirmationCode.length === 6
+    const isJoinFormValid = useMemo(() => {
+        return confirmationCode.length === 6
+    }, [confirmationCode]);
 
     return (
         <Card>

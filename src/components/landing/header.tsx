@@ -10,13 +10,13 @@ export function Header() {
 
     const router = useRouter();
 
-    const navigation = [
-        { name: "Features", href: "#features" },
-        { name: "Solutions", href: "#solutions" },
-        { name: "Pricing", href: "#pricing" },
-        { name: "Resources", href: "#resources" },
-        { name: "About", href: "#about" },
-    ]
+    // const navigation = [
+    //     { name: "Features", href: "#features" },
+    //     { name: "Solutions", href: "#solutions" },
+    //     { name: "Pricing", href: "#pricing" },
+    //     { name: "Resources", href: "#resources" },
+    //     { name: "About", href: "#about" },
+    // ]
 
     return (
         <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -31,7 +31,7 @@ export function Header() {
                     </div>
 
                     {/* Desktop Navigation */}
-                    <nav className="hidden md:flex items-center space-x-8">
+                    {/* <nav className="hidden md:flex items-center space-x-8">
                         {navigation.map((item) => (
                         <a
                             key={item.name}
@@ -41,7 +41,7 @@ export function Header() {
                             {item.name}
                         </a>
                         ))}
-                    </nav>
+                    </nav> */}
 
                     {/* Auth Buttons */}
                     <div className="hidden md:flex items-center space-x-4">
@@ -61,7 +61,7 @@ export function Header() {
                 {isMenuOpen && (
                 <div className="md:hidden border-t border-gray-200 py-4">
                     <nav className="flex flex-col space-y-4">
-                        {navigation.map((item) => (
+                        {/* {navigation.map((item) => (
                             <a
                             key={item.name}
                             href={item.href}
@@ -70,7 +70,7 @@ export function Header() {
                             >
                                 {item.name}
                             </a>
-                        ))}
+                        ))} */}
                         <div className="flex flex-col space-y-2 px-4 pt-4 border-t border-gray-200">
                             <Button onClick={() => router.push("/signin")} variant="ghost" className="text-gray-600 hover:text-[#2563EB] justify-start">
                                 Sign In

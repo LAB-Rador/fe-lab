@@ -2,6 +2,7 @@
 
 import { useAppDispatch, useAppSelector } from "../lib/hooks"
 import { setUser } from "@/src/redux/slices/userSlice"
+import React, { useCallback, useState } from "react"
 import { Button } from "@/src/components/ui/button"
 import { CONFIRMED_EMAIL } from "../lib/variables"
 import { EyeIcon, EyeOffIcon } from "lucide-react"
@@ -9,7 +10,6 @@ import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
 import { AuthService } from "@/src/lib/auth"
 import { useRouter } from "next/navigation"
-import React, { useState } from "react"
 import { toast } from "sonner"
 import Link from "next/link"
 
@@ -22,7 +22,7 @@ export function LoginForm() {
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
@@ -46,7 +46,7 @@ export function LoginForm() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, []);
 
   return (
     <form onSubmit={handleSubmit} className="mt-8 space-y-6">

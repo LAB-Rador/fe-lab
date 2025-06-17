@@ -3,13 +3,13 @@
 import { EyeIcon, EyeOffIcon, CheckCircle, AlertCircle } from "lucide-react"
 import { setUser } from "@/src/redux/slices/userSlice"
 import { CONFIRMED_EMAIL } from "@/src/lib/variables"
+import React, { useCallback, useState } from "react"
 import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
 import { useAppDispatch } from "@/src/lib/hooks"
 import { apiClient } from "@/src/lib/apiClient"
 import { useRouter } from "next/navigation"
-import React, { useState } from "react"
 import Link from "next/link"
 
 export default function SignUpPage() {
@@ -32,7 +32,7 @@ export default function SignUpPage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target
     setFormData((prev) => ({
       ...prev,
@@ -42,9 +42,9 @@ export default function SignUpPage() {
     if (name === "password") {
       calculatePasswordStrength(value)
     }
-  }
+  }, []);
 
-  const calculatePasswordStrength = (password: string) => {
+  const calculatePasswordStrength = useCallback((password: string) => {
     let strength = 0
     if (password.length >= 8) strength++
     if (/[A-Z]/.test(password)) strength++
@@ -52,21 +52,21 @@ export default function SignUpPage() {
     if (/[0-9]/.test(password)) strength++
     if (/[^A-Za-z0-9]/.test(password)) strength++
     setPasswordStrength(strength)
-  }
+  }, []);
 
-  const getPasswordStrengthColor = () => {
+  const getPasswordStrengthColor = useCallback(() => {
     if (passwordStrength <= 2) return "bg-red-500"
     if (passwordStrength <= 3) return "bg-yellow-500"
     return "bg-green-500"
-  }
+  }, [passwordStrength]);
 
-  const getPasswordStrengthText = () => {
+  const getPasswordStrengthText = useCallback(() => {
     if (passwordStrength <= 2) return "Weak"
     if (passwordStrength <= 3) return "Medium"
     return "Strong"
-  }
+  }, [passwordStrength]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async(e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
@@ -85,7 +85,7 @@ export default function SignUpPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, []);
 
   const isFormValid =
     formData.firstName &&

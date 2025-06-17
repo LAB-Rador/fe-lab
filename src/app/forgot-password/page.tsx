@@ -2,15 +2,15 @@
 
 import { ArrowLeft, CheckCircle, AlertCircle, EyeOffIcon, EyeIcon } from "lucide-react"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/src/components/ui/input-otp"
+import { useCallback, useMemo, useState } from "react"
 import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
 import { apiClient } from "@/src/lib/apiClient"
-import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import type React from "react"
 import Link from "next/link"
-import { toast } from "sonner"
-import { useRouter } from "next/navigation"
 
 export default function ForgotPasswordPage() {
   const [confirmationCode, setConfirmationCode] = useState("")
@@ -29,7 +29,7 @@ export default function ForgotPasswordPage() {
 
   const router = useRouter();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target
     setFormData((prev) => ({
       ...prev,
@@ -39,9 +39,9 @@ export default function ForgotPasswordPage() {
     if (name === "password") {
       calculatePasswordStrength(value)
     }
-  }
+  }, []);
 
-  const calculatePasswordStrength = (password: string) => {
+  const calculatePasswordStrength = useCallback((password: string) => {
     let strength = 0
     if (password.length >= 8) strength++
     if (/[A-Z]/.test(password)) strength++
@@ -49,21 +49,21 @@ export default function ForgotPasswordPage() {
     if (/[0-9]/.test(password)) strength++
     if (/[^A-Za-z0-9]/.test(password)) strength++
     setPasswordStrength(strength)
-  }
+  }, []);
 
-  const getPasswordStrengthColor = () => {
+  const getPasswordStrengthColor = useCallback(() => {
     if (passwordStrength <= 2) return "bg-red-500"
     if (passwordStrength <= 3) return "bg-yellow-500"
     return "bg-green-500"
-  }
+  }, [passwordStrength]);
 
-  const getPasswordStrengthText = () => {
+  const getPasswordStrengthText = useCallback(() => {
     if (passwordStrength <= 2) return "Weak"
     if (passwordStrength <= 3) return "Medium"
     return "Strong"
-  }
+  }, [passwordStrength]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setError("")
@@ -80,9 +80,9 @@ export default function ForgotPasswordPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, []);
 
-  const handleResendEmail = async () => {
+  const handleResendEmail = useCallback(async () => {
     setIsLoading(true)
     setError("")
 
@@ -95,9 +95,9 @@ export default function ForgotPasswordPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, []);
 
-  const handleResetPassword = async (e: React.FormEvent) => {
+  const handleResetPassword = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setError("")
@@ -121,9 +121,11 @@ export default function ForgotPasswordPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, []);
 
-  const isJoinFormValid = confirmationCode.length === 6
+  const isJoinFormValid = useMemo(() => {
+    return confirmationCode.length === 6
+  }, [confirmationCode]);
 
   if (isSubmitted) {
     return (

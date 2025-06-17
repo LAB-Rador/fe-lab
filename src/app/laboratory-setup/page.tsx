@@ -4,13 +4,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/src/components/ui/input-otp"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
 import { Building2, Users, CheckCircle, AlertCircle } from "lucide-react"
+import React, { Suspense, useCallback, useMemo, useState } from "react"
 import { setLaboratory } from "@/src/redux/slices/laboratorySlice"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Textarea } from "@/src/components/ui/textarea"
 import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
-import React, { Suspense, useState } from "react"
 import { useAppDispatch } from "@/src/lib/hooks"
 import { apiClient } from "@/src/lib/apiClient"
 import { AuthService } from "@/src/lib/auth"
@@ -36,15 +36,15 @@ const LaboratorySetupPage = () => {
 
     const dispatch = useAppDispatch();
 
-    const handleLaboratoryInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleLaboratoryInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target
         setLaboratoryData((prev) => ({
             ...prev,
             [name]: value,
         }))
-    }
+    }, []);
 
-    const handleCreateLaboratory = async (e: React.FormEvent) => {
+    const handleCreateLaboratory = useCallback(async (e: React.FormEvent) => {
         e.preventDefault()
         setIsLoading(true)
         setError("")
@@ -75,9 +75,9 @@ const LaboratorySetupPage = () => {
         } finally {
             setIsLoading(false);
         }
-    }
+    }, []);
 
-    const handleJoinLaboratory = async (e: React.FormEvent) => {
+    const handleJoinLaboratory = useCallback(async (e: React.FormEvent) => {
         e.preventDefault()
         setIsLoading(true)
         setError("")
@@ -98,10 +98,15 @@ const LaboratorySetupPage = () => {
         } finally {
             setIsLoading(false)
         }
-    }
+    }, []);
 
-    const isCreateFormValid = laboratoryData.name.trim() !== ""
-    const isJoinFormValid = invitationCode.length === 6
+    const isCreateFormValid = useMemo(() => {
+        return laboratoryData.name.trim() !== ""
+    }, [laboratoryData]);
+
+    const isJoinFormValid = useMemo(() => {
+        return invitationCode.length === 6
+    }, [invitationCode]);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
