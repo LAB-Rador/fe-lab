@@ -46,7 +46,7 @@ export function LoginForm() {
     } finally {
       setIsLoading(false)
     }
-  }, []);
+  }, [email, password, router]);
 
   return (
     <form onSubmit={handleSubmit} className="mt-8 space-y-6">

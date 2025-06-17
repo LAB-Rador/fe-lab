@@ -18,8 +18,10 @@ export const EmailConfirmation = () => {
     const [error, setError] = useState("")
     const [success, setSuccess] = useState("")
     const [confirmationCode, setConfirmationCode] = useState("")
+
     const user = useAppSelector((state: RootState) => state.user)
     const dispatch = useAppDispatch()
+    
     const handleConfirmEmail = useCallback(async (e: React.FormEvent) => {
         e.preventDefault()
         setIsLoading(true)
@@ -44,7 +46,7 @@ export const EmailConfirmation = () => {
           } finally {
             setIsLoading(false)
           }
-    }, []);
+    }, [user, confirmationCode]);
 
     const isJoinFormValid = useMemo(() => {
         return confirmationCode.length === 6

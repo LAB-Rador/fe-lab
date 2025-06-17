@@ -61,15 +61,15 @@ export default function LaboratoriesPage({ userLaboratories }: LaboratoriesPageP
 
     const handleJoinLab = useCallback(() => {
         router.push("/laboratory-setup?tab=join")
-    }, []);
+    }, [router]);
 
     const handleCreateLab = useCallback(() => {
         router.push("/laboratory-setup?tab=create")
-    }, []);
+    }, [router]);
 
     const handleLabClick = useCallback((labId: string) => {
         router.push(`/${userInfo?.userId}/${labId}/dashboard`)
-    }, [userInfo]);
+    }, [userInfo, router]);
 
     if (isLoading) {
         return (

@@ -3,7 +3,7 @@
 import { EyeIcon, EyeOffIcon, CheckCircle, AlertCircle } from "lucide-react"
 import { setUser } from "@/src/redux/slices/userSlice"
 import { CONFIRMED_EMAIL } from "@/src/lib/variables"
-import React, { useCallback, useState } from "react"
+import React, { useCallback, useMemo, useState } from "react"
 import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
@@ -85,20 +85,23 @@ export default function SignUpPage() {
     } finally {
       setIsLoading(false)
     }
-  }, []);
+  }, [formData, router]);
 
-  const isFormValid =
-    formData.firstName &&
-    formData.lastName &&
-    formData.email &&
-    formData.address &&
-    formData.institution &&
-    formData.contactPhone &&
-    formData.password &&
-    formData.confirmPassword &&
-    formData.password === formData.confirmPassword &&
-    formData.agreeToTerms &&
-    passwordStrength >= 3
+  const isFormValid = useMemo(() => {
+    return (
+      formData.firstName &&
+      formData.lastName &&
+      formData.email &&
+      formData.address &&
+      formData.institution &&
+      formData.contactPhone &&
+      formData.password &&
+      formData.confirmPassword &&
+      formData.password === formData.confirmPassword &&
+      formData.agreeToTerms &&
+      passwordStrength >= 3
+    )
+  }, [formData, passwordStrength]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">

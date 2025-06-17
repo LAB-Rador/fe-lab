@@ -75,7 +75,7 @@ const LaboratorySetupPage = () => {
         } finally {
             setIsLoading(false);
         }
-    }, []);
+    }, [laboratoryData, router]);
 
     const handleJoinLaboratory = useCallback(async (e: React.FormEvent) => {
         e.preventDefault()
