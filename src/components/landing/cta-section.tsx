@@ -1,7 +1,9 @@
 import { Button } from "@/src/components/ui/button"
 import { ArrowRight, CheckCircle } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 export function CTASection() {
+    const router = useRouter();
     return (
         <section className="py-20 bg-gradient-to-br from-[#2563EB] to-[#8B5CF6]">
             <div className="container mx-auto px-4 lg:px-8">
@@ -28,11 +30,22 @@ export function CTASection() {
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Button size="lg" className="bg-white text-[#2563EB] hover:bg-gray-100 px-8 py-3">
+                        <Button 
+                            onClick={() => {
+                                router.push('/signup');
+                            }}
+                            size="lg" 
+                            className="bg-white text-[#2563EB] hover:bg-gray-100 px-8 py-3"
+                        >
                             Start Free Trial
                             <ArrowRight className="ml-2 h-5 w-5" />
                         </Button>
-                        <Button size="lg" variant="outline" className="border-white text-[#2563EB] hover:bg-white/10 px-8 py-3">
+                        <Button 
+                            disabled
+                            size="lg" 
+                            variant="outline" 
+                            className="border-white text-[#2563EB] hover:bg-white/10 px-8 py-3"
+                        >
                             Schedule Demo
                         </Button>
                     </div>

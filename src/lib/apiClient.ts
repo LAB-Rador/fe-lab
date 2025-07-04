@@ -1,7 +1,7 @@
 import { AuthService } from "./auth";
 
 const BACKEND_URL =
-  process.env.NEXT_PUBLIC_DATABASE_URL || "http://localhost:3001";
+process.env.NEXT_PUBLIC_LOCAL_DATABASE_URL as string || process.env.NEXT_PUBLIC_DATABASE_URL as string;
 
 class ApiClient {
   baseURL: string; // Объявите свойство baseURL

@@ -1,57 +1,22 @@
-import { DashboardStats } from "@/src/components/dashboard/dashboard-stats"
-import { AnimalPopulationChart } from "@/src/components/dashboard/animal-population-chart"
-import { StatusStatisticsChart } from "@/src/components/dashboard/status-statistics-chart"
-import { NotificationPanel } from "@/src/components/dashboard/notification-panel"
-import { UpcomingEvents } from "@/src/components/dashboard/upcoming-events"
-import { SubscriptionStatus } from "@/src/components/dashboard/subscription-status"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
+"use server"
 
-export default function DashboardPage() {
+import DashboardContainer from "./deshboard.container";
+import { apiClient } from "@/src/lib/apiClient";
+import type { PageProps } from "./types";
+
+export default async function Page ({params}: PageProps) {
+
+  const {userId, labId} = await params;
+
+  const experiments = await apiClient.get(`/api/experimentsCount/${userId}/${labId}`);
+  const tasks = await apiClient.get(`/api/tasksCount/${userId}/${labId}`);
+  const animals = await apiClient.get(`/api/animals/${userId}/${labId}`);
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-      </div>
-      <DashboardStats />
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="lg:col-span-4">
-          <CardHeader>
-            <CardTitle>Animal Population</CardTitle>
-            <CardDescription>Population changes over the last 30 days</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <AnimalPopulationChart />
-          </CardContent>
-        </Card>
-        <Card className="lg:col-span-3">
-          <CardHeader>
-            <CardTitle>Status Statistics</CardTitle>
-            <CardDescription>Current animal status distribution</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <StatusStatisticsChart />
-          </CardContent>
-        </Card>
-        <Card className="lg:col-span-4">
-          <CardHeader>
-            <CardTitle>Upcoming Events</CardTitle>
-            <CardDescription>Scheduled events for the next 7 days</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <UpcomingEvents />
-          </CardContent>
-        </Card>
-        <Card className="lg:col-span-3">
-          <CardHeader>
-            <CardTitle>Notifications</CardTitle>
-            <CardDescription>Recent alerts and notifications</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <NotificationPanel />
-          </CardContent>
-        </Card>
-      </div>
-      <SubscriptionStatus />
-    </div>
+    <DashboardContainer 
+      experiments={experiments.data}
+      animals={animals.data}
+      tasks={tasks.data}
+    />
   )
 }

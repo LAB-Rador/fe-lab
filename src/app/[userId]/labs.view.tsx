@@ -1,75 +1,24 @@
-"use client"
-
 import { Building2, Plus, Users, Calendar, MapPin, Mail, User, ChevronRight, Search } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
-import type { LaboratoriesPageProps, Laboratory, UserInfo } from "./types"
 import { Avatar, AvatarFallback } from "@/src/components/ui/avatar"
-import { useState, useEffect, useCallback, useMemo } from "react"
+import type { LaboratoriesViewProps } from "./types"
 import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
 import { Badge } from "@/src/components/ui/badge"
-import { AuthService } from "@/src/lib/auth"
-import { useRouter } from "next/navigation"
 
-export default function LaboratoriesPage({ userLaboratories }: LaboratoriesPageProps) {
-    const router = useRouter()
-    const [searchTerm, setSearchTerm] = useState("")
-    const [laboratories, setLaboratories] = useState<Laboratory[] | []>(userLaboratories)
-    const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
-    const [isLoading, setIsLoading] = useState(true)
-
-    useEffect(() => {
-        const fetchData = async () => {
-        setIsLoading(true)
-
-        const user = await AuthService.getCurrentUser();
-        setUserInfo(user);
-
-        setIsLoading(false)
-        }
-
-        fetchData()
-    }, [])
-
-    const filteredLaboratories = useMemo(() => 
-        laboratories?.filter(
-            (lab) =>
-            lab.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            lab.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            lab.description?.toLowerCase().includes(searchTerm.toLowerCase()),
-        ),
-        [laboratories, searchTerm]
-    );
-
-    const formatDate = useCallback((date: Date | string) => {
-        const dateObj = typeof date === 'string' ? new Date(date) : date;
-        
-        if (isNaN(dateObj.getTime())) {
-            return 'Invalid date';
-        }
-        
-        return new Intl.DateTimeFormat("en-US", {
-            year: "numeric",
-            month: "long", 
-            day: "numeric",
-        }).format(dateObj);
-    }, []);
-
-    const getInitials = useCallback((firstName: string, lastName: string) => {
-        return `${firstName.charAt(0)}${lastName.charAt(0)}`
-    }, []);
-
-    const handleJoinLab = useCallback(() => {
-        router.push("/laboratory-setup?tab=join")
-    }, [router]);
-
-    const handleCreateLab = useCallback(() => {
-        router.push("/laboratory-setup?tab=create")
-    }, [router]);
-
-    const handleLabClick = useCallback((labId: string) => {
-        router.push(`/${userInfo?.userId}/${labId}/dashboard`)
-    }, [userInfo, router]);
+export default function LaboratoriesView(
+    {
+        filteredLaboratories,
+        handleCreateLab,
+        handleLabClick,
+        setSearchTerm,
+        handleJoinLab,
+        getInitials,
+        formatDate,
+        searchTerm,
+        isLoading,
+        userInfo,
+    }: LaboratoriesViewProps) {
 
     if (isLoading) {
         return (

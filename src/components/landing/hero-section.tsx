@@ -1,7 +1,9 @@
 import { Button } from "@/src/components/ui/button"
 import { ArrowRight, Shield, Users, BarChart3 } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 export function HeroSection() {
+    const router = useRouter();
     return (
         <section className="relative bg-gradient-to-br from-[#2563EB]/5 to-[#8B5CF6]/5 py-20 lg:py-32">
             <div className="container mx-auto px-4 lg:px-8">
@@ -18,11 +20,18 @@ export function HeroSection() {
                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-4">
-                            <Button size="lg" className="bg-[#2563EB] hover:bg-[#2563EB]/90 text-white px-8 py-3">
+                            <Button 
+                                onClick={() => {
+                                    router.push('/signup');
+                                }}
+                                size="lg" 
+                                className="bg-[#2563EB] hover:bg-[#2563EB]/90 text-white px-8 py-3"
+                            >
                                 Start Free Trial
                                 <ArrowRight className="ml-2 h-5 w-5" />
                             </Button>
                             <Button
+                                disabled
                                 size="lg"
                                 variant="outline"
                                 className="border-[#2563EB] text-[#2563EB] hover:bg-[#2563EB]/5 px-8 py-3"

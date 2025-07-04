@@ -1,3 +1,5 @@
+import type { SetStateAction } from "react"
+
 export enum Role {
     VETERINARIAN = "VETERINARIAN",
     RESEARCHER = "RESEARCHER", 
@@ -44,8 +46,21 @@ export interface UserInfo {
     email: string
 }
 
-export interface LaboratoriesPageProps {
+export interface LaboratoriesContainerProps {
     userLaboratories: Laboratory[];
+}
+
+export interface LaboratoriesViewProps {
+    getInitials: (firstName: string, lastName: string) => string;
+    formatDate: (date: Date | string) => string
+    filteredLaboratories: Laboratory[] | [];
+    handleLabClick: (labId: string) => void;
+    handleCreateLab: VoidFunction;
+    handleJoinLab: VoidFunction;
+    userInfo: UserInfo | null;
+    setSearchTerm: React.Dispatch<SetStateAction<string>>;
+    isLoading: boolean;
+    searchTerm: string;
 }
 
 export interface PageProps {

@@ -1,7 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { Beaker, MousePointer, ClipboardList, AlertTriangle } from "lucide-react"
+import type { Animal } from "@/src/app/[userId]/[labId]/dashboard/types"
 
-export function DashboardStats() {
+interface DashboardStatsProps {
+  animals: Animal[];
+  experiments: number;
+  tasks: number;
+}
+
+export function DashboardStats({animals, experiments, tasks}: DashboardStatsProps) {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <Card>
@@ -10,7 +17,7 @@ export function DashboardStats() {
           <MousePointer className="h-4 w-4 text-blue-600" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">1,248</div>
+          <div className="text-2xl font-bold">{animals.length}</div>
           <p className="text-xs text-gray-500">+12% from last month</p>
         </CardContent>
       </Card>
@@ -20,7 +27,7 @@ export function DashboardStats() {
           <Beaker className="h-4 w-4 text-purple-600" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">24</div>
+          <div className="text-2xl font-bold">{experiments}</div>
           <p className="text-xs text-gray-500">+2 new this week</p>
         </CardContent>
       </Card>
@@ -30,7 +37,7 @@ export function DashboardStats() {
           <ClipboardList className="h-4 w-4 text-yellow-600" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">42</div>
+          <div className="text-2xl font-bold">{tasks}</div>
           <p className="text-xs text-gray-500">8 due today</p>
         </CardContent>
       </Card>

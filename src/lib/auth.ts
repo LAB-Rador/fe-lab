@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_DATABASE_URL || "http://localhost:3001";
+const BACKEND_URL = process.env.NEXT_PUBLIC_LOCAL_DATABASE_URL || process.env.NEXT_PUBLIC_DATABASE_URL;
 
 export class AuthService {
   static TOKEN_KEY = 'auth-token';
