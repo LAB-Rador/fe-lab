@@ -2,7 +2,11 @@ import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
 import { Plus, Search } from "lucide-react"
 
-export function AnimalsHeader() {
+interface AnimalsHeaderProps {
+  addAnimalTrigger?: React.ReactNode
+}
+
+export function AnimalsHeader({ addAnimalTrigger }: AnimalsHeaderProps) {
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
@@ -14,10 +18,12 @@ export function AnimalsHeader() {
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
           <Input type="search" placeholder="Search animals..." className="w-full pl-8 sm:w-[240px]" />
         </div>
-        <Button className="bg-blue-600 hover:bg-blue-700">
-          <Plus className="mr-1 h-4 w-4" />
-          Add Animal
-        </Button>
+        {addAnimalTrigger || (
+          <Button className="bg-blue-600 hover:bg-blue-700">
+            <Plus className="mr-1 h-4 w-4" />
+            Add Animal
+          </Button>
+        )}
       </div>
     </div>
   )

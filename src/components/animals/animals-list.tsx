@@ -1,8 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
+import { LayoutGrid, LayoutList, MoreHorizontal, Edit } from "lucide-react"
+import { Checkbox } from "@/src/components/ui/checkbox"
+import { Animal, AnimalStatus, Sex } from "./types"
 import { Button } from "@/src/components/ui/button"
+import { Badge } from "@/src/components/ui/badge"
 import { Card } from "@/src/components/ui/card"
+import { useParams } from "next/navigation"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,93 +15,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/src/components/ui/dropdown-menu"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
-import { Badge } from "@/src/components/ui/badge"
-import { Checkbox } from "@/src/components/ui/checkbox"
-import { LayoutGrid, LayoutList, MoreHorizontal } from "lucide-react"
+import { useState } from "react"
 import Link from "next/link"
-import { useParams } from "next/navigation"
 
-interface Animal {
-  id: string
-  name: string
-  species: string
-  sex: "Male" | "Female"
-  age: string
-  status: "Healthy" | "Under Observation" | "Critical" | "In Experiment"
-}
-
-const animals: Animal[] = [
-  {
-    id: "M-1001",
-    name: "Alpha",
-    species: "Mouse",
-    sex: "Male",
-    age: "6 months",
-    status: "Healthy",
-  },
-  {
-    id: "M-1002",
-    name: "Beta",
-    species: "Mouse",
-    sex: "Female",
-    age: "4 months",
-    status: "In Experiment",
-  },
-  {
-    id: "R-2001",
-    name: "Gamma",
-    species: "Rat",
-    sex: "Male",
-    age: "8 months",
-    status: "Under Observation",
-  },
-  {
-    id: "B-3001",
-    name: "Delta",
-    species: "Bird",
-    sex: "Female",
-    age: "1 year",
-    status: "Healthy",
-  },
-  {
-    id: "F-4001",
-    name: "Epsilon",
-    species: "Fish",
-    sex: "Male",
-    age: "3 months",
-    status: "Critical",
-  },
-  {
-    id: "M-1003",
-    name: "Zeta",
-    species: "Mouse",
-    sex: "Female",
-    age: "5 months",
-    status: "Healthy",
-  },
-  {
-    id: "R-2002",
-    name: "Eta",
-    species: "Rat",
-    sex: "Male",
-    age: "7 months",
-    status: "In Experiment",
-  },
-  {
-    id: "B-3002",
-    name: "Theta",
-    species: "Bird",
-    sex: "Female",
-    age: "9 months",
-    status: "Healthy",
-  },
-]
-
-export function AnimalsList() {
+export function AnimalsList({animals}: {animals: Animal[]}) {
   const [view, setView] = useState<"table" | "grid">("table")
   const [selectedAnimals, setSelectedAnimals] = useState<string[]>([])
-
   const params = useParams();
   const { userId, labId } = params;
   
@@ -105,21 +29,27 @@ export function AnimalsList() {
   }
 
   const toggleAllAnimals = () => {
-    setSelectedAnimals((prev) => (prev.length === animals.length ? [] : animals.map((animal) => animal.id)))
+    setSelectedAnimals((prev) => (prev.length === animals.length ? [] : animals.map((animal) => animal.id || "")))
   }
 
-  const getStatusColor = (status: Animal["status"]) => {
+  const getStatusColor = (status: AnimalStatus) => {
     switch (status) {
-      case "Healthy":
-        return "bg-green-50 text-green-700 border-green-200"
-      case "Under Observation":
-        return "bg-yellow-50 text-yellow-700 border-yellow-200"
-      case "Critical":
-        return "bg-red-50 text-red-700 border-red-200"
-      case "In Experiment":
-        return "bg-purple-50 text-purple-700 border-purple-200"
+      case AnimalStatus.ACTIVE:
+        return "bg-green-100 text-green-800 hover:bg-green-100"
+      case AnimalStatus.QUARANTINE:
+        return "bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
+      case AnimalStatus.EXPERIMENT:
+        return "bg-blue-100 text-blue-800 hover:bg-blue-100"
+      case AnimalStatus.BREEDING:
+        return "bg-indigo-100 text-indigo-800 hover:bg-indigo-100"
+      case AnimalStatus.DECEASED:
+        return "bg-red-100 text-red-800 hover:bg-red-100"
+      case AnimalStatus.TRANSFERRED:
+        return "bg-purple-100 text-purple-800 hover:bg-purple-100"
+      case AnimalStatus.RETIRED:
+        return "bg-gray-100 text-gray-800 hover:bg-gray-100"
       default:
-        return "bg-gray-50 text-gray-700 border-gray-200"
+        return "bg-gray-100 text-gray-800 hover:bg-gray-100"
     }
   }
 
@@ -156,13 +86,15 @@ export function AnimalsList() {
           <TableHeader>
             <TableRow>
               <TableHead className="w-12"></TableHead>
-              <TableHead>ID</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Species</TableHead>
-              <TableHead>Sex</TableHead>
-              <TableHead>Age</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="w-12"></TableHead>
+              <TableHead>Identifier</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Laboratory</TableHead>
+                <TableHead>Sex</TableHead>
+                <TableHead>Strain</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Location</TableHead>
+              <TableHead className="w-12">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -170,42 +102,54 @@ export function AnimalsList() {
               <TableRow key={animal.id}>
                 <TableCell>
                   <Checkbox
-                    checked={selectedAnimals.includes(animal.id)}
-                    onCheckedChange={() => toggleAnimalSelection(animal.id)}
+                    checked={selectedAnimals.includes(animal.id || "")}
+                    onCheckedChange={() => toggleAnimalSelection(animal.id || "")}
                   />
                 </TableCell>
-                <TableCell className="font-medium">{animal.id}</TableCell>
+                <TableCell className="font-medium">{animal.identifier}</TableCell>
                 <TableCell>
                   <Link href={`/${userId}/${labId}/animals/${animal.id}`} className="text-blue-600 hover:underline">
                     {animal.name}
                   </Link>
                 </TableCell>
-                <TableCell>{animal.species}</TableCell>
+                <TableCell>{animal.animalType?.name}</TableCell>
+                <TableCell>{animal.laboratory?.name}</TableCell>
                 <TableCell>{animal.sex}</TableCell>
-                <TableCell>{animal.age}</TableCell>
+                <TableCell>{animal.strain}</TableCell>
                 <TableCell>
                   <Badge variant="outline" className={getStatusColor(animal.status)}>
                     {animal.status}
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">Open menu</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <Link href={`/${userId}/${labId}/animals/${animal.id}`} key={animal.id}>
-                        <DropdownMenuItem>View details</DropdownMenuItem>
-                      </Link>
-                      <DropdownMenuItem>Edit animal</DropdownMenuItem>
-                      <DropdownMenuItem>Add measurement</DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-red-600">Archive animal</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <span className="text-sm text-gray-600">
+                    {animal.location || "Not specified"}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="sm" className="h-8 px-2">
+                      <Edit className="h-3.5 w-3.5" />
+                      <span className="sr-only">Edit animal</span>
+                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <MoreHorizontal className="h-4 w-4" />
+                          <span className="sr-only">Open menu</span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <Link href={`/${userId}/${labId}/animals/${animal.id}`} key={animal.id}>
+                          <DropdownMenuItem>View details</DropdownMenuItem>
+                        </Link>
+                        <DropdownMenuItem>Edit animal</DropdownMenuItem>
+                        <DropdownMenuItem>Add measurement</DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="text-red-600">Archive animal</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
@@ -217,34 +161,33 @@ export function AnimalsList() {
             <div key={animal.id} className="relative rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
               <div className="absolute right-2 top-2">
                 <Checkbox
-                  checked={selectedAnimals.includes(animal.id)}
-                  onCheckedChange={() => toggleAnimalSelection(animal.id)}
+                  checked={selectedAnimals.includes(animal.id || "")}
+                  onCheckedChange={() => toggleAnimalSelection(animal.id || "")}
                 />
               </div>
               <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-blue-50">
-                {animal.species === "Mouse" && <span className="text-xl">🐭</span>}
-                {animal.species === "Rat" && <span className="text-xl">🐀</span>}
-                {animal.species === "Bird" && <span className="text-xl">🐦</span>}
-                {animal.species === "Fish" && <span className="text-xl">🐟</span>}
+                {animal.sex === Sex.MALE && <span className="text-xl">🐭</span>}
+                {animal.sex === Sex.FEMALE && <span className="text-xl">🐀</span>}
+                {animal.sex === Sex.UNKNOWN && <span className="text-xl">❔</span>}
               </div>
               <h3 className="text-lg font-medium">
                 <Link href={`/${userId}/${labId}/animals/${animal.id}`} className="text-blue-600 hover:underline">
                   {animal.name}
                 </Link>
               </h3>
-              <p className="text-sm text-gray-500">{animal.id}</p>
+              <p className="text-sm text-gray-500">{animal.identifier}</p>
               <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
                 <div>
-                  <p className="font-medium">Species</p>
-                  <p className="text-gray-500">{animal.species}</p>
+                  <p className="font-medium">Type</p>
+                  <p className="text-gray-500">{animal.animalType?.name}</p>
                 </div>
                 <div>
                   <p className="font-medium">Sex</p>
                   <p className="text-gray-500">{animal.sex}</p>
                 </div>
                 <div>
-                  <p className="font-medium">Age</p>
-                  <p className="text-gray-500">{animal.age}</p>
+                  <p className="font-medium">Strain</p>
+                  <p className="text-gray-500">{animal.strain}</p>
                 </div>
                 <div>
                   <p className="font-medium">Status</p>
@@ -252,8 +195,16 @@ export function AnimalsList() {
                     {animal.status}
                   </Badge>
                 </div>
+                <div className="col-span-2">
+                  <p className="font-medium">Location</p>
+                  <p className="text-gray-500">{animal.location || "Not specified"}</p>
+                </div>
               </div>
-              <div className="mt-4 flex justify-end">
+              <div className="mt-4 flex items-center justify-end gap-1">
+                <Button variant="ghost" size="sm" className="h-8 px-2">
+                  <Edit className="h-3.5 w-3.5" />
+                  <span className="sr-only">Edit animal</span>
+                </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" className="h-8 w-8">

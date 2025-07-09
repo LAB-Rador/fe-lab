@@ -12,13 +12,36 @@ export enum Role {
     GUEST = "GUEST"
 }
 
-enum AccessStatus {
+export enum AccessStatus {
     ACTIVE = "ACTIVE",
     SUSPENDED = "SUSPENDED",
     REVOKED = "REVOKED",
     PENDING = "PENDING"
   }
 
+export enum ExperimentStatus {
+    COMPLETED = "COMPLETED",
+    CANCELLED = "CANCELLED",
+    PLANNED = "PLANNED",
+    ACTIVE = "ACTIVE",
+    PAUSED = "PAUSED",
+}
+
+export enum AnimalStatus {
+    TRANSFERRED = "TRANSFERRED",
+    QUARANTINE = "QUARANTINE",
+    EXPERIMENT = "EXPERIMENT",
+    BREEDING = "BREEDING",
+    DECEASED = "DECEASED",
+    RETIRED = "RETIRED",
+    ACTIVE = "ACTIVE",
+}
+
+export enum Sex {
+    MALE = "MALE",
+    FEMALE = "FEMALE",
+    UNKNOWN = "UNKNOWN"
+}
 export interface Laboratory {
     id: string
     createdAt: Date
@@ -32,6 +55,15 @@ export interface Laboratory {
     position: string
     description: string | null
     userRole: Role
+}
+
+export interface AnimalType {
+    id: string
+    name: string
+    laboratoryId: string
+    description: string | null
+    createdAt: Date
+    updatedAt: Date
 }
 
 export interface UserInfo {

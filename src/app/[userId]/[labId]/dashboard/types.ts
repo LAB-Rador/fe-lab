@@ -1,3 +1,5 @@
+import type { AnimalStatus, AnimalType, ExperimentStatus, Laboratory, Sex } from "../../types";
+
 export interface PageProps {
     params: {
         userId: string;
@@ -6,7 +8,10 @@ export interface PageProps {
 }
 
 export interface Animal {
+    newAnimalType?: AnimalType;
     acquisitionDate: string;
+    animalType: AnimalType;
+    laboratory: Laboratory;
     status: AnimalStatus;
     animalTypeId: string;
     laboratoryId: string;
@@ -14,52 +19,41 @@ export interface Animal {
     identifier: string;
     genotype?: string;
     location?: string;
-    createdAt: string;
-    updatedAt: string;
     strain?: string;
     origin?: string;
     name?: string;
-    sex?: string;
-    id: string;
+    id?: string;
+    sex?: Sex;
 }
-
 export interface Experiment {
-    title: string;
-    description: string;
-    laboratoryId: string;
-    startDate: string;
-    endDate?: string;
     status?: ExperimentStatus;
+    laboratoryId: string;
+    description: string;
     createdById: string;
     protocol?: string;
+    startDate: string;
+    endDate?: string;
+    title: string;
 }
 
 export interface DashboardViewProps {
-    animals: Animal[];
     experiments: number;
+    animals: Animal[];
     tasks: number;
+    previousMonthData?: {
+        experiments: number;
+        animals: number;
+        tasks: number;
+    };
 }
 
 export interface DashboardContainerProps {
-    animals: Animal[];
     experiments: number;
+    animals: Animal[];
     tasks: number;
+    previousMonthData?: {
+        experiments: number;
+        animals: number;
+        tasks: number;
+    };
 }
-
-enum ExperimentStatus {
-    COMPLETED = "COMPLETED",
-    CANCELLED = "CANCELLED",
-    PLANNED = "PLANNED",
-    ACTIVE = "ACTIVE",
-    PAUSED = "PAUSED",
-}
-
-enum AnimalStatus {
-    TRANSFERRED = "TRANSFERRED",
-    QUARANTINE = "QUARANTINE",
-    EXPERIMENT = "EXPERIMENT",
-    BREEDING = "BREEDING",
-    DECEASED = "DECEASED",
-    RETIRED = "RETIRED",
-    ACTIVE = "ACTIVE",
-  }

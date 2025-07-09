@@ -7,7 +7,7 @@ import { DashboardStats } from "@/src/components/dashboard/dashboard-stats"
 import { UpcomingEvents } from "@/src/components/dashboard/upcoming-events"
 import type { DashboardViewProps } from "./types"
 
-export default function DashboardView({animals, experiments, tasks}: DashboardViewProps) {
+export default function DashboardView({animals, experiments, tasks, previousMonthData}: DashboardViewProps) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -17,6 +17,7 @@ export default function DashboardView({animals, experiments, tasks}: DashboardVi
         experiments={experiments}
         animals={animals}
         tasks={tasks}
+        previousMonthData={previousMonthData}
       />
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
         <Card className="lg:col-span-4">
@@ -25,7 +26,7 @@ export default function DashboardView({animals, experiments, tasks}: DashboardVi
             <CardDescription>Population changes over the last 30 days</CardDescription>
           </CardHeader>
           <CardContent>
-            <AnimalPopulationChart />
+            <AnimalPopulationChart animals={animals} />
           </CardContent>
         </Card>
         <Card className="lg:col-span-3">
@@ -34,7 +35,7 @@ export default function DashboardView({animals, experiments, tasks}: DashboardVi
             <CardDescription>Current animal status distribution</CardDescription>
           </CardHeader>
           <CardContent>
-            <StatusStatisticsChart />
+            <StatusStatisticsChart animals={animals} />
           </CardContent>
         </Card>
         <Card className="lg:col-span-4">

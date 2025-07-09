@@ -1,15 +1,22 @@
-import { AnimalsHeader } from "@/src/components/animals/animals-header"
-import { AnimalsFilter } from "@/src/components/animals/animals-filter"
-import { AnimalsList } from "@/src/components/animals/animals-list"
+"use server"
 
-export default function AnimalsPage() {
+import AnimalContainer from "./animal.container";
+import { apiClient } from "@/src/lib/apiClient";
+
+export default async function AnimalsPage({params}: {params: {userId: string, labId: string}}) {
+  const {userId, labId} = await params;
+
+  const animalTypes = await apiClient.get(`/api/animals/types/${userId}/${labId}`);
+  const animals = await apiClient.get(`/api/animals/${userId}/${labId}`);
+  const animalEnums = await apiClient.get(`/api/animals/enums`);
+
   return (
-    <div className="space-y-6">
-      <AnimalsHeader />
-      <div className="grid gap-6 md:grid-cols-[240px_1fr]">
-        <AnimalsFilter />
-        <AnimalsList />
-      </div>
-    </div>
+    <AnimalContainer 
+      animalEnums={animalEnums.data}
+      animalTypes={animalTypes.data}
+      animals={animals.data}
+      userId={userId}
+      labId={labId} 
+    />
   )
 }
