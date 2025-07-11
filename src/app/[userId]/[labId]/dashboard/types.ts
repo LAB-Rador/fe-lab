@@ -36,10 +36,20 @@ export interface Experiment {
     title: string;
 }
 
+export interface Task {
+    laboratoryId: string;
+    assignedToId: string;
+    experimentId: string;
+    description: string;
+    dueDate: string;
+    title: string;
+    id: string;
+}
+
 export interface DashboardViewProps {
-    experiments: number;
+    experiments: Experiment[];
     animals: Animal[];
-    tasks: number;
+    tasks: Task[];
     previousMonthData?: {
         experiments: number;
         animals: number;
@@ -48,9 +58,9 @@ export interface DashboardViewProps {
 }
 
 export interface DashboardContainerProps {
-    experiments: number;
+    experiments: Experiment[];
     animals: Animal[];
-    tasks: number;
+    tasks: Task[];
     previousMonthData?: {
         experiments: number;
         animals: number;

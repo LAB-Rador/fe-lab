@@ -1,5 +1,3 @@
-"use client"
-
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { ChartContainer, ChartTooltipContent } from "@/src/components/ui/chart"
 import type { Animal } from "@/src/app/[userId]/[labId]/dashboard/types"

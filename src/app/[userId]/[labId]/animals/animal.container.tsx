@@ -1,9 +1,9 @@
 "use client";
 
-import type { CreateAnimalData } from "@/src/components/animals/types";
 import { AddAnimalDialog } from "@/src/components/animals/add-animal-dialog";
 import { AnimalsFilter } from "@/src/components/animals/animals-filter";
 import { AnimalsHeader } from "@/src/components/animals/animals-header";
+import type { CreateAnimalData } from "@/src/components/animals/types";
 import { AnimalsList } from "@/src/components/animals/animals-list";
 import type { AnimalType, AnimalTypes, NewAnimal } from "./types";
 import { Button } from "@/src/components/ui/button";

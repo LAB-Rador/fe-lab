@@ -3,7 +3,7 @@ import { AnimalPopulationChart } from "@/src/components/dashboard/animal-populat
 import { StatusStatisticsChart } from "@/src/components/dashboard/status-statistics-chart"
 import { SubscriptionStatus } from "@/src/components/dashboard/subscription-status"
 import { NotificationPanel } from "@/src/components/dashboard/notification-panel"
-import { DashboardStats } from "@/src/components/dashboard/dashboard-stats"
+import { DashboardStatus } from "@/src/components/dashboard/dashboard-status"
 import { UpcomingEvents } from "@/src/components/dashboard/upcoming-events"
 import type { DashboardViewProps } from "./types"
 
@@ -13,11 +13,11 @@ export default function DashboardView({animals, experiments, tasks, previousMont
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
       </div>
-      <DashboardStats 
+      <DashboardStatus 
+        previousMonthData={previousMonthData}
         experiments={experiments}
         animals={animals}
         tasks={tasks}
-        previousMonthData={previousMonthData}
       />
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
         <Card className="lg:col-span-4">

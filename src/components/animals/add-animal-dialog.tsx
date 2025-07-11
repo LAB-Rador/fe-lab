@@ -290,6 +290,22 @@ export function AddAnimalDialog({
                 )}
               />
 
+              {/* Strain */}
+              <FormField
+                control={form.control}
+                name="strain"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Strain</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., C57BL/6J, BALB/c" {...field} />
+                    </FormControl>
+                    <FormDescription>Genetic strain or breed of the animal</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               {/* Birth Date */}
               <FormField
                 control={form.control}
@@ -316,6 +332,9 @@ export function AddAnimalDialog({
                           onSelect={field.onChange}
                           disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
                           initialFocus
+                          captionLayout="dropdown"
+                          showOutsideDays={false}
+                          className="rounded-md border"
                         />
                       </PopoverContent>
                     </Popover>
@@ -344,33 +363,20 @@ export function AddAnimalDialog({
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
+                      <PopoverContent className="w-auto p-0 relative z-50" align="start">
                         <Calendar
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
                           disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
                           initialFocus
+                          captionLayout="dropdown"
+                          showOutsideDays={false}
+                          className="rounded-md border"
                         />
                       </PopoverContent>
                     </Popover>
                     <FormDescription>Date when the animal was acquired by the laboratory</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Strain */}
-              <FormField
-                control={form.control}
-                name="strain"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Strain</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., C57BL/6J, BALB/c" {...field} />
-                    </FormControl>
-                    <FormDescription>Genetic strain or breed of the animal</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
