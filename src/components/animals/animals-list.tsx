@@ -1,6 +1,7 @@
 "use client"
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
+import type { AnimalPagination } from "@/src/app/[userId]/[labId]/animals/types"
 import { LayoutGrid, LayoutList, MoreHorizontal, Edit } from "lucide-react"
 import { Checkbox } from "@/src/components/ui/checkbox"
 import { Animal, AnimalStatus, Sex } from "./types"
@@ -8,6 +9,7 @@ import { Button } from "@/src/components/ui/button"
 import { Badge } from "@/src/components/ui/badge"
 import { Card } from "@/src/components/ui/card"
 import { useParams } from "next/navigation"
+import { useState, useMemo } from "react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,24 +33,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/src/components/ui/select"
-import { useState, useMemo } from "react"
 import Link from "next/link"
 
-export function AnimalsList({animals}: {animals: Animal[]}) {
-  const [view, setView] = useState<"table" | "grid">("table")
+interface AnimalsListProps {
+  handleUpdateDataPagination: (data: {page?: number, pageSize?: number}) => void;
+  setPagination: (pagination: AnimalPagination) => void;
+  animalPagination: AnimalPagination;
+  animals: Animal[];
+}
+
+export function AnimalsList({animals, animalPagination, setPagination, handleUpdateDataPagination}: AnimalsListProps) {
   const [selectedAnimals, setSelectedAnimals] = useState<string[]>([])
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(10)
+  const [view, setView] = useState<"table" | "grid">("table")
   const params = useParams();
   const { userId, labId } = params;
   
-  // Calculate pagination
-  const totalPages = Math.ceil(animals.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const currentAnimals = animals.slice(startIndex, endIndex)
+  const currentAnimals = animals
+  const currentPage = animalPagination.currentPage
+  const totalPages = animalPagination.totalPages
+  const itemsPerPage = animalPagination.pageSize
+  const totalCount = animalPagination.totalCount
   
-  // Generate page numbers for pagination
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = Math.min(startIndex + itemsPerPage, totalCount)
+  
   const pageNumbers = useMemo(() => {
     const pages = []
     const maxVisiblePages = 5
@@ -70,14 +78,21 @@ export function AnimalsList({animals}: {animals: Animal[]}) {
   }
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page)
-    setSelectedAnimals([]) // Clear selections when changing page
+    setPagination({
+      ...animalPagination,
+      currentPage: page
+    })
+    handleUpdateDataPagination({page: Number(page)});
+    setSelectedAnimals([])
   }
 
   const handleItemsPerPageChange = (value: string) => {
-    setItemsPerPage(Number(value))
-    setCurrentPage(1) // Reset to first page
-    setSelectedAnimals([]) // Clear selections
+    setPagination({
+      ...animalPagination,
+      pageSize: Number(value)
+    })
+    handleUpdateDataPagination({pageSize: Number(value)});
+    setSelectedAnimals([])
   }
 
   const getStatusColor = (status: AnimalStatus) => {
@@ -206,11 +221,10 @@ export function AnimalsList({animals}: {animals: Animal[]}) {
             </TableBody>
           </Table>
           
-          {/* Pagination Controls */}
           <div className="flex flex-col gap-4 px-4 py-4 border-t border-gray-200 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
               <span className="text-sm text-gray-700">
-                Showing {startIndex + 1} to {Math.min(endIndex, animals.length)} of {animals.length} entries
+                Showing {startIndex + 1} to {endIndex} of {totalCount} entries
               </span>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-700">Rows per page:</span>
@@ -238,9 +252,9 @@ export function AnimalsList({animals}: {animals: Animal[]}) {
                         href="#" 
                         onClick={(e) => {
                           e.preventDefault()
-                          if (currentPage > 1) handlePageChange(currentPage - 1)
+                          if (animalPagination.hasPreviousPage) handlePageChange(currentPage - 1)
                         }}
-                        className={currentPage <= 1 ? "pointer-events-none opacity-50" : ""}
+                        className={!animalPagination.hasPreviousPage ? "pointer-events-none opacity-50" : ""}
                       />
                     </PaginationItem>
                     
@@ -291,9 +305,9 @@ export function AnimalsList({animals}: {animals: Animal[]}) {
                         href="#" 
                         onClick={(e) => {
                           e.preventDefault()
-                          if (currentPage < totalPages) handlePageChange(currentPage + 1)
+                          if (animalPagination.hasNextPage) handlePageChange(currentPage + 1)
                         }}
-                        className={currentPage >= totalPages ? "pointer-events-none opacity-50" : ""}
+                        className={!animalPagination.hasNextPage ? "pointer-events-none opacity-50" : ""}
                       />
                     </PaginationItem>
                   </PaginationContent>
@@ -375,11 +389,10 @@ export function AnimalsList({animals}: {animals: Animal[]}) {
             ))}
           </div>
           
-          {/* Grid Pagination Controls */}
           <div className="flex flex-col gap-4 px-4 py-4 border-t border-gray-200 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
               <span className="text-sm text-gray-700">
-                Showing {startIndex + 1} to {Math.min(endIndex, animals.length)} of {animals.length} entries
+                Showing {startIndex + 1} to {endIndex} of {totalCount} entries
               </span>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-700">Items per page:</span>
@@ -406,9 +419,9 @@ export function AnimalsList({animals}: {animals: Animal[]}) {
                         href="#" 
                         onClick={(e) => {
                           e.preventDefault()
-                          if (currentPage > 1) handlePageChange(currentPage - 1)
+                          if (animalPagination.hasPreviousPage) handlePageChange(currentPage - 1)
                         }}
-                        className={currentPage <= 1 ? "pointer-events-none opacity-50" : ""}
+                        className={!animalPagination.hasPreviousPage ? "pointer-events-none opacity-50" : ""}
                       />
                     </PaginationItem>
                     
@@ -459,9 +472,9 @@ export function AnimalsList({animals}: {animals: Animal[]}) {
                         href="#" 
                         onClick={(e) => {
                           e.preventDefault()
-                          if (currentPage < totalPages) handlePageChange(currentPage + 1)
+                          if (animalPagination.hasNextPage) handlePageChange(currentPage + 1)
                         }}
-                        className={currentPage >= totalPages ? "pointer-events-none opacity-50" : ""}
+                        className={!animalPagination.hasNextPage ? "pointer-events-none opacity-50" : ""}
                       />
                     </PaginationItem>
                   </PaginationContent>

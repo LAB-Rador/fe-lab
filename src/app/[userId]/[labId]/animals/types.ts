@@ -1,3 +1,4 @@
+import type { AgeGroup } from "@/src/components/animals/types";
 import type { AnimalStatus, Sex } from "../../types";
 
 export interface Animal {
@@ -57,15 +58,32 @@ export interface NewAnimal {
     sex?: Sex;
 }
 
+export interface AnimalPagination {
+    hasPreviousPage: boolean;
+    hasNextPage: boolean;
+    currentPage: number;
+    totalCount: number;
+    totalPages: number;
+    pageSize: number;
+}
+
 export interface AnimalEnums {
     status: AnimalStatus[];
     sex: Sex[];
 }
 
 export interface AnimalTypes {
+    animalPagination: AnimalPagination;
     animalTypes: AnimalType[];
     animalEnums: AnimalEnums;
     animals: Animal[];
     userId: string;
     labId: string;
 }
+
+export interface FiltersType {
+    animalTypes?: string[];
+    statuses?: AnimalStatus[];
+    sex?: Sex | null;
+    ageGroups?: AgeGroup[];
+  }

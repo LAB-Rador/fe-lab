@@ -13,6 +13,13 @@ export enum AnimalStatus {
     TRANSFERRED = "TRANSFERRED",
     RETIRED = "RETIRED",
 }
+
+export enum AgeGroup {
+    JUVENILE = "JUVENILE",
+    YOUNG_ADULT = "YOUNG_ADULT",
+    ADULT = "ADULT",
+    SENIOR = "SENIOR",
+}
   
 export interface Animal {
     animalType: AnimalType;
