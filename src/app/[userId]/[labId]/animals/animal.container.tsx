@@ -1,11 +1,11 @@
 "use client";
 
+import type { AnimalPagination, AnimalType, AnimalTypes, FiltersType, NewAnimal } from "./types";
 import { AddAnimalDialog } from "@/src/components/animals/add-animal-dialog";
 import { AnimalsFilter } from "@/src/components/animals/animals-filter";
 import { AnimalsHeader } from "@/src/components/animals/animals-header";
 import type { CreateAnimalData } from "@/src/components/animals/types";
 import { AnimalsList } from "@/src/components/animals/animals-list";
-import type { AnimalType, AnimalTypes, NewAnimal } from "./types";
 import { Button } from "@/src/components/ui/button";
 import { apiClient } from "@/src/lib/apiClient";
 import { AnimalStatus } from "../../types";
@@ -14,11 +14,19 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes}: AnimalTypes) => {
-    const [animalsData, setAnimalsData] = useState<Animal[]>(animals)
+const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, animalPagination}: AnimalTypes) => {
     const [animalTypesData, setAnimalTypesData] = useState<AnimalType[]>(animalTypes)
+    const [pagination, setPagination] = useState<AnimalPagination>(animalPagination)
     const [newAnimalType, setNewAnimalType] = useState<AnimalType | null>(null)
-    
+    const [animalsData, setAnimalsData] = useState<Animal[]>(animals)
+    const [filters, setFilters] = useState<FiltersType>({})
+
+    const handleUpdateDataPagination = async (data: {page?: number, pageSize?: number, filters?: any}) => {
+        const response = await apiClient.get(`/api/animals/${userId}/${labId}/${data.pageSize || pagination.pageSize}/${data.page || pagination.currentPage}/${JSON.stringify(data.filters) || JSON.stringify(filters)}`)
+        setPagination(response.pagination)
+        setAnimalsData(response.data)
+    }
+
     const handleAddAnimal = async (data: CreateAnimalData) => {
         try {
             const newAnimal: NewAnimal = {
@@ -93,8 +101,18 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes}: Ani
         <div className="space-y-6">
             <AnimalsHeader addAnimalTrigger={addAnimalTrigger} />
             <div className="grid gap-6 md:grid-cols-[240px_1fr]">
-                <AnimalsFilter />
-                <AnimalsList animals={animalsData} />
+                <AnimalsFilter
+                    handleUpdateDataPagination={handleUpdateDataPagination}
+                    animalTypes={animalTypesData}
+                    animalEnums={animalEnums}
+                    setFilters={setFilters}
+                />
+                <AnimalsList
+                    handleUpdateDataPagination={handleUpdateDataPagination}
+                    setPagination={setPagination}
+                    animalPagination={pagination}
+                    animals={animalsData}
+                />
             </div>
         </div>
     )
