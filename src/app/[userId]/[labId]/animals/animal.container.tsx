@@ -19,12 +19,30 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
     const [pagination, setPagination] = useState<AnimalPagination>(animalPagination)
     const [newAnimalType, setNewAnimalType] = useState<AnimalType | null>(null)
     const [animalsData, setAnimalsData] = useState<Animal[]>(animals)
+    const [animalSearch, setAnimalSearch] = useState<string>("")
     const [filters, setFilters] = useState<FiltersType>({})
 
     const handleUpdateDataPagination = async (data: {page?: number, pageSize?: number, filters?: any}) => {
         const response = await apiClient.get(`/api/animals/${userId}/${labId}/${data.pageSize || pagination.pageSize}/${data.page || pagination.currentPage}/${JSON.stringify(data.filters) || JSON.stringify(filters)}`)
         setPagination(response.pagination)
         setAnimalsData(response.data)
+    }
+
+    const handleSearch = (search: string) => {
+        setAnimalSearch(search)
+
+        const filteredAnimals = animals.filter((animal) => {
+            return animal.sex?.toLowerCase().includes(search.toLowerCase()) || animal.sex === null
+            || animal.animalType?.name?.toLowerCase().includes(search.toLowerCase())
+            || animal.identifier.toLowerCase().includes(search.toLowerCase())
+            || animal.genotype?.toLowerCase().includes(search.toLowerCase())
+            || animal.location?.toLowerCase().includes(search.toLowerCase())
+            || animal.status?.toLowerCase().includes(search.toLowerCase())
+            || animal.strain?.toLowerCase().includes(search.toLowerCase())
+            || animal.name?.toLowerCase().includes(search.toLowerCase()) 
+        })
+
+        setAnimalsData(filteredAnimals)
     }
 
     const handleAddAnimal = async (data: CreateAnimalData) => {
@@ -99,7 +117,11 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
     
     return (
         <div className="space-y-6">
-            <AnimalsHeader addAnimalTrigger={addAnimalTrigger} />
+            <AnimalsHeader 
+                addAnimalTrigger={addAnimalTrigger}
+                handleSearch={handleSearch}
+                animalSearch={animalSearch}
+            />
             <div className="grid gap-6 md:grid-cols-[240px_1fr]">
                 <AnimalsFilter
                     handleUpdateDataPagination={handleUpdateDataPagination}

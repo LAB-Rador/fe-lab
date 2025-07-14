@@ -8,8 +8,8 @@ export default async function Page ({params}: PageProps) {
 
   const {userId, labId} = await params;
 
+  const animals = await apiClient.get(`/api/animals/${userId}/${labId}/999999/1/${JSON.stringify({})}`);
   const experiments = await apiClient.get(`/api/experiments/${userId}/${labId}`);
-  const animals = await apiClient.get(`/api/animals/${userId}/${labId}/10/1/${JSON.stringify({})}`);
   const tasks = await apiClient.get(`/api/tasks/${userId}/${labId}`);
 
   return (
