@@ -27,7 +27,7 @@ export function LoginForm() {
     setIsLoading(true)
 
     try {
-      const response = await AuthService.login(email, password);
+      const response = await AuthService.login(email || process.env.NEXT_PUBLIC_GUEST_EMAIL || "", password || process.env.NEXT_PUBLIC_GUEST_PASSWORD || "");
       toast(`${response.message || response.error}`, {
         description: `${response?.user.firstName} ${response?.user.lastName} - ${response?.user.institution}`
       });
@@ -49,59 +49,64 @@ export function LoginForm() {
   }, [email, password, router]);
 
   return (
-    <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="email">Email address</Label>
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            required
-            placeholder="name@laboratory.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full"
-          />
-        </div>
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="password">Password</Label>
-            <Link href="/forgot-password" className="text-sm font-medium text-blue-600 hover:text-blue-500">
-              Forgot password?
-            </Link>
-          </div>
-          <div className="relative">
+    <>
+      <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email">Email address</Label>
             <Input
-              id="password"
-              name="password"
-              type={!showPassword ? "text" : "password"}
-              autoComplete="current-password"
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
               required
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full pr-10"
+              placeholder="name@laboratory.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full"
             />
-            <button
-              type="button"
-              className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-500"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? (
-                <EyeOffIcon className="h-5 w-5" aria-hidden="true" />
-              ) : (
-                <EyeIcon className="h-5 w-5" aria-hidden="true" />
-              )}
-            </button>
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password">Password</Label>
+              <Link href="/forgot-password" className="text-sm font-medium text-blue-600 hover:text-blue-500">
+                Forgot password?
+              </Link>
+            </div>
+            <div className="relative">
+              <Input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
+                required
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full pr-10"
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-500"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {!showPassword ? (
+                  <EyeOffIcon className="h-5 w-5" aria-hidden="true" />
+                ) : (
+                  <EyeIcon className="h-5 w-5" aria-hidden="true" />
+                )}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={isLoading}>
-        {isLoading ? "Signing in..." : "Sign in"}
+        <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={isLoading}>
+          {isLoading ? "Signing in..." : "Sign in"}
+        </Button>
+      </form>
+      <Button type="button" className="w-full bg-blue-600 hover:bg-blue-700" disabled={isLoading} onClick={handleSubmit}>
+          {isLoading ? "Accessing..." : "Guest access"}
       </Button>
-    </form>
+    </>
   )
 }

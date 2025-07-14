@@ -196,7 +196,7 @@ export default function ForgotPasswordPage() {
                     <Input
                       id="password"
                       name="password"
-                      type={!showPassword ? "text" : "password"}
+                      type={showPassword ? "text" : "password"}
                       autoComplete="new-password"
                       required
                       placeholder="••••••••"
@@ -209,7 +209,7 @@ export default function ForgotPasswordPage() {
                       className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-500"
                       onClick={() => setShowPassword(!showPassword)}
                     >
-                      {showPassword ? (
+                      {!showPassword ? (
                         <EyeOffIcon className="h-5 w-5" aria-hidden="true" />
                       ) : (
                         <EyeIcon className="h-5 w-5" aria-hidden="true" />
@@ -251,7 +251,7 @@ export default function ForgotPasswordPage() {
                     <Input
                       id="confirmPassword"
                       name="confirmPassword"
-                      type={!showConfirmPassword ? "text" : "password"}
+                      type={showConfirmPassword ? "text" : "password"}
                       autoComplete="new-password"
                       required
                       placeholder="••••••••"
@@ -264,7 +264,7 @@ export default function ForgotPasswordPage() {
                       className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-500"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     >
-                      {showConfirmPassword ? (
+                      {!showConfirmPassword ? (
                         <EyeOffIcon className="h-5 w-5" aria-hidden="true" />
                       ) : (
                         <EyeIcon className="h-5 w-5" aria-hidden="true" />
