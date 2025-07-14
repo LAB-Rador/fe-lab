@@ -27,7 +27,7 @@ export function LoginForm() {
     setIsLoading(true)
 
     try {
-      const response = await AuthService.login(email || process.env.NEXT_PUBLIC_GUEST_EMAIL || "", password || process.env.NEXT_PUBLIC_GUEST_PASSWORD || "");
+      const response = await AuthService.login(email || process.env.NEXT_PUBLIC_GUEST_EMAIL as string, password || process.env.NEXT_PUBLIC_GUEST_PASSWORD as string);
       toast(`${response.message || response.error}`, {
         description: `${response?.user.firstName} ${response?.user.lastName} - ${response?.user.institution}`
       });
