@@ -10,14 +10,18 @@ import { Button } from "@/src/components/ui/button";
 import { apiClient } from "@/src/lib/apiClient";
 import { AnimalStatus } from "../../types";
 import type { Animal } from "./types";
-import { Plus } from "lucide-react";
+import { Edit, Plus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { EditAnimalDialog } from "@/src/components/animals/edit-animal-dialog";
 
 const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, animalPagination}: AnimalTypes) => {
     const [animalTypesData, setAnimalTypesData] = useState<AnimalType[]>(animalTypes)
     const [pagination, setPagination] = useState<AnimalPagination>(animalPagination)
     const [newAnimalType, setNewAnimalType] = useState<AnimalType | null>(null)
+    const [selectedAnimal, setSelectedAnimal] = useState<Animal | null>(null)
+    const [openEditAnimalDialog, setOpenEditAnimalDialog] = useState(false)
+    const [openAddAnimalDialog, setOpenAddAnimalDialog] = useState(false)
     const [animalsData, setAnimalsData] = useState<Animal[]>(animals)
     const [animalSearch, setAnimalSearch] = useState<string>("")
     const [filters, setFilters] = useState<FiltersType>({})
@@ -78,8 +82,47 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
             }
         } catch (error) {
             console.error("Error adding animal:", error)
+        }  
+    }
+
+    const handleEditAnimal = async (data: CreateAnimalData) => {
+        try {
+            const newAnimal: NewAnimal = {
+                id: data.id,
+                userId: userId,
+                identifier: data.identifier,
+                laboratoryId: data.laboratoryId,
+                newAnimalType: {
+                    name: newAnimalType?.name || "",
+                    description: newAnimalType?.description || ""
+                },
+                customFields: [],
+                animalTypeId: data.animalTypeId === "null" ? "" : data.animalTypeId,
+                name: data.name,
+                birthDate: data.birthDate?.toISOString().split('T')[0], // Конвертируем в строку формата YYYY-MM-DD
+                acquisitionDate: data.acquisitionDate?.toISOString().split('T')[0] || new Date().toISOString().split('T')[0],
+                sex: data.sex,
+                strain: data.strain,
+                genotype: data.genotype,
+                status: (data.status as any) || AnimalStatus.ACTIVE,
+                location: data.location,
+                origin: data.origin,
+            }
+
+            const response = await apiClient.put(`/api/animals`, newAnimal);
+            toast(response.message || response.error, {
+                description: `${newAnimal.identifier} - ${newAnimal.name}`
+            });
+            if(response.success && response.data) {
+                // Предполагаем, что сервер возвращает полный объект Animal в response.data
+                const updatedAnimals = animalsData.filter((animal) => {
+                    return animal.id !== newAnimal.id
+                });
+                setAnimalsData((prev) => [...updatedAnimals, response.data as Animal])
+            }
+        } catch (error) {
+            console.error("Error adding animal:", error)
         }
-        
     }
 
     const handleAddAnimalType = async (typeName: string): Promise<string> => {
@@ -97,28 +140,36 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
 
         return typeName
     }
-    
-    const addAnimalTrigger = (
-        <AddAnimalDialog 
-            onAddAnimalType={handleAddAnimalType}
-            animalTypes={animalTypesData}
-            onSubmit={handleAddAnimal}
-            animalEnums={animalEnums}
-            userId={userId}
-            labId={labId}
-            trigger={
-                <Button className="bg-blue-600 hover:bg-blue-700">
-                    <Plus className="mr-1 h-4 w-4" />
-                    Add Animal
-                </Button>
-            }
-        />
-    )
-    
+
     return (
         <div className="space-y-6">
+            <EditAnimalDialog 
+                onAddAnimalType={handleAddAnimalType}
+                setOpen={setOpenEditAnimalDialog}
+                submitButtonText={"Edit Animal"}
+                selectedAnimal={selectedAnimal}
+                animalTypes={animalTypesData}
+                loadingButtonText={"Editing"}
+                onSubmit={handleEditAnimal}
+                open={openEditAnimalDialog}
+                animalEnums={animalEnums}
+                userId={userId}
+                labId={labId}
+            />
+            <AddAnimalDialog 
+                onAddAnimalType={handleAddAnimalType}
+                setOpen={setOpenAddAnimalDialog}
+                submitButtonText={"Add Animal"}
+                animalTypes={animalTypesData}
+                loadingButtonText={"Adding"}
+                open={openAddAnimalDialog}
+                onSubmit={handleAddAnimal}
+                animalEnums={animalEnums}
+                userId={userId}
+                labId={labId}
+            />
             <AnimalsHeader 
-                addAnimalTrigger={addAnimalTrigger}
+                setOpen={setOpenAddAnimalDialog}
                 handleSearch={handleSearch}
                 animalSearch={animalSearch}
             />
@@ -131,6 +182,8 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
                 />
                 <AnimalsList
                     handleUpdateDataPagination={handleUpdateDataPagination}
+                    setSelectedAnimal={setSelectedAnimal}
+                    setOpen={setOpenEditAnimalDialog}
                     setPagination={setPagination}
                     animalPagination={pagination}
                     animals={animalsData}

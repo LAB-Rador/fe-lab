@@ -66,5 +66,6 @@ export interface CreateAnimalData {
     strain?: string;
     origin?: string;
     name?: string;
+    id?: string;
     sex?: Sex;
 }

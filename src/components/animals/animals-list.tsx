@@ -38,11 +38,13 @@ import Link from "next/link"
 interface AnimalsListProps {
   handleUpdateDataPagination: (data: {page?: number, pageSize?: number}) => void;
   setPagination: (pagination: AnimalPagination) => void;
+  setSelectedAnimal: (animal: Animal) => void;
   animalPagination: AnimalPagination;
   animals: Animal[];
+  setOpen: (open: boolean) => void;
 }
 
-export function AnimalsList({animals, animalPagination, setPagination, handleUpdateDataPagination}: AnimalsListProps) {
+export function AnimalsList({animals, animalPagination, setPagination, handleUpdateDataPagination, setSelectedAnimal, setOpen}: AnimalsListProps) {
   const [selectedAnimals, setSelectedAnimals] = useState<string[]>([])
   const [view, setView] = useState<"table" | "grid">("table")
   const params = useParams();
@@ -159,7 +161,7 @@ export function AnimalsList({animals, animalPagination, setPagination, handleUpd
                   <TableHead>Strain</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Location</TableHead>
-                <TableHead className="w-12">Actions</TableHead>
+                  <TableHead className="w-12">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -193,9 +195,17 @@ export function AnimalsList({animals, animalPagination, setPagination, handleUpd
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
-                      <Button variant="ghost" size="sm" className="h-8 px-2">
-                        <Edit className="h-3.5 w-3.5" />
-                        <span className="sr-only">Edit animal</span>
+                      <Button 
+                          onClick={() => {
+                              setSelectedAnimal(animal);
+                              setOpen(true)}
+                          }
+                          className="h-8 px-2"
+                          variant="ghost"
+                          size="sm"
+                      >
+                          <Edit className="h-3.5 w-3.5" />
+                          <span className="sr-only">Edit animal</span>
                       </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -208,7 +218,14 @@ export function AnimalsList({animals, animalPagination, setPagination, handleUpd
                           <Link href={`/${userId}/${labId}/animals/${animal.id}`} key={animal.id}>
                             <DropdownMenuItem>View details</DropdownMenuItem>
                           </Link>
-                          <DropdownMenuItem>Edit animal</DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setSelectedAnimal(animal);
+                              setOpen(true)
+                            }}
+                          >
+                            Edit animal
+                          </DropdownMenuItem>
                           <DropdownMenuItem>Add measurement</DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem className="text-red-600">Archive animal</DropdownMenuItem>
@@ -363,7 +380,15 @@ export function AnimalsList({animals, animalPagination, setPagination, handleUpd
                   </div>
                 </div>
                 <div className="mt-4 flex items-center justify-end gap-1">
-                  <Button variant="ghost" size="sm" className="h-8 px-2">
+                  <Button
+                    onClick={() => {
+                      setSelectedAnimal(animal);
+                      setOpen(true)
+                    }}
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-8 px-2"
+                  >
                     <Edit className="h-3.5 w-3.5" />
                     <span className="sr-only">Edit animal</span>
                   </Button>
@@ -378,7 +403,14 @@ export function AnimalsList({animals, animalPagination, setPagination, handleUpd
                       <Link href={`/${userId}/${labId}/animals/${animal.id}`} key={animal.id}>
                           <DropdownMenuItem>View details</DropdownMenuItem>
                       </Link>
-                      <DropdownMenuItem>Edit animal</DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          setSelectedAnimal(animal);
+                          setOpen(true)
+                        }}
+                      >
+                        Edit animal
+                      </DropdownMenuItem>
                       <DropdownMenuItem>Add measurement</DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem className="text-red-600">Archive animal</DropdownMenuItem>

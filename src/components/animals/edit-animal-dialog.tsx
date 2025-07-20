@@ -2,18 +2,19 @@
 
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/src/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
-import { Sex, AnimalStatus, type CreateAnimalData, type AnimalType } from "./types"
+import { Sex, AnimalStatus, type CreateAnimalData, type AnimalType, type Animal } from "./types"
 import { Popover, PopoverContent, PopoverTrigger } from "@/src/components/ui/popover"
+import type { AnimalEnums } from "@/src/app/[userId]/[labId]/animals/types"
 import { Calendar } from "@/src/components/ui/calendar"
 import { Textarea } from "@/src/components/ui/textarea"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/src/components/ui/button"
 import { CalendarIcon, Plus } from "lucide-react"
 import { Input } from "@/src/components/ui/input"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { cn } from "@/src/lib/utils"
 import { format } from "date-fns"
-import { useState } from "react"
 import type React from "react"
 import * as z from "zod"
 import {
@@ -25,9 +26,9 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/src/components/ui/dialog'
-import type { AnimalEnums } from "@/src/app/[userId]/[labId]/animals/types"
 
 const formSchema = z.object({
+    id: z.string(),
     identifier: z.string().min(1, "Identifier is required").max(50, "Identifier must be less than 50 characters"),
     name: z.string().optional(),
     animalTypeId: z.string().min(1, "Animal type is required"),
@@ -46,9 +47,9 @@ interface AddAnimalDialogProps {
     onAddAnimalType: (typeName: string) => Promise<string>
     onSubmit: (data: CreateAnimalData) => Promise<void>
     setOpen: (open: boolean) => void
+    selectedAnimal: Animal | null
     loadingButtonText: string
     animalTypes: AnimalType[]
-    trigger?: React.ReactNode
     animalEnums: AnimalEnums
     submitButtonText: string
     userId: string
@@ -56,13 +57,14 @@ interface AddAnimalDialogProps {
     open: boolean
 }
 
-export function AddAnimalDialog({ 
+export function EditAnimalDialog({ 
     loadingButtonText,
     submitButtonText,
     onAddAnimalType,
+    selectedAnimal,
     animalTypes,
     animalEnums,
-    onSubmit, 
+    onSubmit,
     setOpen,
     labId,
     open,
@@ -71,9 +73,42 @@ export function AddAnimalDialog({
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [newTypeValue, setNewTypeValue] = useState("")
 
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      laboratoryId: labId,
+      status: undefined,
+      animalTypeId: "",
+      identifier: "",
+      sex: undefined,
+      location: "",
+      genotype: "",
+      strain: "",
+      origin: "",
+      name: "",
+    },
+  })
+
+  useEffect(() => {
+    if (selectedAnimal) {
+      form.reset({
+        id: selectedAnimal?.id,
+        laboratoryId: labId,
+        status: selectedAnimal?.status,
+        animalTypeId: selectedAnimal?.animalTypeId,
+        identifier: selectedAnimal?.identifier,
+        sex: selectedAnimal?.sex,
+        location: selectedAnimal?.location,
+        genotype: selectedAnimal?.genotype,
+        strain: selectedAnimal?.strain,
+        origin: selectedAnimal?.origin,
+        name: selectedAnimal?.name,
+        birthDate: selectedAnimal?.birthDate ? new Date(selectedAnimal.birthDate) : undefined,
+        acquisitionDate: selectedAnimal?.acquisitionDate ? new Date(selectedAnimal.acquisitionDate) : undefined,
+      })
+    } else {
+      form.reset({
         laboratoryId: labId,
         status: undefined,
         animalTypeId: "",
@@ -84,17 +119,14 @@ export function AddAnimalDialog({
         strain: "",
         origin: "",
         name: "",
-    },
-  })
+      })
+    }
+  }, [selectedAnimal]);
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true)
     try {
-      await onSubmit({
-        ...values,
-        acquisitionDate: values.acquisitionDate || new Date(),
-        status: values.status || AnimalStatus.ACTIVE,
-      })
+      await onSubmit(values)
       form.reset()
       setOpen(false)
     } catch (error) {
@@ -136,9 +168,9 @@ export function AddAnimalDialog({
         }}
       >
         <DialogHeader>
-          <DialogTitle>Add New Animal</DialogTitle>
+          <DialogTitle>Edit Animal ({selectedAnimal?.identifier} - {selectedAnimal?.name})</DialogTitle>
           <DialogDescription>
-            Enter the details for the new animal. Fields marked with * are required.
+            Edit the details for the animal. Fields marked with * are required.
           </DialogDescription>
         </DialogHeader>
 
