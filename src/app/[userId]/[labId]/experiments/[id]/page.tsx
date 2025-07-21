@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { use, useState } from "react"
 import Link from "next/link"
 import {
   ArrowLeft,
@@ -144,8 +144,10 @@ const experimentData = {
   ],
 }
 
-export default function ExperimentDetailPage({ params }: { params: { id: string } }) {
-  const [activeTab, setActiveTab] = useState("overview")
+  export default function ExperimentDetailPage({ params }: { params: Promise<{ id: string }> }) {
+    const [activeTab, setActiveTab] = useState("overview")
+    const resolvedParams = use(params)
+    const experimentId = resolvedParams.id
 
   // In a real app, you would fetch the experiment data based on the ID
   const experiment = experimentData

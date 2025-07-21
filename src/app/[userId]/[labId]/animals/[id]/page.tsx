@@ -1,17 +1,24 @@
+"use client"
+
+import { AnimalMedicalRecords } from "@/src/components/animals/animal/animal-medical-records"
+import { AnimalMeasurements } from "@/src/components/animals/animal/animal-measurements"
+import { AnimalExperiments } from "@/src/components/animals/animal/animal-experiments"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
+import { AnimalBasicInfo } from "@/src/components/animals/animal/animal-basic-info"
+import { AnimalGenealogy } from "@/src/components/animals/animal/animal-genealogy"
+import { Avatar, AvatarFallback, AvatarImage } from "@/src/components/ui/avatar"
+import { QuickActionPanel } from "@/src/components/animals/quick-action-panel"
+import { Calendar, Clock, Edit, MapPin, Plus } from "lucide-react"
 import { Button } from "@/src/components/ui/button"
 import { Badge } from "@/src/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/src/components/ui/avatar"
-import { Calendar, Clock, Edit, MapPin, Plus } from "lucide-react"
-import { AnimalBasicInfo } from "@/src/components/animals/animal/animal-basic-info"
-import { AnimalMeasurements } from "@/src/components/animals/animal/animal-measurements"
-import { AnimalMedicalRecords } from "@/src/components/animals/animal/animal-medical-records"
-import { AnimalExperiments } from "@/src/components/animals/animal/animal-experiments"
-import { AnimalGenealogy } from "@/src/components/animals/animal/animal-genealogy"
-import { QuickActionPanel } from "@/src/components/animals/quick-action-panel"
+import { useParams, useRouter } from "next/navigation"
+import { use } from "react"
 
-export default function AnimalDetailPage() {
-  // This would be fetched from an API in a real application
+export default function AnimalDetailPage({params}: {params: Promise<{id: string}>}) {
+  const resolvedParams = use(params);
+  const animalId = resolvedParams.id;
+  const {userId, labId} = useParams();
+  const router = useRouter();
   const animal = {
     id: "M-2023-156",
     name: "Subject M-156",
@@ -69,7 +76,12 @@ export default function AnimalDetailPage() {
               <Edit className="h-4 w-4 mr-2" />
               Edit
             </Button>
-            <Button size="sm">
+            <Button
+              onClick={() => {
+                router.push(`/${userId}/${labId}/animals/${animalId}/measurements/new`)
+              }}
+              size="sm"
+            >
               <Plus className="h-4 w-4 mr-2" />
               New Measurement
             </Button>

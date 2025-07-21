@@ -1,10 +1,7 @@
-"use client"
-
-import type React from "react"
-
 import { DashboardHeader } from "@/src/components/dashboard/dashboard-header"
 import { SidebarProvider } from "@/src/components/sidebar-provider"
 import { Sidebar } from "@/src/components/sidebar"
+import type React from "react"
 
 export default function DashboardLayout({
   children,

@@ -1,22 +1,35 @@
-import { Button } from "@/src/components/ui/button"
+"use client"
+
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
+import { ArrowLeft, Calendar, Clock, ImageIcon, Plus, Trash, Upload } from "lucide-react"
+import { Separator } from "@/src/components/ui/separator"
+import { Textarea } from "@/src/components/ui/textarea"
+import { useParams, useRouter } from "next/navigation"
+import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
-import { Textarea } from "@/src/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
-import { ArrowLeft, Calendar, Clock, ImageIcon, Plus, Trash, Upload } from "lucide-react"
 import Link from "next/link"
-import { Separator } from "@/src/components/ui/separator"
+import { use } from "react"
 
-export default function NewMeasurementPage({ params }: { params: { id: string } }) {
-  const animalId = params.id
-
+export default function NewMeasurementPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = use(params);
+  const {userId, labId} = useParams();
+  const animalId = resolvedParams.id;
+  const router = useRouter();
   return (
     <div className="container mx-auto p-4 md:p-6">
       <div className="space-y-6">
         <div className="flex items-center gap-2">
-          <Link href={`/animals/${animalId}`}>
-            <Button variant="ghost" size="sm" className="gap-1">
+          <Link href={`/${userId}/${labId}/animals/${animalId}`}>
+            <Button 
+              onClick={() => {
+                router.back()
+              }}
+              variant="ghost" 
+              size="sm" 
+              className="gap-1"
+            >
               <ArrowLeft className="h-4 w-4" />
               Back to Animal
             </Button>

@@ -15,8 +15,8 @@ export interface Animal {
     strain?: string;
     origin?: string;
     name?: string;
-    sex?: Sex;
     id?: string;
+    sex?: Sex;
 }
 
 export interface AnimalType {
@@ -82,8 +82,8 @@ export interface AnimalTypes {
 }
 
 export interface FiltersType {
-    animalTypes?: string[];
     statuses?: AnimalStatus[];
-    sex?: Sex | null;
+    animalTypes?: string[];
     ageGroups?: AgeGroup[];
+    sex?: Sex | null;
   }
