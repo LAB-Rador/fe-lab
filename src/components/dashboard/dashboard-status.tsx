@@ -1,6 +1,7 @@
 import type { Animal, Experiment, Task } from "@/src/app/[userId]/[labId]/dashboard/types"
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { Beaker, MousePointer, ClipboardList, AlertTriangle } from "lucide-react"
+import { useMemo } from "react"
 
 interface DashboardStatusProps {
   experiments: Experiment[];
@@ -13,7 +14,6 @@ interface DashboardStatusProps {
   };
 }
 
-// Функция для расчета процента изменения
 function calculatePercentageChange(current: number, previous: number): { 
   percentage: number; 
   isPositive: boolean; 
@@ -35,7 +35,6 @@ function calculatePercentageChange(current: number, previous: number): {
   };
 }
 
-// Функция для форматирования текста статистики
 function formatPercentageText(current: number, previous: number, type: 'animals' | 'experiments' | 'tasks'): { 
   text: string; 
   className: string 
@@ -51,7 +50,6 @@ function formatPercentageText(current: number, previous: number, type: 'animals'
       };
     }
     
-    // Ограничиваем максимальный процент для более понятного отображения
     if (percentage > 500) {
       const diff = current - previous;
       const sign = diff > 0 ? "+" : "";
@@ -71,7 +69,6 @@ function formatPercentageText(current: number, previous: number, type: 'animals'
       className: `text-xs ${color}` 
     };
   } else if (type === 'experiments') {
-    // Для экспериментов показываем абсолютные числа
     const diff = current - previous;
     
     if (diff === 0) {
@@ -89,7 +86,6 @@ function formatPercentageText(current: number, previous: number, type: 'animals'
       className: `text-xs ${color}` 
     };
   } else if (type === 'tasks') {
-    // Для задач показываем количество на сегодня
     if (current === 0) {
       return { 
         text: "No task today", 
@@ -110,18 +106,17 @@ function formatPercentageText(current: number, previous: number, type: 'animals'
 }
 
 export function DashboardStatus({animals, experiments, tasks, previousMonthData}: DashboardStatusProps) {
-  // Получаем форматированный текст для каждой статистики
-  const animalsChange = previousMonthData ?
+  const animalsChange = useMemo(() => previousMonthData ?
     formatPercentageText(animals.length, previousMonthData.animals, 'animals') : 
-    { text: "No previous data", className: "text-xs text-gray-500" };
-    
-  const experimentsChange = previousMonthData ? 
+    { text: "No previous data", className: "text-xs text-gray-500" }, [animals, previousMonthData]);
+
+  const experimentsChange = useMemo(() => previousMonthData ? 
     formatPercentageText(experiments.length, previousMonthData.experiments, 'experiments') : 
-    { text: "No previous data", className: "text-xs text-gray-500" };
-    
-  const tasksChange = previousMonthData ? 
+    { text: "No previous data", className: "text-xs text-gray-500" }, [experiments, previousMonthData]);
+
+  const tasksChange = useMemo(() => previousMonthData ? 
     formatPercentageText(tasks.length, previousMonthData.tasks, 'tasks') : 
-    { text: "No previous data", className: "text-xs text-gray-500" };
+    { text: "No previous data", className: "text-xs text-gray-500" }, [tasks, previousMonthData]);
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

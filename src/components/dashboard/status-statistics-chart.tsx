@@ -5,7 +5,6 @@ import { ChartContainer, ChartTooltipContent } from "@/src/components/ui/chart"
 import type { Animal } from "@/src/app/[userId]/[labId]/dashboard/types"
 import { useMemo } from "react"
 
-// Маппинг статусов животных с русскими названиями и цветами
 const statusMapping = {
   ACTIVE: { label: "Active", color: "#10B981" },
   EXPERIMENT: { label: "Experiment", color: "#8B5CF6" },
@@ -16,13 +15,11 @@ const statusMapping = {
   DECEASED: { label: "Deceased", color: "#EF4444" },
 } as const
 
-// Функция для обработки данных животных по статусам
 function processStatusData(animals: Animal[]) {
   if (!animals || animals.length === 0) {
     return []
   }
 
-  // Группируем животных по статусам
   const statusCounts = animals.reduce((acc, animal) => {
     const status = animal.status
     if (!acc[status]) {
@@ -32,7 +29,6 @@ function processStatusData(animals: Animal[]) {
     return acc
   }, {} as Record<string, number>)
 
-  // Преобразуем в формат для PieChart
   const chartData = Object.entries(statusCounts)
     .map(([status, count]) => ({
       name: statusMapping[status as keyof typeof statusMapping]?.label || status,
@@ -40,13 +36,25 @@ function processStatusData(animals: Animal[]) {
       color: statusMapping[status as keyof typeof statusMapping]?.color || "#6B7280",
       status: status
     }))
-    .sort((a, b) => b.value - a.value) // Сортируем по убыванию
-
+    .sort((a, b) => b.value - a.value)
+  
   return chartData
 }
 
 export function StatusStatisticsChart({animals}: {animals: Animal[]}) {
   const chartData = useMemo(() => processStatusData(animals), [animals])
+
+  const config = useMemo(() => {
+    if (!chartData || chartData.length === 0) return {}
+    
+    return chartData.reduce((acc, item) => {
+      acc[item.status] = {
+        label: item.name,
+        color: item.color,
+      }
+      return acc
+    }, {} as Record<string, { label: string; color: string }>)
+  }, [chartData])
 
   if (!chartData || chartData.length === 0) {
     return (
@@ -55,15 +63,6 @@ export function StatusStatisticsChart({animals}: {animals: Animal[]}) {
       </div>
     )
   }
-
-  // Создаем конфигурацию для каждого статуса
-  const config = chartData.reduce((acc, item) => {
-    acc[item.status] = {
-      label: item.name,
-      color: item.color,
-    }
-    return acc
-  }, {} as Record<string, { label: string; color: string }>)
 
   return (
     <ChartContainer

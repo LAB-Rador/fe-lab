@@ -68,6 +68,8 @@ export interface AnimalPagination {
 }
 
 export interface AnimalEnums {
+    activityLevel: ActivityLevel[];
+    recordType: RecordType[];
     status: AnimalStatus[];
     sex: Sex[];
 }
@@ -86,4 +88,21 @@ export interface FiltersType {
     animalTypes?: string[];
     ageGroups?: AgeGroup[];
     sex?: Sex | null;
-  }
+}
+
+export enum RecordType {
+    ROUTINE_CHECK = "ROUTINE_CHECK",
+    OBSERVATION = "OBSERVATION",
+    MEDICATION = "MEDICATION",
+    TREATMENT = "TREATMENT",
+    EMERGENCY = "EMERGENCY",
+    SAMPLING = "SAMPLING",
+}
+
+export enum ActivityLevel {
+    VERY_HIGH = "VERY_HIGH",
+    VERY_LOW = "VERY_LOW",
+    NORMAL = "NORMAL",
+    HIGH = "HIGH",
+    LOW = "LOW",
+}
