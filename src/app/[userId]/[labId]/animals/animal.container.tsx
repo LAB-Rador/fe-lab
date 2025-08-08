@@ -1,19 +1,17 @@
 "use client";
 
 import type { AnimalPagination, AnimalType, AnimalTypes, FiltersType, NewAnimal } from "./types";
+import { EditAnimalDialog } from "@/src/components/animals/edit-animal-dialog";
 import { AddAnimalDialog } from "@/src/components/animals/add-animal-dialog";
 import { AnimalsFilter } from "@/src/components/animals/animals-filter";
 import { AnimalsHeader } from "@/src/components/animals/animals-header";
 import type { CreateAnimalData } from "@/src/components/animals/types";
 import { AnimalsList } from "@/src/components/animals/animals-list";
-import { Button } from "@/src/components/ui/button";
 import { apiClient } from "@/src/lib/apiClient";
+import { useCallback, useState } from "react";
 import { AnimalStatus } from "../../types";
 import type { Animal } from "./types";
-import { Edit, Plus } from "lucide-react";
-import { useState } from "react";
 import { toast } from "sonner";
-import { EditAnimalDialog } from "@/src/components/animals/edit-animal-dialog";
 
 const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, animalPagination}: AnimalTypes) => {
     const [animalTypesData, setAnimalTypesData] = useState<AnimalType[]>(animalTypes)
@@ -26,13 +24,13 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
     const [animalSearch, setAnimalSearch] = useState<string>("")
     const [filters, setFilters] = useState<FiltersType>({})
 
-    const handleUpdateDataPagination = async (data: {page?: number, pageSize?: number, filters?: any}) => {
+    const handleUpdateDataPagination = useCallback(async (data: {page?: number, pageSize?: number, filters?: any}) => {
         const response = await apiClient.get(`/api/animals/${userId}/${labId}/${data.pageSize || pagination.pageSize}/${data.page || pagination.currentPage}/${JSON.stringify(data.filters) || JSON.stringify(filters)}`)
         setPagination(response.pagination)
         setAnimalsData(response.data)
-    }
+    }, [userId, labId, pagination, filters])
 
-    const handleSearch = (search: string) => {
+    const handleSearch = useCallback((search: string) => {
         setAnimalSearch(search)
 
         const filteredAnimals = animals.filter((animal) => {
@@ -47,9 +45,9 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
         })
 
         setAnimalsData(filteredAnimals)
-    }
+    }, [animals])
 
-    const handleAddAnimal = async (data: CreateAnimalData) => {
+    const handleAddAnimal = useCallback(async (data: CreateAnimalData) => {
         try {
             const newAnimal: NewAnimal = {
                 userId: userId,
@@ -83,9 +81,9 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
         } catch (error) {
             console.error("Error adding animal:", error)
         }  
-    }
+    }, [userId, labId, newAnimalType, animalsData])
 
-    const handleEditAnimal = async (data: CreateAnimalData) => {
+    const handleEditAnimal = useCallback(async (data: CreateAnimalData) => {
         try {
             const newAnimal: NewAnimal = {
                 id: data.id,
@@ -123,9 +121,9 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
         } catch (error) {
             console.error("Error adding animal:", error)
         }
-    }
+    }, [userId, labId, newAnimalType, animalsData])
 
-    const handleAddAnimalType = async (typeName: string): Promise<string> => {
+    const handleAddAnimalType = useCallback(async (typeName: string): Promise<string> => {
         
         const newAnimalType: AnimalType = {
             id: "",
@@ -139,7 +137,7 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
         console.log("Creating new animal type:", newAnimalType)
 
         return typeName
-    }
+    }, [labId, animalTypesData])
 
     return (
         <div className="space-y-6">

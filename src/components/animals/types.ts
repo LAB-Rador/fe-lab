@@ -55,6 +55,7 @@ export interface Laboratory {
 }
   
 export interface CreateAnimalData {
+    measurements?: CreateParameterData[];
     acquisitionDate?: Date;
     status?: AnimalStatus;
     animalTypeId: string;
@@ -68,4 +69,10 @@ export interface CreateAnimalData {
     name?: string;
     id?: string;
     sex?: Sex;
+}
+
+export interface CreateParameterData {
+    parameterName: string;
+    parameterValue?: number;
+    parameterUnit?: string;
 }
