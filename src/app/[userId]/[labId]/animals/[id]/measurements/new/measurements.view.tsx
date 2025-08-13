@@ -172,7 +172,7 @@ export default function MeasurementsView({
                                                 name="waterIntake"
                                                 render={({ field }) => (
                                                     <FormItem>
-                                                        <FormLabel>Water Intake</FormLabel>
+                                                        <FormLabel>Water Intake (ml)</FormLabel>
                                                         <Input
                                                             id="water-intake"
                                                             type="number"
@@ -191,7 +191,7 @@ export default function MeasurementsView({
                                                 name="feedIntake"
                                                 render={({ field }) => (
                                                     <FormItem>
-                                                        <FormLabel>Feed Intake</FormLabel>
+                                                        <FormLabel>Feed Intake (g)</FormLabel>
                                                         <Input
                                                             id="feed-intake"
                                                             type="number"
@@ -262,9 +262,9 @@ export default function MeasurementsView({
                                                         <FormItem>
                                                             <FormLabel>{parameter.parameterName} {parameter.parameterUnit ? `(${parameter.parameterUnit})` : ""}</FormLabel>
                                                             <Input
-                                                                id={parameter.parameterName} 
+                                                                id={parameter.parameterName}
                                                                 type="number"
-                                                                placeholder="Enter value" 
+                                                                placeholder="Enter value"
                                                                 value={parameter.parameterValue || field.value || ""}
                                                                 onChange={(e) => {
                                                                     field.onChange(Number(e.target.value));

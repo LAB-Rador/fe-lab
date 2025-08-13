@@ -1,18 +1,19 @@
 "use client"
 
+import type { AnimalRecord } from "@/src/app/[userId]/[labId]/animals/[id]/types"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/src/components/ui/chart"
 import { Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
 
 interface TemperatureChartProps {
-  measurements: any[]
+  records: AnimalRecord[]
 }
 
-export function TemperatureChart({ measurements }: TemperatureChartProps) {
+export function TemperatureChart({ records }: TemperatureChartProps) {
   // Transform the data for the chart
-  const chartData = measurements
+  const chartData = records
     .map((m) => ({
-      date: m.date,
-      temperature: Number.parseFloat(m.temperature.replace("°C", "")),
+      date: `${new Date(m.date).getFullYear()}-${new Date(m.date).getMonth() + 1}-${new Date(m.date).getDate()}`,
+      temperature: m.temperature,
     }))
     .reverse()
 

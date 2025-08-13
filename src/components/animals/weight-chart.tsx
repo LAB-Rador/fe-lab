@@ -1,18 +1,19 @@
 "use client"
 
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/src/components/ui/chart"
+import type { AnimalRecord } from "@/src/app/[userId]/[labId]/animals/[id]/types"
 import { Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
 
 interface WeightChartProps {
-  measurements: any[]
+  records: AnimalRecord[]
 }
 
-export function WeightChart({ measurements }: WeightChartProps) {
+export function WeightChart({ records }: WeightChartProps) {
   // Transform the data for the chart
-  const chartData = measurements
+  const chartData = records
     .map((m) => ({
-      date: m.date,
-      weight: Number.parseFloat(m.weight.replace("g", "")),
+      date: `${new Date(m.date).getFullYear()}-${new Date(m.date).getMonth() + 1}-${new Date(m.date).getDate()}`,
+      weight: m.weight,
     }))
     .reverse()
 
