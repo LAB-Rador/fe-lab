@@ -40,15 +40,12 @@ export const formSchema = z.object({
 });
 
 export default function MeasurementsContainer({params, animalEnums}: {params: Promise<{id: string}>, animalEnums: AnimalEnums}) {
-        const [additionalParameters, setAdditionalParameters] = useState<CreateParameterData[] | []>(measurements.map((measurement: AnimalRecordMeasurement) => ({
+    const [additionalParameters, setAdditionalParameters] = useState<CreateParameterData[] | []>(measurements.map((measurement: AnimalRecordMeasurement) => ({
         parameterName: measurement.parameter,
         parameterValue: 0,
         parameterUnit: measurement.unit,
     })) || []);
     const [openParameterDialog, setOpenParameterDialog] = useState(false);
-    const resolvedParams = use(params);
-    const {userId, labId} = useParams();
-    const animalId = resolvedParams.id;
     const router = useRouter();
   
     const form = useForm<z.infer<typeof formSchema>>({
