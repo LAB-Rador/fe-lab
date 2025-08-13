@@ -39,7 +39,7 @@ export const formSchema = z.object({
     })).optional(),
 });
 
-export default function MeasurementsContainer({userId, labId, animalId, animalEnums, measurements}: MeasurementsContainerProps) {
+export default function MeasurementsContainer({params, animalEnums}: {params: Promise<{id: string}>, animalEnums: AnimalEnums}) {
     const [additionalParameters, setAdditionalParameters] = useState<CreateParameterData[] | []>(measurements.map((measurement: AnimalRecordMeasurement) => ({
         parameterName: measurement.parameter,
         parameterValue: 0,
