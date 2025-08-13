@@ -2,17 +2,25 @@
 
 import type { CreateParameterData } from "@/src/components/animals/types";
 import { ActivityLevel, AnimalEnums, RecordType } from "../../../types";
+import type { AnimalRecordMeasurement } from "../../types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import MeasurementsView from "./measurements.view";
-import { use, useCallback, useState } from "react";
 import type { BaseSyntheticEvent } from "react";
 import { apiClient } from "@/src/lib/apiClient";
 import type { NewAnimalRecord } from "./types";
-import { useParams } from "next/navigation";
+import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+
+export interface MeasurementsContainerProps {
+    userId: string;
+    labId: string;
+    animalId: string;
+    animalEnums: AnimalEnums;
+    measurements: AnimalRecordMeasurement[];
+}
 
 export const formSchema = z.object({
     activityLevel: z.nativeEnum(ActivityLevel),
@@ -32,7 +40,11 @@ export const formSchema = z.object({
 });
 
 export default function MeasurementsContainer({params, animalEnums}: {params: Promise<{id: string}>, animalEnums: AnimalEnums}) {
-    const [additionalParameters, setAdditionalParameters] = useState<CreateParameterData[] | []>([]);
+        const [additionalParameters, setAdditionalParameters] = useState<CreateParameterData[] | []>(measurements.map((measurement: AnimalRecordMeasurement) => ({
+        parameterName: measurement.parameter,
+        parameterValue: 0,
+        parameterUnit: measurement.unit,
+    })) || []);
     const [openParameterDialog, setOpenParameterDialog] = useState(false);
     const resolvedParams = use(params);
     const {userId, labId} = useParams();
