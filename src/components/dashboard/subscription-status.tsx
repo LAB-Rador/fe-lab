@@ -6,7 +6,7 @@ import { ArrowUpRight } from "lucide-react"
 
 export function SubscriptionStatus() {
   return (
-    <Card>
+    <Card className="w-[315px] md:w-full">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
@@ -51,12 +51,12 @@ export function SubscriptionStatus() {
             <Progress value={48} className="h-2" />
           </div>
         </div>
-        <div className="mt-6 flex items-center justify-between">
+        <div className="mt-6 flex flex-wrap gap-2 items-center justify-between">
           <div>
             <p className="text-sm font-medium">Next billing date: February 15, 2025</p>
             <p className="text-xs text-gray-500">Your plan renews automatically</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button variant="outline">Manage Subscription</Button>
             <Button className="bg-blue-600 hover:bg-blue-700">
               Upgrade Plan

@@ -19,8 +19,8 @@ export default function DashboardView({animals, experiments, tasks, previousMont
         animals={animals}
         tasks={tasks}
       />
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="lg:col-span-4">
+      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-7">
+        <Card className="lg:col-span-4 w-[315px] md:w-full">
           <CardHeader>
             <CardTitle>Animal Population</CardTitle>
             <CardDescription>Population changes over the last 30 days</CardDescription>
@@ -29,7 +29,7 @@ export default function DashboardView({animals, experiments, tasks, previousMont
             <AnimalPopulationChart animals={animals} />
           </CardContent>
         </Card>
-        <Card className="lg:col-span-3">
+        <Card className="lg:col-span-3 w-[315px] md:w-full">
           <CardHeader>
             <CardTitle>Status Statistics</CardTitle>
             <CardDescription>Current animal status distribution</CardDescription>
@@ -38,7 +38,7 @@ export default function DashboardView({animals, experiments, tasks, previousMont
             <StatusStatisticsChart animals={animals} />
           </CardContent>
         </Card>
-        <Card className="lg:col-span-4">
+        <Card className="lg:col-span-4 w-[315px] md:w-full">
           <CardHeader>
             <CardTitle>Upcoming Events</CardTitle>
             <CardDescription>Scheduled events for the next 7 days</CardDescription>
@@ -47,7 +47,7 @@ export default function DashboardView({animals, experiments, tasks, previousMont
             <UpcomingEvents />
           </CardContent>
         </Card>
-        <Card className="lg:col-span-3">
+        <Card className="lg:col-span-3 w-[315px] md:w-full">
           <CardHeader>
             <CardTitle>Notifications</CardTitle>
             <CardDescription>Recent alerts and notifications</CardDescription>

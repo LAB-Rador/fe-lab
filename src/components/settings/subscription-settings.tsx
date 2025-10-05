@@ -16,8 +16,104 @@ export function SubscriptionSettings() {
                 <CardDescription>Manage your subscription plan and billing information</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <Card className="border-2" style={{ borderColor: "#2563EB" }}>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <Card className="flex flex-col justify-between">
+                        <CardHeader className="pb-2">
+                            <CardTitle>
+                                <div className="flex items-center justify-between">
+                                    <span>Free Plan</span>
+                                </div>
+                            </CardTitle>
+                            <CardDescription>
+                                <div className="flex items-end gap-1 mt-2">
+                                    <span className="text-2xl font-bold">$0</span>
+                                    <span className="text-muted-foreground">/month</span>
+                                </div>
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                            <div className="space-y-2 mt-4">
+                                <div className="flex items-center gap-2">
+                                    <Check className="h-4 w-4 text-[#10B981]" />
+                                    <span className="text-sm">Up to 3 users</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Check className="h-4 w-4 text-[#10B981]" />
+                                    <span className="text-sm">Up to 500 animals</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Check className="h-4 w-4 text-[#10B981]" />
+                                    <span className="text-sm">Basic tracking and monitoring</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Check className="h-4 w-4 text-[#10B981]" />
+                                    <span className="text-sm">Basic reports</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Check className="h-4 w-4 text-[#10B981]" />
+                                    <span className="text-sm">Email support</span>
+                                </div>
+                            </div>
+                        </CardContent>
+                        <CardFooter>
+                            <Button className="w-full" variant="outline">
+                                Downgrade
+                            </Button>
+                        </CardFooter>
+                    </Card>
+
+                    <Card className="flex flex-col justify-between">
+                        <CardHeader className="pb-2">
+                        <CardTitle>Basic Plan</CardTitle>
+                            <CardDescription>
+                                <div className="flex items-start gap-1 mt-2 flex-col">
+                                    <div className="flex items-end gap-1 mt-2">
+                                        <span className="text-2xl font-bold">$49-69</span>
+                                        <span className="text-muted-foreground">/month</span>
+                                    </div>
+                                    <div className="flex items-end gap-1 mt-2">
+                                        <span className="text-2xl font-bold">$490-690</span>
+                                        <span className="text-muted-foreground">/year (save ~15%)</span>
+                                    </div>
+                                </div>
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                            <div className="space-y-2 mt-4">
+                                <div className="flex items-center gap-2">
+                                    <Check className="h-4 w-4 text-[#10B981]" />
+                                    <span className="text-sm">Up to 10 users</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Check className="h-4 w-4 text-[#10B981]" />
+                                    <span className="text-sm">Up to 1,000 animals</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Check className="h-4 w-4 text-[#10B981]" />
+                                    <span className="text-sm">Basic breeding management</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Check className="h-4 w-4 text-[#10B981]" />
+                                    <span className="text-sm">Data export</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Check className="h-4 w-4 text-[#10B981]" />
+                                    <span className="text-sm">Email support</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Check className="h-4 w-4 text-[#10B981]" />
+                                    <span className="text-sm">Basic analytics</span>
+                                </div>
+                            </div>
+                        </CardContent>
+                        <CardFooter>
+                            <Button className="w-full" variant="outline">
+                                Downgrade
+                            </Button>
+                        </CardFooter>
+                    </Card>
+
+                    <Card className="border-2 flex flex-col justify-between" style={{ borderColor: "#2563EB" }}>
                         <CardHeader className="pb-2">
                             <CardTitle>
                                 <div className="flex items-center justify-between">
@@ -26,9 +122,15 @@ export function SubscriptionSettings() {
                                 </div>
                             </CardTitle>
                             <CardDescription>
-                                <div className="flex items-end gap-1 mt-2">
-                                    <span className="text-2xl font-bold">$199</span>
-                                    <span className="text-muted-foreground">/month</span>
+                                <div className="flex items-start gap-1 mt-2 flex-col">
+                                    <div className="flex items-end gap-1 mt-2">
+                                        <span className="text-2xl font-bold">$129-149</span>
+                                        <span className="text-muted-foreground">/month</span>
+                                    </div>
+                                    <div className="flex items-end gap-1 mt-2">
+                                        <span className="text-2xl font-bold">$1,290-1,490</span>
+                                        <span className="text-muted-foreground">/year (save ~15%)</span>
+                                    </div>
                                 </div>
                             </CardDescription>
                         </CardHeader>
@@ -54,6 +156,14 @@ export function SubscriptionSettings() {
                                     <Check className="h-4 w-4 text-[#10B981]" />
                                     <span className="text-sm">Email & phone support</span>
                                 </div>
+                                <div className="flex items-center gap-2">
+                                    <Check className="h-4 w-4 text-[#10B981]" />
+                                    <span className="text-sm">Advanced analytics</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Check className="h-4 w-4 text-[#10B981]" />
+                                    <span className="text-sm">Experiment management</span>
+                                </div>
                             </div>
                         </CardContent>
                         <CardFooter>
@@ -63,85 +173,58 @@ export function SubscriptionSettings() {
                         </CardFooter>
                     </Card>
 
-                    <Card>
-                        <CardHeader className="pb-2">
-                        <CardTitle>Basic Plan</CardTitle>
-                        <CardDescription>
-                            <div className="flex items-end gap-1 mt-2">
-                            <span className="text-2xl font-bold">$99</span>
-                            <span className="text-muted-foreground">/month</span>
-                            </div>
-                        </CardDescription>
-                        </CardHeader>
-                        <CardContent className="pt-0">
-                        <div className="space-y-2 mt-4">
-                            <div className="flex items-center gap-2">
-                            <Check className="h-4 w-4 text-[#10B981]" />
-                            <span className="text-sm">Up to 10 users</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                            <Check className="h-4 w-4 text-[#10B981]" />
-                            <span className="text-sm">Up to 1,000 animals</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                            <Check className="h-4 w-4 text-[#10B981]" />
-                            <span className="text-sm">Basic breeding management</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                            <Check className="h-4 w-4 text-[#10B981]" />
-                            <span className="text-sm">Data export</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                            <Check className="h-4 w-4 text-[#10B981]" />
-                            <span className="text-sm">Email support</span>
-                            </div>
-                        </div>
-                        </CardContent>
-                        <CardFooter>
-                        <Button className="w-full" variant="outline">
-                            Downgrade
-                        </Button>
-                        </CardFooter>
-                    </Card>
-
-                    <Card>
+                    <Card className="flex flex-col justify-between">
                         <CardHeader className="pb-2">
                         <CardTitle>Enterprise Plan</CardTitle>
-                        <CardDescription>
-                            <div className="flex items-end gap-1 mt-2">
-                            <span className="text-2xl font-bold">$499</span>
-                            <span className="text-muted-foreground">/month</span>
-                            </div>
-                        </CardDescription>
+                            <CardDescription>
+                                <div className="flex items-start gap-1 mt-2 flex-col">
+                                    <div className="flex items-end gap-1 mt-2">
+                                        <span className="text-2xl font-bold">$299-399</span>
+                                        <span className="text-muted-foreground">/month</span>
+                                    </div>
+                                    <div className="flex items-end gap-1 mt-2">
+                                        <span className="text-2xl font-bold">$2,990-3,990</span>
+                                        <span className="text-muted-foreground">/year (save ~15%-20%)</span>
+                                    </div>
+                                </div>
+                            </CardDescription>
                         </CardHeader>
                         <CardContent className="pt-0">
-                        <div className="space-y-2 mt-4">
-                            <div className="flex items-center gap-2">
-                            <Check className="h-4 w-4 text-[#10B981]" />
-                            <span className="text-sm">Unlimited users</span>
+                            <div className="space-y-2 mt-4">
+                                <div className="flex items-center gap-2">
+                                    <Check className="h-4 w-4 text-[#10B981]" />
+                                    <span className="text-sm">Unlimited users</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Check className="h-4 w-4 text-[#10B981]" />
+                                    <span className="text-sm">Unlimited animals</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Check className="h-4 w-4 text-[#10B981]" />
+                                    <span className="text-sm">All Professional features</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Check className="h-4 w-4 text-[#10B981]" />
+                                    <span className="text-sm">Custom integrations</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Check className="h-4 w-4 text-[#10B981]" />
+                                    <span className="text-sm">24/7 priority support</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Check className="h-4 w-4 text-[#10B981]" />
+                                    <span className="text-sm">Dedicated account manager</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Check className="h-4 w-4 text-[#10B981]" />
+                                    <span className="text-sm">SLA guarantees</span>
+                                </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                            <Check className="h-4 w-4 text-[#10B981]" />
-                            <span className="text-sm">Unlimited animals</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                            <Check className="h-4 w-4 text-[#10B981]" />
-                            <span className="text-sm">Advanced analytics</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                            <Check className="h-4 w-4 text-[#10B981]" />
-                            <span className="text-sm">Custom integrations</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                            <Check className="h-4 w-4 text-[#10B981]" />
-                            <span className="text-sm">24/7 priority support</span>
-                            </div>
-                        </div>
                         </CardContent>
                         <CardFooter>
-                        <Button className="w-full" style={{ backgroundColor: "#2563EB" }}>
-                            Upgrade
-                        </Button>
+                            <Button className="w-full" style={{ backgroundColor: "#2563EB" }}>
+                                Upgrade
+                            </Button>
                         </CardFooter>
                     </Card>
                 </div>

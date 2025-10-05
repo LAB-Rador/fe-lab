@@ -119,7 +119,7 @@ export function DashboardStatus({animals, experiments, tasks, previousMonthData}
     { text: "No previous data", className: "text-xs text-gray-500" }, [tasks, previousMonthData]);
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 w-[315px] md:w-full">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Total Animals</CardTitle>
