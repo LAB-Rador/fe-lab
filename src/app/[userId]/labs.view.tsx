@@ -25,17 +25,17 @@ export default function LaboratoriesView(
         <div className="min-h-screen bg-gray-50">
             {/* Loading skeleton */}
             <div className="bg-white border-b border-gray-200">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                <div className="animate-pulse">
-                <div className="flex items-center space-x-4">
-                    <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
-                    <div className="space-y-2">
-                    <div className="h-6 bg-gray-200 rounded w-48"></div>
-                    <div className="h-4 bg-gray-200 rounded w-32"></div>
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                    <div className="animate-pulse">
+                        <div className="flex items-center space-x-4">
+                            <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
+                            <div className="space-y-2">
+                                <div className="h-6 bg-gray-200 rounded w-48"></div>
+                                <div className="h-4 bg-gray-200 rounded w-32"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                </div>
-            </div>
             </div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -43,10 +43,10 @@ export default function LaboratoriesView(
                 {[...Array(6)].map((_, i) => (
                 <div key={i} className="animate-pulse">
                     <div className="bg-white rounded-lg border border-gray-200 p-6">
-                    <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
-                    <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-                    <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                        <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
+                        <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+                        <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+                        <div className="h-4 bg-gray-200 rounded w-2/3"></div>
                     </div>
                 </div>
                 ))}
@@ -61,54 +61,54 @@ export default function LaboratoriesView(
         {/* Header with user info */}
             <div className="bg-white border-b border-gray-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                    <Avatar className="h-16 w-16">
-                        <AvatarFallback className="bg-blue-600 text-white text-lg font-semibold">
-                        {userInfo && getInitials(userInfo.firstName || "", userInfo.lastName || "")}
-                        </AvatarFallback>
-                    </Avatar>
+                    <div className="flex flex-wrap gap-4 items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                            <Avatar className="h-16 w-16">
+                                <AvatarFallback className="bg-blue-600 text-white text-lg font-semibold">
+                                {userInfo && getInitials(userInfo.firstName || "", userInfo.lastName || "")}
+                                </AvatarFallback>
+                            </Avatar>
 
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-900">
-                        {userInfo?.firstName} {userInfo?.lastName}
-                        </h1>
-                        <div className="flex items-center space-x-4 text-sm text-gray-600 mt-1">
-                        <div className="flex items-center">
-                            <Building2 className="h-4 w-4 mr-1" />
-                            {userInfo?.institution}
-                        </div>
-                        <div className="flex items-center">
-                            <Calendar className="h-4 w-4 mr-1" />
-                            Member since {userInfo && formatDate(userInfo.createdAt)}
-                        </div>
-                        </div>
-                        <div className="flex items-center space-x-4 text-sm text-gray-600 mt-1">
-                        <div className="flex items-center">
-                            <Mail className="h-4 w-4 mr-1" />
-                            {userInfo?.email}
-                        </div>
-                        {userInfo?.address && (
-                            <div className="flex items-center">
-                            <MapPin className="h-4 w-4 mr-1" />
-                            {userInfo.address}
+                            <div>
+                                <h1 className="text-2xl font-bold text-gray-900">
+                                    {userInfo?.firstName} {userInfo?.lastName}
+                                </h1>
+                                <div className="flex flex-wrap items-center space-x-4 text-sm text-gray-600 mt-1">
+                                    <div className="flex items-center">
+                                        <Building2 className="h-4 w-4 mr-1" />
+                                        {userInfo?.institution}
+                                    </div>
+                                    <div className="flex items-center">
+                                        <Calendar className="h-4 w-4 mr-1" />
+                                        Member since {userInfo && formatDate(userInfo.createdAt)}
+                                    </div>
+                                </div>
+                                <div className="flex flex-wrap items-center space-x-4 text-sm text-gray-600 mt-1">
+                                    <div className="flex items-center">
+                                        <Mail className="h-4 w-4 mr-1" />
+                                        {userInfo?.email}
+                                    </div>
+                                    {userInfo?.address && (
+                                        <div className="flex items-center">
+                                            <MapPin className="h-4 w-4 mr-1" />
+                                            {userInfo.address}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                        )}
+                        </div>
+
+                        <div className="flex space-x-3 m-auto md:m-0">
+                            <Button onClick={handleJoinLab} variant="outline" className="flex items-center">
+                                <Users className="h-4 w-4 mr-2" />
+                                Join Lab
+                            </Button>
+                            <Button onClick={handleCreateLab} className="bg-blue-600 hover:bg-blue-700 flex items-center">
+                                <Plus className="h-4 w-4 mr-2" />
+                                Create New Lab
+                            </Button>
                         </div>
                     </div>
-                    </div>
-
-                    <div className="flex space-x-3">
-                    <Button onClick={handleJoinLab} variant="outline" className="flex items-center">
-                        <Users className="h-4 w-4 mr-2" />
-                        Join Lab
-                    </Button>
-                    <Button onClick={handleCreateLab} className="bg-blue-600 hover:bg-blue-700 flex items-center">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Create New Lab
-                    </Button>
-                    </div>
-                </div>
                 </div>
             </div>
 

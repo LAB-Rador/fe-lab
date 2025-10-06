@@ -2,6 +2,25 @@
 
 import * as React from "react"
 
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = React.useState(false)
+
+  React.useEffect(() => {
+    const media = window.matchMedia(query)
+
+    if (media.matches !== matches) {
+      setMatches(media.matches)
+    }
+
+    const listener = () => setMatches(media.matches)
+    media.addEventListener("change", listener)
+
+    return () => media.removeEventListener("change", listener)
+  }, [matches, query])
+
+  return matches
+}
+
 type SidebarContext = {
   isOpen: boolean
   toggle: () => void
@@ -11,7 +30,14 @@ type SidebarContext = {
 const SidebarContext = React.createContext<SidebarContext | undefined>(undefined)
 
 export function SidebarProvider({ children }: { children: React.ReactNode }) {
+  const isMobile = useMediaQuery("(max-width: 600px)")
   const [isOpen, setIsOpen] = React.useState(true)
+
+  React.useEffect(() => {
+    if(isMobile) {
+      setIsOpen(false)
+    }
+  }, [isMobile])
 
   const toggle = React.useCallback(() => {
     setIsOpen((prev) => !prev)
