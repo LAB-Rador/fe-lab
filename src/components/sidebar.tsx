@@ -8,14 +8,15 @@ import { cn } from "@/src/lib/utils"
 import type React from "react"
 import Link from "next/link"
 import {
-  ChevronLeft,
-  LayoutDashboard,
   FlaskRoundIcon as Flask,
-  Rat,
+  LayoutDashboard,
   ClipboardList,
   FileBarChart,
+  ChevronLeft,
   Settings,
+  BookUser,
   LogOut,
+  Rat,
 } from "lucide-react"
 
 export function Sidebar() {
@@ -116,6 +117,13 @@ export function Sidebar() {
               icon={Settings}
               label="Settings"
               isActive={pathname.startsWith(`/${userId}/${labId}/settings`)}
+              isOpen={isOpen}
+            />
+            <NavItem
+              href={`/${userId}/${labId}/team`}
+              icon={BookUser}
+              label="Team"
+              isActive={pathname.startsWith(`/${userId}/${labId}/team`)}
               isOpen={isOpen}
             />
           </nav>

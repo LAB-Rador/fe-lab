@@ -17,32 +17,32 @@ export default function LaboratorySettings() {
             <PageHeader title="Laboratory Settings" description="Manage your laboratory configuration and preferences" />
 
             <Tabs defaultValue="animal-types" value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-                <TabsList className="grid grid-cols-2 md:grid-cols-5 gap-2">
-                <TabsTrigger value="animal-types">Animal Types</TabsTrigger>
-                <TabsTrigger value="user-roles">User Roles</TabsTrigger>
-                <TabsTrigger value="breeding">Breeding Protocols</TabsTrigger>
-                <TabsTrigger value="notifications">Notifications</TabsTrigger>
-                <TabsTrigger value="subscription">Subscription</TabsTrigger>
+                <TabsList className="grid grid-cols-2 md:grid-cols-5 gap-2 mb-20 md:mb-0">
+                    <TabsTrigger value="animal-types">Animal Types</TabsTrigger>
+                    <TabsTrigger value="user-roles">User Roles</TabsTrigger>
+                    <TabsTrigger value="breeding">Breeding Protocols</TabsTrigger>
+                    <TabsTrigger value="notifications">Notifications</TabsTrigger>
+                    <TabsTrigger value="subscription">Subscription</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="animal-types">
-                <AnimalTypesSettings />
+                    <AnimalTypesSettings />
                 </TabsContent>
 
                 <TabsContent value="user-roles">
-                <UserRolesSettings />
+                    <UserRolesSettings />
                 </TabsContent>
 
                 <TabsContent value="breeding">
-                <BreedingProtocolsSettings />
+                    <BreedingProtocolsSettings />
                 </TabsContent>
 
                 <TabsContent value="notifications">
-                <NotificationSettings />
+                    <NotificationSettings />
                 </TabsContent>
 
                 <TabsContent value="subscription">
-                <SubscriptionSettings />
+                    <SubscriptionSettings />
                 </TabsContent>
             </Tabs>
         </div>

@@ -46,8 +46,8 @@ export function AnimalBasicInfo({ animal }: { animal: Animal }) {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <InfoItem label="Activity level" value={animal.records?.[0]?.activityLevel || "-"} />
-            <InfoItem label="Weight" value={animal.records?.[0]?.weight.toString() + "g" || "-"} icon={Weight} />
-            <InfoItem label="Temperature" value={animal.records?.[0]?.temperature.toString() + "°C" || "-"} icon={Thermometer} />
+            <InfoItem label="Weight" value={animal.records?.[0]?.weight ? animal.records?.[0]?.weight.toString() + "g" : "-"} icon={Weight} />
+            <InfoItem label="Temperature" value={animal.records?.[0]?.temperature ? animal.records?.[0]?.temperature.toString() + "°C" : "-"} icon={Thermometer} />
             <InfoItem label="Notes" value={animal.records?.[0]?.notes || "-"} className="md:col-span-3" />
             <InfoItem label="Record Type" value={animal.records?.[0]?.recordType || "-"} className="md:col-span-3" />
           </div>

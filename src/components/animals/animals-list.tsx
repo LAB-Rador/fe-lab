@@ -226,7 +226,11 @@ export function AnimalsList({animals, animalPagination, setPagination, handleUpd
                           >
                             Edit animal
                           </DropdownMenuItem>
-                          <DropdownMenuItem>Add measurement</DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Link href={`/${userId}/${labId}/animals/${animal.id}/measurements/new`} key={animal.id}>
+                                Add measurement
+                            </Link>
+                          </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem className="text-red-600">Archive animal</DropdownMenuItem>
                         </DropdownMenuContent>
@@ -411,7 +415,11 @@ export function AnimalsList({animals, animalPagination, setPagination, handleUpd
                       >
                         Edit animal
                       </DropdownMenuItem>
-                      <DropdownMenuItem>Add measurement</DropdownMenuItem>
+                      <DropdownMenuItem>
+                          <Link href={`/${userId}/${labId}/animals/${animal.id}/measurements/new`} key={animal.id}>
+                              Add measurement
+                          </Link>
+                      </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem className="text-red-600">Archive animal</DropdownMenuItem>
                     </DropdownMenuContent>
