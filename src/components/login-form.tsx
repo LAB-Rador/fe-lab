@@ -38,7 +38,7 @@ export function LoginForm() {
         } else {
           router.push(`account`);
         }
-        document.cookie = `USER_ID=${response.user.userId}; path=/; HttpOnly; Secure; SameSite=Strict`;
+        document.cookie = `USER_ID=${response.user.userId}; path=/; SameSite=Strict`;
         document.cookie = `${CONFIRMED_EMAIL}=${response.user.confirmedEmail}; path=/; max-age=3600`;
         dispatch(setUser(response.user));
       }
