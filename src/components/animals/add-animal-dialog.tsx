@@ -25,7 +25,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/src/components/ui/dialog'
-import type { AnimalEnums } from "@/src/app/[userId]/[labId]/animals/types"
+import type { AnimalEnums } from "@/src/app/[labId]/animals/types"
 
 const formSchema = z.object({
     identifier: z.string().min(1, "Identifier is required").max(50, "Identifier must be less than 50 characters"),

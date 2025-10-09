@@ -16,6 +16,7 @@ export class AuthService {
   
   // Получение токена
   static getToken() {
+
     return Cookies.get(this.TOKEN_KEY);
   }
   

@@ -1,5 +1,12 @@
 import type { AgeGroup } from "@/src/components/animals/types";
-import type { AnimalStatus, Sex } from "../../types";
+import type { AnimalStatus, Sex } from "../../account/types";
+
+export interface PageProps {
+    params: {
+        userId: string;
+        labId: string;
+    }
+}
 
 export interface Animal {
     acquisitionDate: string;

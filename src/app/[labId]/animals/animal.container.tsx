@@ -7,9 +7,9 @@ import { AnimalsFilter } from "@/src/components/animals/animals-filter";
 import { AnimalsHeader } from "@/src/components/animals/animals-header";
 import type { CreateAnimalData } from "@/src/components/animals/types";
 import { AnimalsList } from "@/src/components/animals/animals-list";
+import { AnimalStatus } from "../../account/types";
 import { apiClient } from "@/src/lib/apiClient";
 import { useCallback, useState } from "react";
-import { AnimalStatus } from "../../types";
 import type { Animal } from "./types";
 import { toast } from "sonner";
 

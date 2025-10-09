@@ -1,4 +1,4 @@
-import type { AnimalEnums, AnimalType, FiltersType } from "@/src/app/[userId]/[labId]/animals/types"
+import type { AnimalEnums, AnimalType, FiltersType } from "@/src/app/[labId]/animals/types"
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { RadioGroup, RadioGroupItem } from "@/src/components/ui/radio-group"
 import { Separator } from "@/src/components/ui/separator"

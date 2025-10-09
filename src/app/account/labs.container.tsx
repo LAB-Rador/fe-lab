@@ -55,7 +55,7 @@ export default function LaboratoriesContainer({ userLaboratories }: Laboratories
     }, []);
 
     const handleLabClick = useCallback((labId: string) => {
-        router.push(`/${userInfo?.userId}/${labId}/dashboard`)
+        router.push(`/${labId}/dashboard`)
     }, [userInfo, router]);
     
     const handleJoinLab = useCallback(() => {

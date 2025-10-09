@@ -3,9 +3,9 @@
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/src/components/ui/pagination"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
-import type { Animal, AnimalRecordMeasurement } from "@/src/app/[userId]/[labId]/animals/[id]/types"
+import type { Animal, AnimalRecordMeasurement } from "@/src/app/[labId]/animals/[id]/types"
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
-import type { AnimalPagination } from "@/src/app/[userId]/[labId]/animals/types"
+import type { AnimalPagination } from "@/src/app/[labId]/animals/types"
 import { TemperatureChart } from "@/src/components/animals/temperature-chart"
 import { WeightChart } from "@/src/components/animals/weight-chart"
 import { ChevronDown, Download, Filter, Plus, Check } from "lucide-react"
@@ -181,7 +181,7 @@ export function AnimalMeasurements({ animal, animalId, userId, labId, handleUpda
             <Download className="h-4 w-4" />
             Export
           </Button>
-          <Link href={`/${userId}/${labId}/animals/${animalId}/measurements/new`} className="w-full sm:w-auto">
+          <Link href={`/${labId}/animals/${animalId}/measurements/new`} className="w-full sm:w-auto">
             <Button size="sm" className="flex items-center gap-2 w-full">
               <Plus className="h-4 w-4" />
               New Measurement

@@ -1,6 +1,6 @@
 "use client"
 
-import type { AnimalRecord } from "@/src/app/[userId]/[labId]/animals/[id]/types"
+import type { AnimalRecord } from "@/src/app/[labId]/animals/[id]/types"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/src/components/ui/chart"
 import { Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
 

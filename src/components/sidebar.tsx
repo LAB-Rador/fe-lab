@@ -78,52 +78,52 @@ export function Sidebar() {
         <div className="px-3 py-2">
           <nav className="flex flex-col gap-1">
             <NavItem
-              href={`/${userId}/${labId}/dashboard`}
+              href={`/${labId}/dashboard`}
               icon={LayoutDashboard}
               label="Dashboard"
-              isActive={pathname === `/${userId}/${labId}/dashboard`}
+              isActive={pathname === `/${labId}/dashboard`}
               isOpen={isOpen}
             />
             <NavItem
-              href={`/${userId}/${labId}/animals`}
+              href={`/${labId}/animals`}
               icon={Rat}
               label="Animals"
-              isActive={pathname.startsWith(`/${userId}/${labId}/animals`)}
+              isActive={pathname.startsWith(`/${labId}/animals`)}
               isOpen={isOpen}
             />
             <NavItem
-              href={`/${userId}/${labId}/experiments`}
+              href={`/${labId}/experiments`}
               icon={Flask}
               label="Experiments"
-              isActive={pathname.startsWith(`/${userId}/${labId}/experiments`)}
+              isActive={pathname.startsWith(`/${labId}/experiments`)}
               isOpen={isOpen}
             />
             <NavItem
-              href={`/${userId}/${labId}/tasks`}
+              href={`/${labId}/tasks`}
               icon={ClipboardList}
               label="Tasks"
-              isActive={pathname.startsWith(`/${userId}/${labId}/tasks`)}
+              isActive={pathname.startsWith(`/${labId}/tasks`)}
               isOpen={isOpen}
             />
             <NavItem
-              href={`/${userId}/${labId}/reports`}
+              href={`/${labId}/reports`}
               icon={FileBarChart}
               label="Reports"
-              isActive={pathname.startsWith(`/${userId}/${labId}/reports`)}
+              isActive={pathname.startsWith(`/${labId}/reports`)}
               isOpen={isOpen}
             />
             <NavItem
-              href={`/${userId}/${labId}/settings`}
+              href={`/${labId}/settings`}
               icon={Settings}
               label="Settings"
-              isActive={pathname.startsWith(`/${userId}/${labId}/settings`)}
+              isActive={pathname.startsWith(`/${labId}/settings`)}
               isOpen={isOpen}
             />
             <NavItem
-              href={`/${userId}/${labId}/team`}
+              href={`/${labId}/team`}
               icon={BookUser}
               label="Team"
-              isActive={pathname.startsWith(`/${userId}/${labId}/team`)}
+              isActive={pathname.startsWith(`/${labId}/team`)}
               isOpen={isOpen}
             />
           </nav>

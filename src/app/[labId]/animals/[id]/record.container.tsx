@@ -15,7 +15,7 @@ export interface RecordContainerProps {
 }
 
 export default function RecordContainer({userId, labId, animalId, animal, animalPagination}: RecordContainerProps) {
-    const [pagination, setPagination] = useState<AnimalPagination>(animalPagination)
+    const [pagination, setPagination] = useState<AnimalPagination>(animalPagination);
     const [animalData, setAnimalData] = useState(animal);
 
     const handleUpdateDataPagination = useCallback(async (data: {page?: number, pageSize?: number}) => {

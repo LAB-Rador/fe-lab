@@ -5,6 +5,13 @@ import type { UseFormReturn } from "react-hook-form";
 import type { useRouter } from "next/navigation";
 import type { z } from "zod";
 
+export interface PageProps {
+    params: {
+        labId: string;
+        id: string
+    }
+}
+
 export interface MeasurementsViewProps {
     handleSubmit: (data: z.infer<typeof formSchema>) => Promise<void>;
     handleAddParameter: (data: CreateParameterData) => Promise<void>;

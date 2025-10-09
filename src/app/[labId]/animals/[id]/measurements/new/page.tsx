@@ -1,9 +1,14 @@
 import type { AnimalRecord, AnimalRecordMeasurement } from "../../types";
 import MeasurementsContainer from "./measurements.container";
 import { apiClient } from "@/src/lib/apiClient";
+import type { PageProps } from "./types";
+import { cookies } from "next/headers";
 
-export default async function Page({ params }: {params: {userId: string, labId: string, id: string}}) {
-  const { userId, labId, id: animalId } = await params;
+export default async function Page({ params }: PageProps) {
+  const { labId, id: animalId } = await params;
+  const cookieStore = await cookies();
+  const userId = await cookieStore.get('USER_ID')?.value || 'default';
+
   const rows = 100;
   const page = 1;
   const animal = await apiClient.get(`/api/animals/animal/${userId}/${labId}/${animalId}/${rows}/${page}`);
