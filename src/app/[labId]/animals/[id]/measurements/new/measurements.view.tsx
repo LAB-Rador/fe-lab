@@ -30,7 +30,7 @@ export default function MeasurementsView({
             <div className="container mx-auto p-4 md:p-6">
                 <div className="space-y-6">
                     <div className="flex items-center gap-2">
-                        <Link href={`/${userId}/${labId}/animals/${animalId}`}>
+                        <Link href={`/${labId}/animals/${animalId}`}>
                             <Button 
                                 onClick={() => {
                                     router.back()
@@ -327,7 +327,7 @@ export default function MeasurementsView({
                 
                                 {/* Action Buttons */}
                                 <div className="flex justify-end gap-3">
-                                    <Link href={`/${userId}/${labId}/animals/${animalId}`}>
+                                    <Link href={`/${labId}/animals/${animalId}`}>
                                         <Button type="button" variant="outline">
                                             Cancel
                                         </Button>
