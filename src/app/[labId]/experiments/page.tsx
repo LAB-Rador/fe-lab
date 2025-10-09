@@ -193,7 +193,7 @@ export default function ExperimentsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredExperiments.map((experiment) => (
-          <Link href={`/${userId}/${labId}/experiments/${experiment.id}`} key={experiment.id}>
+          <Link href={`/${labId}/experiments/${experiment.id}`} key={experiment.id}>
             <Card className="h-full hover:shadow-md transition-shadow">
               <CardContent className="p-6">
                 <div className="flex justify-between items-start mb-4">

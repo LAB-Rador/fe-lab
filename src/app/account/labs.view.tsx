@@ -116,25 +116,25 @@ export default function LaboratoriesView(
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Search and filters */}
                 <div className="mb-8">
-                <div className="flex items-center justify-between mb-6">
-                    <div>
-                    <h2 className="text-xl font-semibold text-gray-900">Your Laboratories</h2>
-                    <p className="text-gray-600 mt-1">
-                        {filteredLaboratories.length} laborator{filteredLaboratories.length !== 1 ? "ies" : "y"} available
-                    </p>
+                    <div className="flex items-center justify-between mb-6">
+                        <div>
+                            <h2 className="text-xl font-semibold text-gray-900">Your Laboratories</h2>
+                            <p className="text-gray-600 mt-1">
+                                {filteredLaboratories.length} laborator{filteredLaboratories.length !== 1 ? "ies" : "y"} available
+                            </p>
+                        </div>
                     </div>
-                </div>
 
-                <div className="relative max-w-md">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <Input
-                    type="text"
-                    placeholder="Search laboratories..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                    />
-                </div>
+                    <div className="relative max-w-md">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Input
+                            type="text"
+                            placeholder="Search laboratories..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="pl-10"
+                        />
+                    </div>
                 </div>
 
                 {/* Laboratory cards */}
@@ -143,19 +143,19 @@ export default function LaboratoriesView(
                     <Building2 className="mx-auto h-12 w-12 text-gray-400" />
                     <h3 className="mt-2 text-sm font-medium text-gray-900">No laboratories found</h3>
                     <p className="mt-1 text-sm text-gray-500">
-                    {searchTerm
-                        ? "Try adjusting your search terms."
-                        : "Get started by creating a new laboratory or joining an existing one."}
+                        {searchTerm
+                            ? "Try adjusting your search terms."
+                            : "Get started by creating a new laboratory or joining an existing one."}
                     </p>
                     <div className="mt-6 flex justify-center space-x-3">
-                    <Button onClick={handleJoinLab} variant="outline">
-                        <Users className="h-4 w-4 mr-2" />
-                        Join Lab
-                    </Button>
-                    <Button onClick={handleCreateLab} className="bg-blue-600 hover:bg-blue-700">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Create New Lab
-                    </Button>
+                        <Button onClick={handleJoinLab} variant="outline">
+                            <Users className="h-4 w-4 mr-2" />
+                            Join Lab
+                        </Button>
+                        <Button onClick={handleCreateLab} className="bg-blue-600 hover:bg-blue-700">
+                            <Plus className="h-4 w-4 mr-2" />
+                            Create New Lab
+                        </Button>
                     </div>
                 </div>
                 ) : (

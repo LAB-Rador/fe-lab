@@ -2,9 +2,14 @@
 
 import AnimalContainer from "./animal.container";
 import { apiClient } from "@/src/lib/apiClient";
+import type { PageProps } from "./types";
+import { cookies } from "next/headers";
 
-export default async function AnimalsPage({params}: {params: {userId: string, labId: string}}) {
-  const {userId, labId} = await params;
+export default async function AnimalsPage({params}: PageProps) {
+  const {labId} = await params;
+  const cookieStore = await cookies();
+  const userId = await cookieStore.get('USER_ID')?.value || 'default';
+
   const rows = 10;
   const page = 1;
 

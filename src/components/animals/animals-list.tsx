@@ -1,7 +1,7 @@
 "use client"
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
-import type { AnimalPagination } from "@/src/app/[userId]/[labId]/animals/types"
+import type { AnimalPagination } from "@/src/app/[labId]/animals/types"
 import { LayoutGrid, LayoutList, MoreHorizontal, Edit } from "lucide-react"
 import { Checkbox } from "@/src/components/ui/checkbox"
 import { Animal, AnimalStatus, Sex } from "./types"
@@ -175,7 +175,7 @@ export function AnimalsList({animals, animalPagination, setPagination, handleUpd
                   </TableCell>
                   <TableCell className="font-medium">{animal.identifier}</TableCell>
                   <TableCell>
-                    <Link href={`/${userId}/${labId}/animals/${animal.id}`} className="text-blue-600 hover:underline">
+                    <Link href={`/${labId}/animals/${animal.id}`} className="text-blue-600 hover:underline">
                       {animal.name}
                     </Link>
                   </TableCell>
@@ -215,7 +215,7 @@ export function AnimalsList({animals, animalPagination, setPagination, handleUpd
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <Link href={`/${userId}/${labId}/animals/${animal.id}`} key={animal.id}>
+                          <Link href={`/${labId}/animals/${animal.id}`} key={animal.id}>
                             <DropdownMenuItem>View details</DropdownMenuItem>
                           </Link>
                           <DropdownMenuItem
@@ -227,7 +227,7 @@ export function AnimalsList({animals, animalPagination, setPagination, handleUpd
                             Edit animal
                           </DropdownMenuItem>
                           <DropdownMenuItem>
-                            <Link href={`/${userId}/${labId}/animals/${animal.id}/measurements/new`} key={animal.id}>
+                            <Link href={`/${labId}/animals/${animal.id}/measurements/new`} key={animal.id}>
                                 Add measurement
                             </Link>
                           </DropdownMenuItem>
@@ -354,7 +354,7 @@ export function AnimalsList({animals, animalPagination, setPagination, handleUpd
                   {animal.sex === Sex.UNKNOWN && <span className="text-xl">❔</span>}
                 </div>
                 <h3 className="text-lg font-medium">
-                  <Link href={`/${userId}/${labId}/animals/${animal.id}`} className="text-blue-600 hover:underline">
+                  <Link href={`/${labId}/animals/${animal.id}`} className="text-blue-600 hover:underline">
                     {animal.name}
                   </Link>
                 </h3>
@@ -404,7 +404,7 @@ export function AnimalsList({animals, animalPagination, setPagination, handleUpd
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <Link href={`/${userId}/${labId}/animals/${animal.id}`} key={animal.id}>
+                      <Link href={`/${labId}/animals/${animal.id}`} key={animal.id}>
                           <DropdownMenuItem>View details</DropdownMenuItem>
                       </Link>
                       <DropdownMenuItem
@@ -416,7 +416,7 @@ export function AnimalsList({animals, animalPagination, setPagination, handleUpd
                         Edit animal
                       </DropdownMenuItem>
                       <DropdownMenuItem>
-                          <Link href={`/${userId}/${labId}/animals/${animal.id}/measurements/new`} key={animal.id}>
+                          <Link href={`/${labId}/animals/${animal.id}/measurements/new`} key={animal.id}>
                               Add measurement
                           </Link>
                       </DropdownMenuItem>

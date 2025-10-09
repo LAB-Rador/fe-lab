@@ -84,13 +84,13 @@ export interface LaboratoriesContainerProps {
 
 export interface LaboratoriesViewProps {
     getInitials: (firstName: string, lastName: string) => string;
+    setSearchTerm: React.Dispatch<SetStateAction<string>>;
     formatDate: (date: Date | string) => string
     filteredLaboratories: Laboratory[] | [];
     handleLabClick: (labId: string) => void;
     handleCreateLab: VoidFunction;
     handleJoinLab: VoidFunction;
     userInfo: UserInfo | null;
-    setSearchTerm: React.Dispatch<SetStateAction<string>>;
     isLoading: boolean;
     searchTerm: string;
 }

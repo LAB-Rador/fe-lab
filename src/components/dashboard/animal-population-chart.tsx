@@ -1,6 +1,6 @@
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { ChartContainer, ChartTooltipContent } from "@/src/components/ui/chart"
-import type { Animal } from "@/src/app/[userId]/[labId]/dashboard/types"
+import type { Animal } from "@/src/app/[labId]/dashboard/types"
 import { useMemo } from "react"
 
 const colors = [

@@ -4,7 +4,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
 import { Sex, AnimalStatus, type CreateAnimalData, type AnimalType, type Animal } from "./types"
 import { Popover, PopoverContent, PopoverTrigger } from "@/src/components/ui/popover"
-import type { AnimalEnums } from "@/src/app/[userId]/[labId]/animals/types"
+import type { AnimalEnums } from "@/src/app/[labId]/animals/types"
 import { Calendar } from "@/src/components/ui/calendar"
 import { Textarea } from "@/src/components/ui/textarea"
 import { zodResolver } from "@hookform/resolvers/zod"

@@ -1,5 +1,12 @@
 import type { AnimalStatus, AnimalType, Laboratory, Sex } from "@/src/components/animals/types";
 
+export interface PageProps {
+    params: {
+        labId: string;
+        id: string
+    }
+}
+
 export interface Animal {
     acquisitionDate: string;
     animalType: AnimalType;

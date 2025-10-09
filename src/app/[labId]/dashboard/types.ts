@@ -1,4 +1,4 @@
-import type { AnimalStatus, AnimalType, ExperimentStatus, Laboratory, Sex } from "../../types";
+import type { AnimalStatus, AnimalType, ExperimentStatus, Laboratory, Sex } from "../../account/types";
 
 export interface PageProps {
     params: {

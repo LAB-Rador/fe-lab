@@ -71,7 +71,7 @@ export default function MeasurementsView({
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    {animalEnums.recordType.map((type) => (
+                                                    {animalEnums?.recordType.map((type) => (
                                                     <SelectItem key={type} value={type}>
                                                         {type}
                                                     </SelectItem>
@@ -218,7 +218,7 @@ export default function MeasurementsView({
                                                             </SelectTrigger>
                                                         </FormControl>
                                                         <SelectContent>
-                                                            {animalEnums.activityLevel.map((type) => (
+                                                            {animalEnums?.activityLevel.map((type) => (
                                                             <SelectItem key={type} value={type}>
                                                                 {type}
                                                             </SelectItem>

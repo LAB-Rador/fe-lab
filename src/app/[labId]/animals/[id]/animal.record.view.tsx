@@ -71,7 +71,7 @@ export default function AnimalDetailPage({userId, labId, animalId, animal, handl
             </Button>
             <Button
               onClick={() => {
-                router.push(`/${userId}/${labId}/animals/${animalId}/measurements/new`)
+                router.push(`/${labId}/animals/${animalId}/measurements/new`)
               }}
               size="sm"
             >

@@ -1,4 +1,4 @@
-import type { Animal, Experiment, Task } from "@/src/app/[userId]/[labId]/dashboard/types"
+import type { Animal, Experiment, Task } from "@/src/app/[labId]/dashboard/types"
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { Beaker, MousePointer, ClipboardList, AlertTriangle } from "lucide-react"
 import { useMemo } from "react"
