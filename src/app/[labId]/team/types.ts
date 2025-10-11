@@ -1,3 +1,6 @@
+import type { AccessStatus, AnimalStatus, Role, Sex } from "../../account/types";
+import type { ActivityLevel, RecordType } from "../animals/types";
+
 export interface InitialMembersTypes {
     id: string;
     name: string;
@@ -12,27 +15,14 @@ export interface InitialMembersTypes {
 };
 
 export interface NewMemberTypes {
-    department: string;
     email: string;
-    phone: string;
     role: string;
-    name: string;
 }
-
-export enum Departments {
-    ALL_DEPARTMENTS = "All Departments",
-    NEUROBIOLOGY = "Neurobiology",
-    BEHAVIORAL_SCIENCE = "Behavioral Science",
-    GENETICS = "Genetics",
-    TOXICOLOGY = "Toxicology",
-    GENERAL_LAB = "General Lab",
-}
-
-export enum Roles {
-    ALL_ROLES = "All Roles",
-    LEAD_RESEARCHER = "Lead Researcher",
-    SENIOR_RESEARCHER = "Senior Researcher",
-    RESEARCH_ASSOCIATE = "Research Associate",
-    LAB_TECHNICIAN = "Lab Technician",
-    GRADUATE_ASSISTANT = "Graduate Assistant",
+export interface AnimalEnums {
+    activityLevel: ActivityLevel[];
+    accessStatus: AccessStatus[]
+    recordType: RecordType[];
+    status: AnimalStatus[];
+    role: Role[];
+    sex: Sex[];
 }

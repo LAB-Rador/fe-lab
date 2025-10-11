@@ -1,17 +1,21 @@
 "use client";
 
-import type { InitialMembersTypes } from "./types";
+import type { AnimalEnums, InitialMembersTypes } from "./types";
 import TeamView from "./team.view";
 import { useState } from "react";
+import { apiClient } from "@/src/lib/apiClient";
+import { toast } from "sonner";
 
 interface TeamContainerProps{
-    initialMembers: InitialMembersTypes[]
+    initialMembers: InitialMembersTypes[],
+    animalEnums: AnimalEnums,
+    userId: string,
+    labId: string,
 }
 
 export default function TeamContainer(props: TeamContainerProps) {
-    const {initialMembers} = props;
+    const {initialMembers, animalEnums, userId, labId} = props;
 
-    const [departmentFilter, setDepartmentFilter] = useState("All Departments");
     const [memberToDelete, setMemberToDelete] = useState<string | null>(null);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -19,11 +23,8 @@ export default function TeamContainer(props: TeamContainerProps) {
     const [members, setMembers] = useState(initialMembers);
     const [searchQuery, setSearchQuery] = useState("");
     const [newMember, setNewMember] = useState({
-        department: "",
         email: "",
-        phone: "",
         role: "",
-        name: "",
     });
 
   // Filter members based on search query and filters
@@ -33,45 +34,37 @@ export default function TeamContainer(props: TeamContainerProps) {
       member.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       member.department.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesDepartment =
-      departmentFilter === "All Departments" ||
-      member.department === departmentFilter;
-
     const matchesRole =
       roleFilter === "All Roles" || member.role === roleFilter;
 
-    return matchesSearch && matchesDepartment && matchesRole;
+    return matchesSearch && matchesRole;
   });
 
   // Handle add member
-  const handleAddMember = () => {
-    if (
-      newMember.name &&
-      newMember.role &&
-      newMember.department &&
-      newMember.email
-    ) {
-      const member = {
-        id: `member-${Date.now()}`,
-        name: newMember.name,
-        role: newMember.role,
-        department: newMember.department,
-        email: newMember.email,
-        phone: newMember.phone,
-        joinDate: new Date().toISOString().split("T")[0],
-        activeExperiments: 0,
-        avatar: "/placeholder.svg?height=80&width=80",
-        status: "active" as const,
-      };
-      setMembers([...members, member]);
-      setIsAddDialogOpen(false);
-      setNewMember({
-        name: "",
-        role: "",
-        department: "",
-        email: "",
-        phone: "",
-      });
+  const handleAddMember = async () => {
+    try {
+      if ( newMember.role && newMember.email ) {
+        const member = {
+          email: newMember.email,
+          role: newMember.role,
+          invitedBy: userId,
+          labId: labId,
+        };
+
+        const response = await apiClient.post("/api/invitation", member);
+        toast(response.message || response.error, {
+          description: ``
+        });
+        if(response.success) {
+          setIsAddDialogOpen(false);
+          setNewMember({
+            role: "",
+            email: "",
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Failed to create Invitation:", error)
     }
   };
 
@@ -92,11 +85,9 @@ export default function TeamContainer(props: TeamContainerProps) {
     return (
         <TeamView
             setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-            setDepartmentFilter={setDepartmentFilter}
             setIsAddDialogOpen={setIsAddDialogOpen}
             handleDeleteMember={handleDeleteMember}
             isDeleteDialogOpen={isDeleteDialogOpen}
-            departmentFilter={departmentFilter}
             isAddDialogOpen={isAddDialogOpen}
             filteredMembers={filteredMembers}
             handleAddMember={handleAddMember}
@@ -105,6 +96,7 @@ export default function TeamContainer(props: TeamContainerProps) {
             confirmDelete={confirmDelete}
             setNewMember={setNewMember}
             searchQuery={searchQuery}
+            animalEnums={animalEnums}
             roleFilter={roleFilter}
             newMember={newMember}
             members={members}

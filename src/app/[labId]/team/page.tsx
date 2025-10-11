@@ -1,7 +1,9 @@
 "use server"
 
 import type { InitialMembersTypes } from "./types";
+import { apiClient } from "@/src/lib/apiClient";
 import TeamContainer from "./team.container";
+import { cookies } from "next/headers";
 
 // Mock data for team members
 const initialMembers: InitialMembersTypes[] = [
@@ -127,8 +129,23 @@ const initialMembers: InitialMembersTypes[] = [
   },
 ];
 
-export default async function TeamPage() {
+interface TeamPageTypes {
+  params: {
+    labId: string
+  }
+}
+
+export default async function TeamPage({params}: TeamPageTypes) {
+  const { labId } = await params;
+  const cookieStore = await cookies();
+  const userId = await cookieStore.get('USER_ID')?.value || 'default';
+  const animalEnums = await apiClient.get(`/api/animals/enums`);
   return (
-    <TeamContainer initialMembers={initialMembers} />
+    <TeamContainer 
+      initialMembers={initialMembers}
+      animalEnums={animalEnums.data}
+      userId={userId}
+      labId={labId}
+    />
   );
 }
