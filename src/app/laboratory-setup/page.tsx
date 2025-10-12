@@ -65,7 +65,7 @@ const LaboratorySetupPage = () => {
             if(response.success) {
                 dispatch(setLaboratory(response?.data));
                 setSuccess("Laboratory created successfully!");
-                router.push(`/${user.userId}`);
+                router.push(`/account`);
             } else {
                 setError(response?.message);
             }

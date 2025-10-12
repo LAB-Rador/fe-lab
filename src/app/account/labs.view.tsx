@@ -178,15 +178,15 @@ export default function LaboratoriesView(
                                             <p>Owner:</p>
                                             {lab.username}
                                         </div>
+                                        <Badge variant="secondary" className="flex gap-1 w-fit mt-1 text-xs">
+                                            <p>Position:</p>
+                                            {lab.position}
+                                        </Badge>
                                         <div className="flex gap-1 items-center text-sm text-gray-600">
                                             <BriefcaseBusiness className="h-3 w-3" />
                                             <p>Member:</p>
                                             {userInfo?.firstName} {userInfo?.lastName}
                                         </div>
-                                        <Badge variant="secondary" className="flex gap-1 w-fit mt-1 text-xs">
-                                            <p>Position:</p>
-                                            {lab.position}
-                                        </Badge>
                                     </CardDescription>
                                 </div>
                                 <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-blue-600 transition-colors" />
