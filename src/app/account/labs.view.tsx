@@ -1,4 +1,4 @@
-import { Building2, Plus, Users, Calendar, MapPin, Mail, User, ChevronRight, Search } from "lucide-react"
+import { Building2, Plus, Users, Calendar, MapPin, Mail, User, ChevronRight, Search, BriefcaseBusiness } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { Avatar, AvatarFallback } from "@/src/components/ui/avatar"
 import type { LaboratoriesViewProps } from "./types"
@@ -176,6 +176,11 @@ export default function LaboratoriesView(
                                         <div className="flex gap-1 items-center text-sm text-gray-600">
                                             <User className="h-3 w-3" />
                                             <p>Owner:</p>
+                                            {lab.username}
+                                        </div>
+                                        <div className="flex gap-1 items-center text-sm text-gray-600">
+                                            <BriefcaseBusiness className="h-3 w-3" />
+                                            <p>Member:</p>
                                             {userInfo?.firstName} {userInfo?.lastName}
                                         </div>
                                         <Badge variant="secondary" className="flex gap-1 w-fit mt-1 text-xs">
