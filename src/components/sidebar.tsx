@@ -17,6 +17,7 @@ import {
   BookUser,
   LogOut,
   Rat,
+  IdCard,
 } from "lucide-react"
 
 export function Sidebar() {
@@ -130,6 +131,14 @@ export function Sidebar() {
         </div>
       </ScrollArea>
       <div className="absolute bottom-4 left-0 right-0 px-3">
+        <Button
+          variant="ghost"
+          className={cn("w-full justify-start text-gray-500 hover:text-gray-900", !isOpen && "justify-center px-0")}
+          onClick={() => {router.push("/account")}}
+        >
+          <IdCard className="h-4 w-4 mr-2" />
+          {isOpen && <span>Account / Labs</span>}
+        </Button>
         <Button
           variant="ghost"
           className={cn("w-full justify-start text-gray-500 hover:text-gray-900", !isOpen && "justify-center px-0")}

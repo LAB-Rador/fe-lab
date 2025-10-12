@@ -173,11 +173,13 @@ export default function LaboratoriesView(
                                         {lab.name}
                                     </CardTitle>
                                     <CardDescription className="mt-1">
-                                        <div className="flex items-center text-sm text-gray-600">
-                                            <User className="h-3 w-3 mr-1" />
-                                            {lab.username}
+                                        <div className="flex gap-1 items-center text-sm text-gray-600">
+                                            <User className="h-3 w-3" />
+                                            <p>Owner:</p>
+                                            {userInfo?.firstName} {userInfo?.lastName}
                                         </div>
-                                        <Badge variant="secondary" className="mt-1 text-xs">
+                                        <Badge variant="secondary" className="flex gap-1 w-fit mt-1 text-xs">
+                                            <p>Position:</p>
                                             {lab.position}
                                         </Badge>
                                     </CardDescription>

@@ -32,7 +32,7 @@ const LaboratorySetupPage = () => {
         name: "",
     })
     // Join laboratory state
-    const [invitationCode, setInvitationCode] = useState("")
+    const [invitationCode, setInvitationCode] = useState("");
 
     const dispatch = useAppDispatch();
 
@@ -84,21 +84,30 @@ const LaboratorySetupPage = () => {
         setSuccess("")
 
         try {
-            // Simulate API call to join laboratory
-            await new Promise((resolve) => setTimeout(resolve, 2000))
+            const user = await AuthService.getCurrentUser();
 
-            setSuccess("Successfully joined laboratory!")
+            const userData = {
+                code: invitationCode,
+                userId: user.userId,
+            }
 
-            // Redirect to dashboard after success
-            setTimeout(() => {
-                router.push("/dashboard")
-            }, 1500)
+            const response = await apiClient.post("/api/invitation/verification", userData);
+            toast(response.success ? "Success!" : "Error!", {
+                description: response.success ? `${response?.message}` : response?.message
+            })
+            
+            if(response.success) {
+                setSuccess("Congratulations, you have been successfully added to the lab.");
+                router.push(`/account`);
+            } else {
+                setError(response?.message);
+            }
         } catch (err) {
             setError("Invalid invitation code. Please check and try again.")
         } finally {
             setIsLoading(false)
         }
-    }, []);
+    }, [invitationCode, router]);
 
     const isCreateFormValid = useMemo(() => {
         return laboratoryData.name.trim() !== ""
