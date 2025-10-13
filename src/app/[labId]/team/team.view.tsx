@@ -7,6 +7,7 @@ import { Mail, Phone, Plus, Search, Trash2, UserPlus } from "lucide-react";
 import { Card, CardContent } from "@/src/components/ui/card";
 import type { Dispatch, SetStateAction } from "react";
 import { Button } from "@/src/components/ui/button";
+import { AccessStatus, Role } from "../../account/types";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 import { Badge } from "@/src/components/ui/badge";
@@ -28,6 +29,7 @@ interface TeamViewProps {
     animalEnums: AnimalEnums;
     searchQuery: string;
     roleFilter: string;
+    userId: string;
 }
 
 export default function TeamView (props: TeamViewProps) {
@@ -48,7 +50,10 @@ export default function TeamView (props: TeamViewProps) {
         roleFilter,
         newMember,
         members,
+        userId,
     } = props;
+
+    const currentUserRole = filteredMembers.find((user) => user.user.id === userId);
 
     return (
         <div className="space-y-6">
@@ -85,6 +90,9 @@ export default function TeamView (props: TeamViewProps) {
                         <SelectValue placeholder="Role" />
                     </SelectTrigger>
                     <SelectContent>
+                        <SelectItem value={"ALL ROLES"}>
+                            ALL ROLES
+                        </SelectItem>
                         {animalEnums.role.map((role) => (
                         <SelectItem key={role} value={role}>
                             {role}
@@ -103,20 +111,24 @@ export default function TeamView (props: TeamViewProps) {
             {filteredMembers.map((member: InitialMembersTypes) => (
                 <Card
                 key={member.id}
-                className="overflow-hidden hover:shadow-lg transition-shadow"
+                className={member.userId === userId ? "overflow-hidden hover:shadow-lg transition-shadow border-blue-600" : "overflow-hidden hover:shadow-lg transition-shadow"}
                 >
                 <CardContent className="p-6">
                     <div className="flex items-start justify-between mb-4">
                     <Avatar className="h-16 w-16">
                         <AvatarImage
-                        src={member.avatar || "/placeholder.svg"}
-                        alt={member.name}
+                            src={"/placeholder.svg"}
+                            alt={`${member.user.firstName} ${member.user.lastName}`}
                         />
                         <AvatarFallback className="bg-blue-100 text-blue-600 text-lg">
-                        {member.name
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")}
+                            {member.user.firstName
+                                ?.split(" ")
+                                .map((n) => n[0])
+                                .join("") || ""}
+                            {member.user.lastName
+                                ?.split(" ")
+                                .map((n) => n[0])
+                                .join("") || ""}
                         </AvatarFallback>
                     </Avatar>
                     <Button
@@ -124,6 +136,7 @@ export default function TeamView (props: TeamViewProps) {
                         size="icon"
                         className="text-red-500 hover:text-red-700 hover:bg-red-50"
                         onClick={() => handleDeleteMember(member.id)}
+                        disabled={currentUserRole?.role !== Role.OWNER || member.role === Role.OWNER}
                     >
                         <Trash2 className="h-4 w-4" />
                         <span className="sr-only">Delete member</span>
@@ -132,25 +145,27 @@ export default function TeamView (props: TeamViewProps) {
     
                     <div className="space-y-3">
                     <div>
-                        <h3 className="font-semibold text-lg">{member.name}</h3>
+                        <h3 className="font-semibold text-lg">{member.user.firstName || ""} {member.user.lastName || ""}</h3>
                         <p className="text-sm text-gray-600">{member.role}</p>
                     </div>
     
                     <div className="flex items-center gap-2">
-                        <Badge variant="secondary" className="text-xs">
-                        {member.department}
-                        </Badge>
+                        {member.user.address && (
+                            <Badge variant="secondary" className="text-xs">
+                                {member.user.address}
+                            </Badge>
+                        )}
                         <Badge
-                        variant={
-                            member.status === "active" ? "default" : "secondary"
-                        }
-                        className={
-                            member.status === "active"
-                            ? "bg-green-100 text-green-800 hover:bg-green-200"
-                            : ""
-                        }
+                            variant={
+                                member.accessStatus === AccessStatus.ACTIVE ? "default" : "secondary"
+                            }
+                            className={
+                                member.accessStatus === AccessStatus.ACTIVE
+                                ? "bg-green-100 text-green-800 hover:bg-green-200"
+                                : ""
+                            }
                         >
-                        {member.status}
+                            {member.accessStatus}
                         </Badge>
                     </div>
     
@@ -158,28 +173,30 @@ export default function TeamView (props: TeamViewProps) {
                         <div className="flex items-center gap-2 text-sm text-gray-600">
                         <Mail className="h-4 w-4" />
                         <a
-                            href={`mailto:${member.email}`}
+                            href={`mailto:${member.user.email}`}
                             className="hover:text-blue-600 truncate"
                         >
-                            {member.email}
+                            {member.user.email}
                         </a>
                         </div>
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Phone className="h-4 w-4" />
-                        <span>{member.phone}</span>
-                        </div>
+                        {member.user.contactPhone && (
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                                <Phone className="h-4 w-4" />
+                                <span>{member.user.contactPhone}</span>
+                            </div>
+                        )}
                     </div>
     
                     <div className="pt-2 border-t border-gray-100">
                         <div className="flex justify-between text-sm">
                         <span className="text-gray-500">Active Experiments</span>
                         <span className="font-semibold text-blue-600">
-                            {member.activeExperiments}
+                            {"-"}
                         </span>
                         </div>
                         <div className="flex justify-between text-sm mt-1">
                         <span className="text-gray-500">Join Date</span>
-                        <span className="font-medium">{member.joinDate}</span>
+                        <span className="font-medium">{new Date(member.joinedAt).toISOString().split('T')[0]}</span>
                         </div>
                     </div>
                     </div>

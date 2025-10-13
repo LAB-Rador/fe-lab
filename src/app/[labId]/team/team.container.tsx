@@ -19,7 +19,7 @@ export default function TeamContainer(props: TeamContainerProps) {
     const [memberToDelete, setMemberToDelete] = useState<string | null>(null);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-    const [roleFilter, setRoleFilter] = useState("All Roles");
+    const [roleFilter, setRoleFilter] = useState("ALL ROLES");
     const [members, setMembers] = useState(initialMembers);
     const [searchQuery, setSearchQuery] = useState("");
     const [newMember, setNewMember] = useState({
@@ -30,12 +30,13 @@ export default function TeamContainer(props: TeamContainerProps) {
   // Filter members based on search query and filters
   const filteredMembers = members.filter((member) => {
     const matchesSearch =
-      member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      member.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      member.department.toLowerCase().includes(searchQuery.toLowerCase());
+      member.user.firstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      member.user.lastName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      member.user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      member.user.institution?.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesRole =
-      roleFilter === "All Roles" || member.role === roleFilter;
+      roleFilter === "ALL ROLES" || member.role === roleFilter;
 
     return matchesSearch && matchesRole;
   });
@@ -100,6 +101,7 @@ export default function TeamContainer(props: TeamContainerProps) {
             roleFilter={roleFilter}
             newMember={newMember}
             members={members}
+            userId={userId}
         />
     );
 };
