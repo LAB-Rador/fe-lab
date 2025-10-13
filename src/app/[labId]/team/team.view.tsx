@@ -129,7 +129,7 @@ export default function TeamView (props: TeamViewProps) {
                                     .join("") || ""}
                             </AvatarFallback>
                         </Avatar>
-                        {(member.role !== Role.OWNER && member?.userId === userId) || member.role !== Role.OWNER &&
+                        {(member.role !== Role.OWNER && member?.userId !== userId) || member.role !== Role.OWNER &&
                             <Button
                                 variant="ghost"
                                 size="icon"
