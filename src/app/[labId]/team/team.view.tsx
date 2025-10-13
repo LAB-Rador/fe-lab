@@ -53,8 +53,6 @@ export default function TeamView (props: TeamViewProps) {
         userId,
     } = props;
 
-    const currentUserRole = filteredMembers.find((user) => user.user.id === userId);
-
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -131,7 +129,7 @@ export default function TeamView (props: TeamViewProps) {
                                     .join("") || ""}
                             </AvatarFallback>
                         </Avatar>
-                        {currentUserRole?.role !== Role.OWNER || member.role === Role.OWNER &&
+                        {member.role === Role.OWNER || member?.userId !== userId &&
                             <Button
                                 variant="ghost"
                                 size="icon"
