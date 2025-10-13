@@ -115,32 +115,33 @@ export default function TeamView (props: TeamViewProps) {
                 >
                 <CardContent className="p-6">
                     <div className="flex items-start justify-between mb-4">
-                    <Avatar className="h-16 w-16">
-                        <AvatarImage
-                            src={"/placeholder.svg"}
-                            alt={`${member.user.firstName} ${member.user.lastName}`}
-                        />
-                        <AvatarFallback className="bg-blue-100 text-blue-600 text-lg">
-                            {member.user.firstName
-                                ?.split(" ")
-                                .map((n) => n[0])
-                                .join("") || ""}
-                            {member.user.lastName
-                                ?.split(" ")
-                                .map((n) => n[0])
-                                .join("") || ""}
-                        </AvatarFallback>
-                    </Avatar>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                        onClick={() => handleDeleteMember(member.id)}
-                        disabled={currentUserRole?.role !== Role.OWNER || member.role === Role.OWNER}
-                    >
-                        <Trash2 className="h-4 w-4" />
-                        <span className="sr-only">Delete member</span>
-                    </Button>
+                        <Avatar className="h-16 w-16">
+                            <AvatarImage
+                                src={"/placeholder.svg"}
+                                alt={`${member.user.firstName} ${member.user.lastName}`}
+                            />
+                            <AvatarFallback className="bg-blue-100 text-blue-600 text-lg">
+                                {member.user.firstName
+                                    ?.split(" ")
+                                    .map((n) => n[0])
+                                    .join("") || ""}
+                                {member.user.lastName
+                                    ?.split(" ")
+                                    .map((n) => n[0])
+                                    .join("") || ""}
+                            </AvatarFallback>
+                        </Avatar>
+                        {currentUserRole?.role !== Role.OWNER || member.role === Role.OWNER &&
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                                onClick={() => handleDeleteMember(member.id)}
+                            >
+                                <Trash2 className="h-4 w-4" />
+                                <span className="sr-only">Delete member</span>
+                            </Button>
+                        }
                     </div>
     
                     <div className="space-y-3">

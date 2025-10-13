@@ -1,9 +1,9 @@
 "use client";
 
 import type { AnimalEnums, InitialMembersTypes } from "./types";
-import TeamView from "./team.view";
-import { useState } from "react";
 import { apiClient } from "@/src/lib/apiClient";
+import { useCallback, useState } from "react";
+import TeamView from "./team.view";
 import { toast } from "sonner";
 
 interface TeamContainerProps{
@@ -42,7 +42,7 @@ export default function TeamContainer(props: TeamContainerProps) {
   });
 
   // Handle add member
-  const handleAddMember = async () => {
+  const handleAddMember = useCallback(async () => {
     try {
       if ( newMember.role && newMember.email ) {
         const member = {
@@ -67,7 +67,7 @@ export default function TeamContainer(props: TeamContainerProps) {
     } catch (error) {
       console.error("Failed to create Invitation:", error)
     }
-  };
+  }, [newMember, userId, labId])
 
   // Handle delete member
   const handleDeleteMember = (id: string) => {
@@ -75,13 +75,28 @@ export default function TeamContainer(props: TeamContainerProps) {
     setIsDeleteDialogOpen(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = useCallback(async() => {
     if (memberToDelete) {
-      setMembers(members.filter((member) => member.id !== memberToDelete));
-      setIsDeleteDialogOpen(false);
-      setMemberToDelete(null);
+      const userLabId = memberToDelete;
+      try {
+        const response = await apiClient.delete(`/api/laboratory/${userId}/${labId}/${userLabId}`);
+        const resSuccess = response.success;
+
+        toast(resSuccess ? "Success" : "Error", {
+          description: response.message
+        });
+
+        if(resSuccess) {
+          setMembers(members.filter((member) => member.id !== memberToDelete));
+          setIsDeleteDialogOpen(false);
+          setMemberToDelete(null);
+        }
+
+      } catch (error) {
+        console.error("Failed to delete a Member:", error)
+      }
     }
-  };
+  }, [memberToDelete, userId, labId]);
 
     return (
         <TeamView
