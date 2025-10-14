@@ -20,7 +20,8 @@ export default async function DashboardLayout({
   const cookieStore = await cookies();
   const userId = await cookieStore.get('USER_ID')?.value || 'default';
   const laboratories = await apiClient.get(`/api/laboratories/${userId}`);
-  const laboratory = laboratories.data.find((laboratory: Laboratory) => laboratory.name === labId);
+  const laboratory = await laboratories.data.find((laboratory: Laboratory) => laboratory.name === labId);
+  const laboratoryMembers = await apiClient.get(`/api/laboratory/${userId}/${labId}`);
 
   if(!laboratory) {
     redirect('/account');
@@ -31,7 +32,7 @@ export default async function DashboardLayout({
       <div className="flex min-h-screen bg-gray-50">
         <Sidebar />
         <div className="flex flex-1 flex-col">
-          <DashboardHeader />
+          <DashboardHeader laboratoryMembers={laboratoryMembers} />
           <main className="flex-1 p-6">{children}</main>
         </div>
       </div>

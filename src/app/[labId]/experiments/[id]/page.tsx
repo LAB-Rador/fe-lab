@@ -144,10 +144,18 @@ const experimentData = {
   ],
 }
 
-  export default function ExperimentDetailPage({ params }: { params: Promise<{ id: string }> }) {
-    const [activeTab, setActiveTab] = useState("overview")
-    const resolvedParams = use(params)
-    const experimentId = resolvedParams.id
+interface ExperimentPageTypes {
+  params: {
+    id: string,
+    labId: string
+  }
+}
+
+export default function ExperimentDetailPage({ params }: { params: Promise<ExperimentPageTypes['params']> }) {
+  const [activeTab, setActiveTab] = useState("overview")
+  const resolvedParams = use(params)
+  const experimentId = resolvedParams.id
+  const labId = resolvedParams.labId
 
   // In a real app, you would fetch the experiment data based on the ID
   const experiment = experimentData
@@ -157,7 +165,7 @@ const experimentData = {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" asChild>
-            <Link href="/experiments">
+            <Link href={`/${labId}/experiments`}>
               <ArrowLeft className="h-5 w-5" />
               <span className="sr-only">Back to experiments</span>
             </Link>
