@@ -53,6 +53,8 @@ export default function TeamView (props: TeamViewProps) {
         userId,
     } = props;
 
+    const labOwner = members.find((member) => userId === member.userId);
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -129,7 +131,7 @@ export default function TeamView (props: TeamViewProps) {
                                     .join("") || ""}
                             </AvatarFallback>
                         </Avatar>
-                        {(member.role !== Role.OWNER && member?.userId !== userId) || member.role !== Role.OWNER &&
+                        {(member.role !== Role.OWNER && member?.userId !== userId && labOwner?.role === Role.OWNER) &&
                             <Button
                                 variant="ghost"
                                 size="icon"
