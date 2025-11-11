@@ -75,6 +75,7 @@ export interface AnimalPagination {
 }
 
 export interface AnimalEnums {
+    experimentStatus: ExperimentStatus[];
     activityLevel: ActivityLevel[];
     recordType: RecordType[];
     status: AnimalStatus[];
@@ -112,4 +113,12 @@ export enum ActivityLevel {
     NORMAL = "NORMAL",
     HIGH = "HIGH",
     LOW = "LOW",
+}
+
+export enum ExperimentStatus {
+    COMPLETED = "COMPLETED",
+    CANCELLED = "CANCELLED",
+    PLANNED = "PLANNED",
+    ACTIVE = "ACTIVE",
+    PAUSED = "PAUSED",
 }

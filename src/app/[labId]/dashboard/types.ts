@@ -34,6 +34,13 @@ export interface Experiment {
     startDate: string;
     endDate?: string;
     title: string;
+    createdBy?: {
+        id: string;
+        email: string;
+        firstName?: string;
+        lastName?: string;
+    };
+    id: string;
 }
 
 export interface Task {
