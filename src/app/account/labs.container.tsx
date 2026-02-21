@@ -2,6 +2,7 @@
 
 import type { LaboratoriesContainerProps, Laboratory, UserInfo } from "./types"
 import { useState, useEffect, useCallback, useMemo } from "react"
+import { getInitials } from "@/src/lib/utils"
 import { AuthService } from "@/src/lib/auth"
 import { useRouter } from "next/navigation"
 import LaboratoriesView from "./labs.view"
@@ -48,10 +49,6 @@ export default function LaboratoriesContainer({ userLaboratories }: Laboratories
             month: "long", 
             day: "numeric",
         }).format(dateObj);
-    }, []);
-
-    const getInitials = useCallback((firstName: string, lastName: string) => {
-        return `${firstName.charAt(0)}${lastName.charAt(0)}`
     }, []);
 
     const handleLabClick = useCallback((labId: string) => {

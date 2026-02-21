@@ -6,10 +6,11 @@ import type { InitialMembersTypes } from "@/src/app/[labId]/team/types"
 import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
 import { Badge } from "@/src/components/ui/badge"
+import { getInitials } from "@/src/lib/utils"
 import { Bell, Search } from "lucide-react"
 
 export function DashboardHeader({laboratoryMembers}: {laboratoryMembers: InitialMembersTypes[]}) {
-  return (
+    return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 md:px-6">
       <div className="flex flex-1 items-center gap-4 md:gap-8">
         <form className="hidden md:block md:flex-1">
@@ -24,24 +25,16 @@ export function DashboardHeader({laboratoryMembers}: {laboratoryMembers: Initial
         </form>
       </div>
       <div className="flex items-center gap-4">
-        <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
+        <div className="*:data-[slot=avatar]:ring-background flex space-x-1 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
           {laboratoryMembers.map((member) => {
             return (
               <DropdownMenu key={member.id}>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src="/placeholder.svg" alt={`${member.user.firstName} ${member.user.lastName}`} />
-                      <AvatarFallback className="bg-blue-100 text-blue-600 text-lg">
-                          {member.user.firstName
-                            ?.split(" ")
-                            .map((n) => n[0])
-                            .join("") || ""}
-                          {member.user.lastName
-                            ?.split(" ")
-                            .map((n) => n[0])
-                            .join("") || ""}
-                      </AvatarFallback>
+                  <Button disabled variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Avatar className="h-10 w-10">
+                        <AvatarFallback className="bg-blue-600 text-white text-lg font-semibold">
+                          {getInitials(member.user.firstName || "", member.user.lastName || "")}
+                        </AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>

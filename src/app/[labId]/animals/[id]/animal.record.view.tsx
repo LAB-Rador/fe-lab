@@ -65,10 +65,6 @@ export default function AnimalDetailPage({userId, labId, animalId, animal, handl
           </div>
 
           <div className="flex gap-2">
-            <Button variant="outline" size="sm">
-              <Edit className="h-4 w-4 mr-2" />
-              Edit
-            </Button>
             <Button
               onClick={() => {
                 router.push(`/${labId}/animals/${animalId}/measurements/new`)

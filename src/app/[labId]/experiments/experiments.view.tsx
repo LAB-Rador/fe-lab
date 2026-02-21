@@ -20,6 +20,7 @@ import {
 import Link from "next/link"
 
 interface ExperimentsViewProps {
+    calculateProgress: (startDate?: string, endDate?: string) => number;
     setStatusFilter: Dispatch<SetStateAction<string>>;
     setSearchQuery: Dispatch<SetStateAction<string>>;
     setDateFilter: Dispatch<SetStateAction<string>>;
@@ -32,7 +33,7 @@ interface ExperimentsViewProps {
 }
 
 export default function ExperimentsView(props: ExperimentsViewProps) {
-    const { filteredExperiments, setStatusFilter, setSearchQuery, setDateFilter, setOpen, statusFilter, searchQuery, dateFilter, labId } = props;
+    const { filteredExperiments, setStatusFilter, setSearchQuery, setDateFilter, setOpen, statusFilter, searchQuery, dateFilter, labId, calculateProgress } = props;
 
     return (
       <div className="space-y-6">
@@ -63,7 +64,7 @@ export default function ExperimentsView(props: ExperimentsViewProps) {
           </div>
           <div className="flex gap-2">
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[140px]">
+              <SelectTrigger className="sm:w-[140px] [display: contents]">
                 <Filter className="mr-2 h-4 w-4" />
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
@@ -78,7 +79,7 @@ export default function ExperimentsView(props: ExperimentsViewProps) {
             </Select>
   
             <Select value={dateFilter} onValueChange={setDateFilter}>
-              <SelectTrigger className="w-[140px]">
+              <SelectTrigger className="sm:w-[140px] [display: contents]">
                 <Calendar className="mr-2 h-4 w-4" />
                 <SelectValue placeholder="Date" />
               </SelectTrigger>
@@ -124,7 +125,7 @@ export default function ExperimentsView(props: ExperimentsViewProps) {
                       <Beaker className="h-5 w-5 text-blue-600" />
                       <StatusBadge status={experiment.status as any} />
                     </div>
-                    <div className="text-sm text-gray-500">ID: {experiment.id}</div>
+                    <div className="text-sm text-gray-500">Dates: {experiment.startDate ? new Date(experiment.startDate).toLocaleDateString() : 'N/A'} - {experiment.endDate ? new Date(experiment.endDate).toLocaleDateString() : 'N/A'}</div>
                   </div>
                   <h3 className="font-semibold text-lg mb-2 line-clamp-2">{experiment.title}</h3>
                   <p className="text-gray-600 text-sm mb-4 line-clamp-2">{experiment.description}</p>
@@ -132,12 +133,10 @@ export default function ExperimentsView(props: ExperimentsViewProps) {
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-500">Progress</span>
-                      {/* <span className="font-medium">{experiment.progress}%</span> */}
-                      <span className="font-medium">{experiment.startDate}%</span>
+                      <span className="font-medium">{calculateProgress(experiment.startDate, experiment.endDate)}%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      {/* <div className="bg-blue-600 h-2 rounded-full" style={{ width: `${experiment.progress}%` }}></div> */}
-                      <div className="bg-blue-600 h-2 rounded-full" style={{ width: `${experiment.endDate}%` }}></div>
+                      <div className="bg-blue-600 h-2 rounded-full" style={{ width: `${calculateProgress(experiment.startDate, experiment.endDate)}%` }}></div>
                     </div>
                   </div>
                 </CardContent>

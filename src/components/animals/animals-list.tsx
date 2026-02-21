@@ -1,38 +1,19 @@
 "use client"
 
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/src/components/ui/pagination"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/src/components/ui/dropdown-menu"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
-import type { AnimalPagination } from "@/src/app/[labId]/animals/types"
 import { LayoutGrid, LayoutList, MoreHorizontal, Edit } from "lucide-react"
+import type { AnimalPagination } from "@/src/app/[labId]/animals/types"
 import { Checkbox } from "@/src/components/ui/checkbox"
+import { useState, useMemo, useEffect } from "react"
+import { useMediaQuery } from "../sidebar-provider"
 import { Animal, AnimalStatus, Sex } from "./types"
 import { Button } from "@/src/components/ui/button"
 import { Badge } from "@/src/components/ui/badge"
 import { Card } from "@/src/components/ui/card"
 import { useParams } from "next/navigation"
-import { useState, useMemo } from "react"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/src/components/ui/dropdown-menu"
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/src/components/ui/pagination"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/src/components/ui/select"
 import Link from "next/link"
 
 interface AnimalsListProps {
@@ -47,8 +28,17 @@ interface AnimalsListProps {
 export function AnimalsList({animals, animalPagination, setPagination, handleUpdateDataPagination, setSelectedAnimal, setOpen}: AnimalsListProps) {
   const [selectedAnimals, setSelectedAnimals] = useState<string[]>([])
   const [view, setView] = useState<"table" | "grid">("table")
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const params = useParams();
   const { userId, labId } = params;
+
+  useEffect(() => {
+    if (isMobile) {
+      setView("grid")
+    } else {
+      setView("table")
+    }
+  }, [isMobile]);
   
   const currentAnimals = animals
   const currentPage = animalPagination.currentPage
@@ -435,16 +425,17 @@ export function AnimalsList({animals, animalPagination, setPagination, handleUpd
                 Showing {startIndex + 1} to {endIndex} of {totalCount} entries
               </span>
               <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-700">Items per page:</span>
+                <span className="text-sm text-gray-700">Rows per page:</span>
                 <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
                   <SelectTrigger className="h-8 w-20">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="8">8</SelectItem>
-                    <SelectItem value="12">12</SelectItem>
-                    <SelectItem value="24">24</SelectItem>
-                    <SelectItem value="48">48</SelectItem>
+                    <SelectItem value="5">5</SelectItem>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="20">20</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
