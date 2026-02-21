@@ -1,5 +1,7 @@
 "use client";
 
+import { DeleteMemberDialog } from "@/src/components/team/deleteMemberDialog";
+import { AddMemberDialog } from "@/src/components/team/addMemberDialog";
 import type { AnimalEnums, InitialMembersTypes } from "./types";
 import { apiClient } from "@/src/lib/apiClient";
 import { useCallback, useState } from "react";
@@ -99,24 +101,36 @@ export default function TeamContainer(props: TeamContainerProps) {
   }, [memberToDelete, userId, labId]);
 
     return (
-        <TeamView
-            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+        <>
+          <TeamView
+              setIsAddDialogOpen={setIsAddDialogOpen}
+              handleDeleteMember={handleDeleteMember}
+              isAddDialogOpen={isAddDialogOpen}
+              filteredMembers={filteredMembers}
+              handleAddMember={handleAddMember}
+              setSearchQuery={setSearchQuery}
+              setRoleFilter={setRoleFilter}
+              setNewMember={setNewMember}
+              searchQuery={searchQuery}
+              animalEnums={animalEnums}
+              roleFilter={roleFilter}
+              newMember={newMember}
+              members={members}
+              userId={userId}
+          />
+          <AddMemberDialog 
             setIsAddDialogOpen={setIsAddDialogOpen}
-            handleDeleteMember={handleDeleteMember}
-            isDeleteDialogOpen={isDeleteDialogOpen}
-            isAddDialogOpen={isAddDialogOpen}
-            filteredMembers={filteredMembers}
             handleAddMember={handleAddMember}
-            setSearchQuery={setSearchQuery}
-            setRoleFilter={setRoleFilter}
-            confirmDelete={confirmDelete}
+            isAddDialogOpen={isAddDialogOpen}
             setNewMember={setNewMember}
-            searchQuery={searchQuery}
             animalEnums={animalEnums}
-            roleFilter={roleFilter}
             newMember={newMember}
-            members={members}
-            userId={userId}
-        />
+          />
+          <DeleteMemberDialog 
+            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+            isDeleteDialogOpen={isDeleteDialogOpen}
+            confirmDelete={confirmDelete}
+          />
+        </>
     );
 };

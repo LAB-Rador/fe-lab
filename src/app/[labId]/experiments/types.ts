@@ -1,4 +1,5 @@
-import type { ExperimentStatus } from "../animals/types";
+import type { Animal, ExperimentStatus } from "../animals/types";
+import type { Task } from "../tasks/types";
 
 export interface CreateExperimentType {
     status?: ExperimentStatus;
@@ -27,4 +28,6 @@ export interface Experiment {
         lastName?: string;
     };
     id: string;
+    animals: Animal[];
+    tasks: Task[];
 }

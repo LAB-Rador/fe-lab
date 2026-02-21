@@ -7,9 +7,10 @@ import { AnimalsFilter } from "@/src/components/animals/animals-filter";
 import { AnimalsHeader } from "@/src/components/animals/animals-header";
 import type { CreateAnimalData } from "@/src/components/animals/types";
 import { AnimalsList } from "@/src/components/animals/animals-list";
+import { useMediaQuery } from "@/src/components/sidebar-provider";
 import { AnimalStatus } from "../../account/types";
 import { apiClient } from "@/src/lib/apiClient";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { Animal } from "./types";
 import { toast } from "sonner";
 
@@ -23,6 +24,16 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
     const [animalsData, setAnimalsData] = useState<Animal[]>(animals)
     const [animalSearch, setAnimalSearch] = useState<string>("")
     const [filters, setFilters] = useState<FiltersType>({})
+    const [filterView, setFilterView] = useState<boolean>(false)
+    const isMobile = useMediaQuery("(max-width: 768px)");
+
+    useEffect(() => {
+        if (isMobile) {
+          setFilterView(false)
+        } else {
+          setFilterView(true)
+        }
+      }, [isMobile]);
 
     const handleUpdateDataPagination = useCallback(async (data: {page?: number, pageSize?: number, filters?: any}) => {
         const response = await apiClient.get(`/api/animals/${userId}/${labId}/${data.pageSize || pagination.pageSize}/${data.page || pagination.currentPage}/${JSON.stringify(data.filters) || JSON.stringify(filters)}`)
@@ -166,18 +177,22 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
                 userId={userId}
                 labId={labId}
             />
-            <AnimalsHeader 
+            <AnimalsHeader
                 setOpen={setOpenAddAnimalDialog}
+                setFilterView={setFilterView}
                 handleSearch={handleSearch}
                 animalSearch={animalSearch}
+                filterView={filterView}
             />
             <div className="grid gap-6 md:grid-cols-[240px_1fr]">
-                <AnimalsFilter
-                    handleUpdateDataPagination={handleUpdateDataPagination}
-                    animalTypes={animalTypesData}
-                    animalEnums={animalEnums}
-                    setFilters={setFilters}
-                />
+                {filterView && 
+                    <AnimalsFilter
+                        handleUpdateDataPagination={handleUpdateDataPagination}
+                        animalTypes={animalTypesData}
+                        animalEnums={animalEnums}
+                        setFilters={setFilters}
+                    />
+                }
                 <AnimalsList
                     handleUpdateDataPagination={handleUpdateDataPagination}
                     setSelectedAnimal={setSelectedAnimal}
