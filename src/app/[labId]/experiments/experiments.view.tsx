@@ -1,31 +1,23 @@
 "use client"
 
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/src/components/ui/dropdown-menu"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
 import { Beaker, Calendar, ChevronDown, Filter, Plus, Search, SlidersHorizontal } from "lucide-react"
 import { Card, CardContent, CardFooter } from "@/src/components/ui/card"
 import { StatusBadge } from "@/src/components/status-badge"
 import type { Dispatch, SetStateAction } from "react"
+import { calculateProgress } from "@/src/lib/utils"
 import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
 import type { Experiment } from "./types"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/src/components/ui/dropdown-menu"
 import Link from "next/link"
 
 interface ExperimentsViewProps {
-    calculateProgress: (startDate?: string, endDate?: string) => number;
     setStatusFilter: Dispatch<SetStateAction<string>>;
     setSearchQuery: Dispatch<SetStateAction<string>>;
     setDateFilter: Dispatch<SetStateAction<string>>;
     filteredExperiments: Experiment[];
-    setOpen: (open: boolean) => void
+    setOpen: (open: boolean) => void;
     statusFilter: string;
     searchQuery: string;
     dateFilter: string;
@@ -33,7 +25,7 @@ interface ExperimentsViewProps {
 }
 
 export default function ExperimentsView(props: ExperimentsViewProps) {
-    const { filteredExperiments, setStatusFilter, setSearchQuery, setDateFilter, setOpen, statusFilter, searchQuery, dateFilter, labId, calculateProgress } = props;
+    const { filteredExperiments, setStatusFilter, setSearchQuery, setDateFilter, setOpen, statusFilter, searchQuery, dateFilter, labId } = props;
 
     return (
       <div className="space-y-6">

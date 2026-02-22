@@ -182,7 +182,6 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
                 setFilterView={setFilterView}
                 handleSearch={handleSearch}
                 animalSearch={animalSearch}
-                filterView={filterView}
             />
             <div className="grid gap-6 md:grid-cols-[240px_1fr]">
                 {filterView && 

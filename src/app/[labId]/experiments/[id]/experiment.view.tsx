@@ -10,13 +10,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/ca
 import { StatusBadge } from "@/src/components/status-badge"
 import { Progress } from "@/src/components/ui/progress"
 import { Button } from "@/src/components/ui/button"
+import { calculateProgress } from "@/src/lib/utils"
+import { TaskStatus } from "../../tasks/types"
 import { Experiment } from "../types"
 import { useState } from "react"
 import Link from "next/link"
-import { TaskStatus } from "../../tasks/types"
 
 interface ExperimentViewProps {
-  calculateProgress: (startDate?: string, endDate?: string) => number;
   experiment: Experiment;
   experimentId: string;
   labId: string;
@@ -24,7 +24,7 @@ interface ExperimentViewProps {
 
 export const ExperimentView = (props: ExperimentViewProps) => {
   const [activeTab, setActiveTab] = useState<string>("overview")
-  const { experiment, calculateProgress, experimentId, labId } = props;
+  const { experiment, experimentId, labId } = props;
 
 
   return (
@@ -130,7 +130,7 @@ export const ExperimentView = (props: ExperimentViewProps) => {
                           <span className="font-medium">{calculateProgress(experiment?.startDate, experiment?.endDate)}%</span>
                           <span className="text-gray-500">
                             <Clock className="inline-block mr-1 h-3 w-3" />
-                            {Math.floor((new Date(experiment?.endDate || '').getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} days remaining
+                            {!experiment?.endDate ? 'N/A' : Math.floor((new Date(experiment?.endDate || '').getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} days remaining
                           </span>
                         </div>
                         <Progress value={calculateProgress(experiment?.startDate, experiment?.endDate)} className="h-2" />

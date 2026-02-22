@@ -1,17 +1,29 @@
 import type { Dispatch, SetStateAction } from "react"
 import { Filter, Plus, Search } from "lucide-react"
 import { Button } from "@/src/components/ui/button"
+import { useMediaQuery } from "../sidebar-provider"
 import { Input } from "@/src/components/ui/input"
+import { useEffect, useState } from "react"
 
 interface AnimalsHeaderProps {
   setFilterView: Dispatch<SetStateAction<boolean>>
   handleSearch: (search: string) => void
   setOpen: (open: boolean) => void
   animalSearch: string
-  filterView: boolean
 }
 
-export function AnimalsHeader({ setOpen, handleSearch, animalSearch, setFilterView, filterView }: AnimalsHeaderProps) {
+export function AnimalsHeader({ setOpen, handleSearch, animalSearch, setFilterView }: AnimalsHeaderProps) {
+  const [filterButtonView, setFilterButtonView] = useState<boolean>(true)
+  const isMobile = useMediaQuery("(max-width: 768px)");
+
+  useEffect(() => {
+      if (isMobile) {
+        setFilterButtonView(true)
+      } else {
+        setFilterButtonView(false)
+      }
+    }, [isMobile]);
+
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
@@ -37,11 +49,11 @@ export function AnimalsHeader({ setOpen, handleSearch, animalSearch, setFilterVi
             <Plus className="mr-1 h-4 w-4" />
             Add Animal
           </Button>
-          {!filterView &&
+          {filterButtonView &&
             <Button
-                onClick={() => setFilterView((prev: boolean) => !prev)}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
+              onClick={() => setFilterView((prev: boolean) => !prev)}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
               <Filter className="mr-1 h-4 w-4" />
             </Button>
           }
