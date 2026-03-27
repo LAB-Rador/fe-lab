@@ -1,3 +1,5 @@
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/react";
 import CustomLayout from "./customLayout"
 import { Inter } from "next/font/google"
 import type { Metadata } from "next"
@@ -31,6 +33,8 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <Toaster position="top-center" />
+        <Analytics />
+        <SpeedInsights />
         <CustomLayout>
           {children}
         </CustomLayout>
