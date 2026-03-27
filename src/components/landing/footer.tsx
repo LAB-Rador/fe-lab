@@ -9,13 +9,13 @@ export function Footer() {
             { name: "Integrations", href: "#" },
         ],
         company: [
-            { name: "About Us", href: "#" },
+            { name: "About Us", href: "https://egor-kolev.vercel.app" },
             { name: "Careers", href: "#" },
             { name: "Press", href: "#" },
-            { name: "Contact", href: "#" },
+            { name: "Contact", href: "https://www.linkedin.com/in/iegor-koliev-834759233" },
         ],
         resources: [
-            { name: "Documentation", href: "#" },
+            { name: "Documentation", href: "https://github.com/LAB-Rador" },
             { name: "Help Center", href: "#" },
             { name: "Webinars", href: "#" },
             { name: "Blog", href: "#" },
@@ -47,15 +47,15 @@ export function Footer() {
                         <div className="space-y-3">
                             <div className="flex items-center space-x-3">
                                 <Mail className="h-4 w-4 text-gray-400" />
-                                <span className="text-gray-400">contact@labassist.com</span>
+                                <span className="text-gray-400">kolevegov@gmail.com</span>
                             </div>
                             <div className="flex items-center space-x-3">
                                 <Phone className="h-4 w-4 text-gray-400" />
-                                <span className="text-gray-400">+1 (555) 123-4567</span>
+                                <span className="text-gray-400">+1 (438) 497-7715</span>
                             </div>
                             <div className="flex items-center space-x-3">
                                 <MapPin className="h-4 w-4 text-gray-400" />
-                                <span className="text-gray-400">San Francisco, CA</span>
+                                <span className="text-gray-400">Calgary, AB</span>
                             </div>
                         </div>
                     </div>
@@ -66,7 +66,7 @@ export function Footer() {
                         <ul className="space-y-2">
                             {footerLinks.product.map((link) => (
                                 <li key={link.name}>
-                                    <a href={link.href} className="text-gray-400 hover:text-white transition-colors">
+                                    <a href={link.href} className="text-gray-400 transition-colors">
                                         {link.name}
                                     </a>
                                 </li>
@@ -79,7 +79,7 @@ export function Footer() {
                         <ul className="space-y-2">
                             {footerLinks.company.map((link) => (
                                 <li key={link.name}>
-                                    <a href={link.href} className="text-gray-400 hover:text-white transition-colors">
+                                    <a href={link.href} className={`${link.href.includes('https') ? 'text-white' : 'text-gray-400'} transition-colors`}>
                                         {link.name}
                                     </a>
                                 </li>
@@ -92,7 +92,7 @@ export function Footer() {
                         <ul className="space-y-2">
                             {footerLinks.resources.map((link) => (
                                 <li key={link.name}>
-                                    <a href={link.href} className="text-gray-400 hover:text-white transition-colors">
+                                    <a href={link.href} className={`${link.href.includes('https') ? 'text-white' : 'text-gray-400'} transition-colors`}>
                                         {link.name}
                                     </a>
                                 </li>
@@ -105,7 +105,7 @@ export function Footer() {
                         <ul className="space-y-2">
                             {footerLinks.legal.map((link) => (
                                 <li key={link.name}>
-                                    <a href={link.href} className="text-gray-400 hover:text-white transition-colors">
+                                    <a href={link.href} className="text-gray-400 transition-colors">
                                         {link.name}
                                     </a>
                                 </li>
@@ -116,7 +116,7 @@ export function Footer() {
 
                 <div className="border-t border-gray-800 mt-12 pt-8">
                     <div className="flex flex-col md:flex-row justify-between items-center">
-                        <p className="text-gray-400 text-sm">© 2024 LabAssist. All rights reserved.</p>
+                        <p className="text-gray-400 text-sm">© 2026 LabAssist. All rights reserved.</p>
                         <div className="flex space-x-6 mt-4 md:mt-0">
                             <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">
                                 Privacy
