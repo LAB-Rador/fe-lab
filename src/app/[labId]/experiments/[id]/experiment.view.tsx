@@ -1,30 +1,66 @@
 "use client"
 
-import { ArrowLeft, Calendar, Check, ChevronDown, Clock, Download, Edit, FileText, MousePointer, Plus, Share } from "lucide-react"
+import { ArrowLeft, Calendar, Check, ChevronDown, Clock, Download, Edit, FileText, MousePointer, Plus, Search, Share, Trash2 } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/src/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/src/components/ui/chart"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/src/components/ui/dialog"
+import { Avatar, AvatarFallback } from "@/src/components/ui/avatar"
 import { StatusBadge } from "@/src/components/status-badge"
 import { Progress } from "@/src/components/ui/progress"
 import { Button } from "@/src/components/ui/button"
-import { calculateProgress } from "@/src/lib/utils"
+import { Input } from "@/src/components/ui/input"
+import { calculateProgress, getInitials } from "@/src/lib/utils"
+import { AccessStatus } from "@/src/app/account/types"
 import { TaskStatus } from "../../tasks/types"
-import { Experiment } from "../types"
-import { useState } from "react"
+import type { InitialMembersTypes } from "../../team/types"
+import type { Experiment } from "../types"
+import { useMemo, useState } from "react"
 import Link from "next/link"
 
 interface ExperimentViewProps {
   experiment: Experiment;
-  experimentId: string;
   labId: string;
+  userId: string;
+  labMembers: InitialMembersTypes[];
+  onAddMember: (targetUserId: string) => void | Promise<void>;
+  onRemoveMember: (targetUserId: string) => void | Promise<void>;
 }
 
 export const ExperimentView = (props: ExperimentViewProps) => {
   const [activeTab, setActiveTab] = useState<string>("overview")
-  const { experiment, experimentId, labId } = props;
+  const [addMembersOpen, setAddMembersOpen] = useState(false)
+  const [memberSearch, setMemberSearch] = useState("")
+  const {
+    experiment,
+    labId,
+    userId,
+    labMembers,
+    onAddMember,
+    onRemoveMember,
+  } = props;
+
+  const canManageMembers = experiment.createdById === userId
+
+  const creatorLabRole = useMemo(
+    () => labMembers.find((m) => m.userId === experiment.createdById)?.role,
+    [labMembers, experiment.createdById],
+  )
+
+  const addCandidates = useMemo(() => {
+    const onExperiment = new Set((experiment.members ?? []).map((m) => m.userId))
+    const q = memberSearch.trim().toLowerCase()
+    return labMembers.filter((lm) => {
+      if (lm.userId === experiment.createdById || onExperiment.has(lm.userId)) return false
+      if (lm.accessStatus !== AccessStatus.ACTIVE) return false
+      if (!q) return true
+      const name = `${lm.user.firstName ?? ""} ${lm.user.lastName ?? ""}`.toLowerCase()
+      return name.includes(q) || lm.user.email.toLowerCase().includes(q)
+    })
+  }, [labMembers, experiment.createdById, experiment.members, memberSearch])
 
 
   return (
@@ -145,15 +181,130 @@ export const ExperimentView = (props: ExperimentViewProps) => {
               <CardHeader>
                 <CardTitle>Team Members</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {experiment?.createdBy?.firstName} {experiment?.createdBy?.lastName}
-                  
-                  <Button variant="outline" className="w-full">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add Team Member
-                  </Button>
-                </div>
+              <CardContent className="space-y-4">
+                {experiment?.createdBy && (
+                  <div className="flex items-center justify-between gap-2 rounded-md border border-gray-100 bg-gray-50/50 p-3">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <Avatar className="h-10 w-10 shrink-0">
+                        <AvatarFallback className="bg-blue-600 text-sm font-semibold text-white">
+                          {getInitials(
+                            experiment.createdBy.firstName ?? "",
+                            experiment.createdBy.lastName ?? "",
+                          )}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0">
+                        <div className="truncate font-medium">
+                          {experiment.createdBy.firstName} {experiment.createdBy.lastName}
+                        </div>
+                        <div className="truncate text-sm text-gray-600">
+                          {creatorLabRole ? `${creatorLabRole} · ` : ""}
+                          Creator
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {(experiment.members ?? []).map((m) => {
+                  const labRole = m.user.laboratories[0]?.role
+                  const showRemove = canManageMembers || m.userId === userId
+                  return (
+                    <div
+                      key={m.id}
+                      className="flex items-center justify-between gap-2 rounded-md border border-gray-100 p-3"
+                    >
+                      <div className="flex min-w-0 items-center gap-3">
+                        <Avatar className="h-10 w-10 shrink-0">
+                          <AvatarFallback className="bg-slate-600 text-sm font-semibold text-white">
+                            {getInitials(m.user.firstName ?? "", m.user.lastName ?? "")}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="min-w-0">
+                          <div className="truncate font-medium">
+                            {m.user.firstName} {m.user.lastName}
+                          </div>
+                          <div className="truncate text-sm text-gray-600">
+                            {labRole ?? "Member"}
+                          </div>
+                        </div>
+                      </div>
+                      {showRemove && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="shrink-0 text-red-600 hover:bg-red-50 hover:text-red-700"
+                          onClick={() => onRemoveMember(m.userId)}
+                          aria-label="Remove member"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  )
+                })}
+
+                {canManageMembers && (
+                  <Dialog open={addMembersOpen} onOpenChange={setAddMembersOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" className="w-full">
+                        <Plus className="mr-2 h-4 w-4" />
+                        Add Team Member
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-md">
+                      <DialogHeader>
+                        <DialogTitle>Laboratory members</DialogTitle>
+                      </DialogHeader>
+                      <p className="text-sm text-gray-500">
+                        Add people who already belong to this lab. They will see this experiment on the Experiments page.
+                      </p>
+                      <div className="relative">
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+                        <Input
+                          type="search"
+                          placeholder="Search by name or email..."
+                          className="pl-9"
+                          value={memberSearch}
+                          onChange={(e) => setMemberSearch(e.target.value)}
+                        />
+                      </div>
+                      <div className="max-h-[280px] space-y-2 overflow-y-auto">
+                        {addCandidates.length === 0 ? (
+                          <p className="py-6 text-center text-sm text-gray-500">No members available to add</p>
+                        ) : (
+                          addCandidates.map((lm) => (
+                            <div
+                              key={lm.id}
+                              className="flex items-center justify-between gap-2 rounded-md border border-gray-100 p-3"
+                            >
+                              <div className="min-w-0">
+                                <div className="truncate font-medium">
+                                  {lm.user.firstName} {lm.user.lastName}
+                                </div>
+                                <div className="truncate text-sm text-gray-600">{lm.role}</div>
+                                <div className="truncate text-xs text-gray-400">{lm.user.email}</div>
+                              </div>
+                              <Button
+                                type="button"
+                                size="sm"
+                                className="shrink-0 bg-blue-600 hover:bg-blue-700"
+                                onClick={async () => {
+                                  await onAddMember(lm.userId)
+                                  setAddMembersOpen(false)
+                                  setMemberSearch("")
+                                }}
+                              >
+                                Add
+                              </Button>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                )}
               </CardContent>
             </Card>
           </div>

@@ -12,13 +12,18 @@ export default async function ExperimentDetailPage({ params }: ExperimentDetailP
   const { id: experimentId, labId } = await params;
   const cookieStore = await cookies();
   const userId = await cookieStore.get('USER_ID')?.value || 'default';
-  const experiment = await apiClient.get(`/api/experiments/unique/${userId}/${labId}/${experimentId}`);
+  const [experimentRes, laboratoryMembersRes] = await Promise.all([
+    apiClient.get(`/api/experiments/unique/${userId}/${labId}/${experimentId}`),
+    apiClient.get(`/api/laboratory/${userId}/${labId}`),
+  ]);
 
   return (
     <ExperimentContainer
-      experiment={experiment.data}
+      experiment={experimentRes.data}
       experimentId={experimentId}
       labId={labId}
+      userId={userId}
+      labMembers={laboratoryMembersRes.data}
     />
   )
 }
