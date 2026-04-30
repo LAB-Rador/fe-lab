@@ -7,6 +7,26 @@ export interface PageProps {
     }
 }
 
+export interface AnimalExperimentParticipation {
+    id: string;
+    experimentId: string;
+    animalId: string;
+    notes: string | null;
+    createdAt: string;
+    updatedAt: string;
+    experiment: {
+        id: string;
+        title: string;
+        status: string;
+        startDate: string;
+        endDate: string | null;
+        createdBy: {
+            firstName: string | null;
+            lastName: string | null;
+        };
+    };
+}
+
 export interface Animal {
     acquisitionDate: string;
     animalType: AnimalType;
@@ -15,6 +35,7 @@ export interface Animal {
     status: AnimalStatus;
     animalTypeId: string;
     laboratoryId: string;
+    experimentAnimals?: AnimalExperimentParticipation[];
     birthDate?: string;
     identifier: string;
     genotype?: string;

@@ -12,10 +12,15 @@ export default async function ExperimentDetailPage({ params }: ExperimentDetailP
   const { id: experimentId, labId } = await params;
   const cookieStore = await cookies();
   const userId = await cookieStore.get('USER_ID')?.value || 'default';
-  const [experimentRes, laboratoryMembersRes] = await Promise.all([
+  const labAnimalsRows = 500
+  const labAnimalsPage = 1
+  const [experimentRes, laboratoryMembersRes, labAnimalsRes] = await Promise.all([
     apiClient.get(`/api/experiments/unique/${userId}/${labId}/${experimentId}`),
     apiClient.get(`/api/laboratory/${userId}/${labId}`),
-  ]);
+    apiClient.get(
+      `/api/animals/${userId}/${labId}/${labAnimalsRows}/${labAnimalsPage}/${JSON.stringify({})}`,
+    ),
+  ])
 
   return (
     <ExperimentContainer
@@ -24,6 +29,7 @@ export default async function ExperimentDetailPage({ params }: ExperimentDetailP
       labId={labId}
       userId={userId}
       labMembers={laboratoryMembersRes.data}
+      labAnimals={Array.isArray(labAnimalsRes?.data) ? labAnimalsRes.data : []}
     />
   )
 }

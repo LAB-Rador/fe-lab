@@ -167,12 +167,6 @@ export default function TeamView (props: TeamViewProps) {
                         </div>
         
                         <div className="pt-2 border-t border-gray-100">
-                            <div className="flex justify-between text-sm">
-                            <span className="text-gray-500">Active Experiments</span>
-                            <span className="font-semibold text-blue-600">
-                                {"-"}
-                            </span>
-                            </div>
                             <div className="flex justify-between text-sm mt-1">
                             <span className="text-gray-500">Join Date</span>
                             <span className="font-medium">{new Date(member.joinedAt).toISOString().split('T')[0]}</span>

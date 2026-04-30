@@ -1,10 +1,11 @@
 "use client"
 
-import { Button } from "@/src/components/ui/button"
 import { HeroLandingMetrics } from "@/src/components/landing/hero-landing-metrics"
 import type { LandingStatsPayload } from "@/src/types/landing-stats"
-import { ArrowRight } from "lucide-react"
+import { CountUp } from "@/src/components/ui/count-up"
+import { Button } from "@/src/components/ui/button"
 import { useRouter } from "next/navigation"
+import { ArrowRight } from "lucide-react"
 
 const ROW_DOT_COLORS = ["bg-[#10B981]", "bg-[#2563EB]", "bg-[#8B5CF6]"] as const
 
@@ -83,8 +84,8 @@ export function HeroSection({ stats }: HeroSectionProps) {
                                                     />
                                                     <span className="text-sm font-medium truncate">{row.name}</span>
                                                 </div>
-                                                <span className="text-sm text-gray-600 shrink-0 ml-2">
-                                                    {row.count.toLocaleString()} total
+                                                <span className="text-sm text-gray-600 shrink-0 ml-2 tabular-nums">
+                                                    <CountUp value={row.count} /> total
                                                 </span>
                                             </div>
                                         ))
@@ -94,8 +95,12 @@ export function HeroSection({ stats }: HeroSectionProps) {
                                 <div className="pt-4 border-t border-gray-200">
                                     <div className="flex justify-between text-sm">
                                         <span className="text-gray-600">Active status (share)</span>
-                                        <span className="font-medium text-[#10B981]">
-                                            {activePercent === undefined ? "—" : `${activePercent.toFixed(1)}%`}
+                                        <span className="font-medium text-[#10B981] tabular-nums">
+                                            {activePercent === undefined ? (
+                                                "—"
+                                            ) : (
+                                                <CountUp value={activePercent} decimals={1} suffix="%" />
+                                            )}
                                         </span>
                                     </div>
                                 </div>

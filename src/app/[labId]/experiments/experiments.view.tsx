@@ -134,8 +134,8 @@ export default function ExperimentsView(props: ExperimentsViewProps) {
                 </CardContent>
                 <CardFooter className="px-6 py-4 bg-gray-50 border-t border-gray-100 text-sm text-gray-500 flex justify-between">
                   {/* <div>Animals: {experiment.animalCount}</div> */}
-                  <div>Animals: {experiment.status}</div>
                   <div>{experiment.createdBy?.firstName} {experiment.createdBy?.lastName}</div>
+                  <div>- {experiment.createdBy?.email}</div>
                 </CardFooter>
               </Card>
             </Link>

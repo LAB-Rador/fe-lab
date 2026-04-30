@@ -2,6 +2,13 @@ import type { Role } from "@/src/app/account/types";
 import type { Animal, ExperimentStatus } from "../animals/types";
 import type { Task } from "../tasks/types";
 
+/** Animal row on experiment detail: same as lab Animal plus link id from ExperimentAnimal */
+export interface ExperimentLinkedAnimal extends Animal {
+  id: string;
+  experimentAnimalId: string;
+  experimentNotes?: string | null;
+}
+
 export interface ExperimentMemberRow {
     id: string;
     userId: string;
@@ -43,7 +50,7 @@ export interface Experiment {
         lastName?: string;
     };
     id: string;
-    animals: Animal[];
+    animals: ExperimentLinkedAnimal[];
     tasks: Task[];
     members?: ExperimentMemberRow[];
 }

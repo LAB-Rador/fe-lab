@@ -124,7 +124,6 @@ export default function AnimalDetailPage({userId, labId, animalId, animal, handl
                     pagination={pagination}
                     animalId={animalId}
                     animal={animal}
-                    userId={userId}
                     labId={labId}
                 />
               </TabsContent>
@@ -134,7 +133,7 @@ export default function AnimalDetailPage({userId, labId, animalId, animal, handl
               </TabsContent>
 
               <TabsContent value="experiments" className="pt-6">
-                <AnimalExperiments animalId={animal.id || ""} />
+                <AnimalExperiments labId={labId} experiments={animal.experimentAnimals ?? []} />
               </TabsContent>
 
               <TabsContent value="genealogy" className="pt-6">
@@ -144,7 +143,12 @@ export default function AnimalDetailPage({userId, labId, animalId, animal, handl
           </div>
 
           <div>
-            <QuickActionPanel animalId={animal.id || ""} />
+            <QuickActionPanel
+              labId={labId}
+              animalId={animal.id || ""}
+              userId={userId}
+              linkedExperimentIds={(animal.experimentAnimals ?? []).map((ea) => ea.experimentId)}
+            />
           </div>
         </div>
       </div>
