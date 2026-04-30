@@ -1,3 +1,5 @@
+"use client"
+
 import { Button } from "@/src/components/ui/button"
 import { ArrowRight, CheckCircle } from "lucide-react"
 import { useRouter } from "next/navigation"

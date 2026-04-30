@@ -1,9 +1,22 @@
+"use client"
+
 import { Button } from "@/src/components/ui/button"
-import { ArrowRight, Shield, Users, BarChart3 } from "lucide-react"
+import { HeroLandingMetrics } from "@/src/components/landing/hero-landing-metrics"
+import type { LandingStatsPayload } from "@/src/types/landing-stats"
+import { ArrowRight } from "lucide-react"
 import { useRouter } from "next/navigation"
 
-export function HeroSection() {
-    const router = useRouter();
+const ROW_DOT_COLORS = ["bg-[#10B981]", "bg-[#2563EB]", "bg-[#8B5CF6]"] as const
+
+interface HeroSectionProps {
+    stats: LandingStatsPayload | null
+}
+
+export function HeroSection({ stats }: HeroSectionProps) {
+    const router = useRouter()
+    const rows = stats?.topAnimalTypes ?? []
+    const activePercent = stats?.activePercent
+
     return (
         <section className="relative bg-gradient-to-br from-[#2563EB]/5 to-[#8B5CF6]/5 py-20 lg:py-32">
             <div className="container mx-auto px-4 lg:px-8">
@@ -20,11 +33,9 @@ export function HeroSection() {
                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-4">
-                            <Button 
-                                onClick={() => {
-                                    router.push('/signup');
-                                }}
-                                size="lg" 
+                            <Button
+                                onClick={() => router.push("/signup")}
+                                size="lg"
                                 className="bg-[#2563EB] hover:bg-[#2563EB]/90 text-white px-8 py-3"
                             >
                                 Start Free Trial
@@ -40,29 +51,7 @@ export function HeroSection() {
                             </Button>
                         </div>
 
-                        <div className="grid grid-cols-3 gap-8 pt-8">
-                            <div className="text-center">
-                                <div className="flex justify-center mb-2">
-                                    <Shield className="h-8 w-8 text-[#10B981]" />
-                                </div>
-                                <div className="text-2xl font-bold text-gray-900">99.9%</div>
-                                <div className="text-sm text-gray-600">Compliance Rate</div>
-                            </div>
-                            <div className="text-center">
-                                <div className="flex justify-center mb-2">
-                                    <Users className="h-8 w-8 text-[#2563EB]" />
-                                </div>
-                                <div className="text-2xl font-bold text-gray-900">500+</div>
-                                <div className="text-sm text-gray-600">Research Labs</div>
-                            </div>
-                            <div className="text-center">
-                                <div className="flex justify-center mb-2">
-                                    <BarChart3 className="h-8 w-8 text-[#8B5CF6]" />
-                                </div>
-                                <div className="text-2xl font-bold text-gray-900">1M+</div>
-                                <div className="text-sm text-gray-600">Animals Tracked</div>
-                            </div>
-                        </div>
+                        <HeroLandingMetrics stats={stats} />
                     </div>
 
                     <div className="relative">
@@ -78,35 +67,36 @@ export function HeroSection() {
                                 </div>
 
                                 <div className="space-y-4">
-                                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                        <div className="flex items-center space-x-3">
-                                            <div className="w-2 h-2 bg-[#10B981] rounded-full"></div>
-                                            <span className="text-sm font-medium">Laboratory Mice</span>
-                                        </div>
-                                        <span className="text-sm text-gray-600">1,247 active</span>
-                                    </div>
-
-                                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                        <div className="flex items-center space-x-3">
-                                            <div className="w-2 h-2 bg-[#2563EB] rounded-full"></div>
-                                            <span className="text-sm font-medium">Zebrafish</span>
-                                        </div>
-                                        <span className="text-sm text-gray-600">856 active</span>
-                                    </div>
-
-                                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                        <div className="flex items-center space-x-3">
-                                            <div className="w-2 h-2 bg-[#8B5CF6] rounded-full"></div>
-                                            <span className="text-sm font-medium">Zebra Finch</span>
-                                        </div>
-                                        <span className="text-sm text-gray-600">423 active</span>
-                                    </div>
+                                    {rows.length === 0 ? (
+                                        <p className="text-sm text-gray-500 py-4 text-center">
+                                            No animal types in the database yet.
+                                        </p>
+                                    ) : (
+                                        rows.map((row, i) => (
+                                            <div
+                                                key={`${row.name}-${i}`}
+                                                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                                            >
+                                                <div className="flex items-center space-x-3 min-w-0">
+                                                    <div
+                                                        className={`w-2 h-2 rounded-full shrink-0 ${ROW_DOT_COLORS[i % ROW_DOT_COLORS.length]}`}
+                                                    />
+                                                    <span className="text-sm font-medium truncate">{row.name}</span>
+                                                </div>
+                                                <span className="text-sm text-gray-600 shrink-0 ml-2">
+                                                    {row.count.toLocaleString()} total
+                                                </span>
+                                            </div>
+                                        ))
+                                    )}
                                 </div>
 
                                 <div className="pt-4 border-t border-gray-200">
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-gray-600">Health Status</span>
-                                        <span className="font-medium text-[#10B981]">98.5% Healthy</span>
+                                        <span className="text-gray-600">Active status (share)</span>
+                                        <span className="font-medium text-[#10B981]">
+                                            {activePercent === undefined ? "—" : `${activePercent.toFixed(1)}%`}
+                                        </span>
                                     </div>
                                 </div>
                             </div>

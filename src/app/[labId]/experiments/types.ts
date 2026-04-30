@@ -1,5 +1,20 @@
+import type { Role } from "@/src/app/account/types";
 import type { Animal, ExperimentStatus } from "../animals/types";
 import type { Task } from "../tasks/types";
+
+export interface ExperimentMemberRow {
+    id: string;
+    userId: string;
+    experimentId: string;
+    createdAt: string;
+    user: {
+        id: string;
+        email: string;
+        firstName?: string | null;
+        lastName?: string | null;
+        laboratories: { role: Role }[];
+    };
+}
 
 export interface CreateExperimentType {
     status?: ExperimentStatus;
@@ -30,4 +45,5 @@ export interface Experiment {
     id: string;
     animals: Animal[];
     tasks: Task[];
+    members?: ExperimentMemberRow[];
 }
