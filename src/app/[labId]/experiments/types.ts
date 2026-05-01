@@ -2,7 +2,8 @@ import type { Role } from "@/src/app/account/types";
 import type { Animal, ExperimentStatus } from "../animals/types";
 import type { Task } from "../tasks/types";
 
-/** Animal row on experiment detail: same as lab Animal plus link id from ExperimentAnimal */
+/** Loaded via `/experiments/unique/.../tasks` pagination; not nested on Experiment. */
+
 export interface ExperimentLinkedAnimal extends Animal {
   id: string;
   experimentAnimalId: string;
@@ -81,6 +82,20 @@ export interface ExperimentAnimalRecordRow {
     measurements: ExperimentAnimalRecordMeasurement[]
 }
 
+export interface ExperimentTasksPagination {
+    currentPage: number
+    totalPages: number
+    pageSize: number
+    totalCount: number
+    hasPreviousPage: boolean
+    hasNextPage: boolean
+}
+
+export interface ExperimentTasksPagePayload {
+    items: Task[]
+    pagination: ExperimentTasksPagination
+}
+
 export interface Experiment {
     status?: ExperimentStatus;
     laboratoryId: string;
@@ -101,6 +116,5 @@ export interface Experiment {
     /** Present on list responses from GET experiments; detail loads full `animals`. */
     animalCount?: number;
     animals?: ExperimentLinkedAnimal[];
-    tasks?: Task[];
     members?: ExperimentMemberRow[];
 }

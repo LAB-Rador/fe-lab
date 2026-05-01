@@ -1,46 +1,58 @@
 "use client"
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/src/components/ui/dropdown-menu"
+import type { Experiment, ExperimentAnimalRecordRow, ExperimentMetricsData, ExperimentTasksPagination } from "../types"
 import { ArrowLeft, Archive, ArchiveRestore, ChevronDown, Download, Edit, FileText, Share } from "lucide-react"
+import type { ExperimentTaskAssigneeOption, ExperimentTaskUpsertPayload } from "./tabs/experiment-tasks-tab"
 import { Tabs, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
 import { ExperimentOverviewTab } from "./tabs/experiment-overview-tab"
 import { ExperimentAnimalsTab } from "./tabs/experiment-animals-tab"
 import { ExperimentMetricsTab } from "./tabs/experiment-metrics-tab"
-import type { Experiment, ExperimentAnimalRecordRow, ExperimentMetricsData } from "../types"
 import { ExperimentTasksTab } from "./tabs/experiment-tasks-tab"
 import { StatusBadge } from "@/src/components/status-badge"
 import type { InitialMembersTypes } from "../../team/types"
+import type { Role } from "@/src/app/account/types"
 import { Button } from "@/src/components/ui/button"
 import { Badge } from "@/src/components/ui/badge"
-import type { Role } from "@/src/app/account/types"
 import type { Animal } from "../../animals/types"
+import { TaskStatus } from "../../tasks/types"
+import type { Task } from "../../tasks/types"
 import Link from "next/link"
 
 interface ExperimentViewProps {
+  onUpdateExperimentTask: (taskId: string, payload: ExperimentTaskUpsertPayload) => void | Promise<void>
+  onExperimentTasksPagination: (next: { page?: number; pageSize?: number }) => void | Promise<void>
+  onPatchExperimentTaskStatus: (taskId: string, status: TaskStatus) => void | Promise<void>
+  onCreateExperimentTask: (payload: ExperimentTaskUpsertPayload) => void | Promise<void>
+  onDeleteExperimentTask: (taskId: string) => void | Promise<void>
   onRemoveMember: (targetUserId: string) => void | Promise<void>
   onAddMember: (targetUserId: string) => void | Promise<void>
   onRemoveAnimal: (animalId: string) => void | Promise<void>
+  experimentTaskAssignees: ExperimentTaskAssigneeOption[]
   onAddAnimal: (animalId: string) => void | Promise<void>
+  experimentTasksPagination: ExperimentTasksPagination
+  onUnarchiveExperiment: () => void | Promise<void>
   onAddMembersOpenChange: (open: boolean) => void
   onAddAnimalsOpenChange: (open: boolean) => void
+  onArchiveExperiment: () => void | Promise<void>
   onMemberSearchChange: (value: string) => void
   onAnimalSearchChange: (value: string) => void
+  animalRecords: ExperimentAnimalRecordRow[]
+  metrics: ExperimentMetricsData | null
   addCandidates: InitialMembersTypes[]
   labMembers: InitialMembersTypes[]
   creatorLabRole: Role | undefined
+  experimentsLoadingTasks: boolean
   animalAddCandidates: Animal[]
   canManageMembers: boolean
   addMembersOpen: boolean
   addAnimalsOpen: boolean
-  animalRecords: ExperimentAnimalRecordRow[]
+  experimentTasks: Task[]
   experiment: Experiment
-  metrics: ExperimentMetricsData | null
   memberSearch: string
   animalSearch: string
   userId: string
   labId: string
-  onArchiveExperiment: () => void | Promise<void>
-  onUnarchiveExperiment: () => void | Promise<void>
 }
 
 export const ExperimentView = (props: ExperimentViewProps) => {
@@ -69,6 +81,15 @@ export const ExperimentView = (props: ExperimentViewProps) => {
     onRemoveAnimal,
     onArchiveExperiment,
     onUnarchiveExperiment,
+    experimentTasksPagination,
+    onExperimentTasksPagination,
+    experimentsLoadingTasks,
+    onCreateExperimentTask,
+    experimentTaskAssignees,
+    experimentTasks,
+    onUpdateExperimentTask,
+    onPatchExperimentTaskStatus,
+    onDeleteExperimentTask,
   } = props
 
   return (
@@ -185,7 +206,17 @@ export const ExperimentView = (props: ExperimentViewProps) => {
 
         <ExperimentMetricsTab metrics={metrics} />
 
-        <ExperimentTasksTab experiment={experiment} />
+        <ExperimentTasksTab
+          experimentsLoadingTasks={experimentsLoadingTasks}
+          onPaginationChange={onExperimentTasksPagination}
+          onPatchTaskStatus={onPatchExperimentTaskStatus}
+          pagination={experimentTasksPagination}
+          onCreateTask={onCreateExperimentTask}
+          onUpdateTask={onUpdateExperimentTask}
+          onDeleteTask={onDeleteExperimentTask}
+          assignees={experimentTaskAssignees}
+          tasks={experimentTasks}
+        />
       </Tabs>
     </div>
   )

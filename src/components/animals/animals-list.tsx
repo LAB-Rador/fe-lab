@@ -4,27 +4,27 @@ import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, Pagi
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/src/components/ui/dropdown-menu"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
+import { useResponsiveTableGridView } from "@/src/hooks/use-responsive-table-grid-view"
 import { LayoutGrid, LayoutList, MoreHorizontal, Edit } from "lucide-react"
 import type { AnimalPagination } from "@/src/app/[labId]/animals/types"
 import { Checkbox } from "@/src/components/ui/checkbox"
-import { useState, useMemo, useEffect } from "react"
-import { useMediaQuery } from "../sidebar-provider"
 import { Animal, AnimalStatus, Sex } from "./types"
 import { Button } from "@/src/components/ui/button"
 import { Badge } from "@/src/components/ui/badge"
 import { Card } from "@/src/components/ui/card"
 import { useParams } from "next/navigation"
+import { useState, useMemo } from "react"
 import Link from "next/link"
 
 interface AnimalsListProps {
-  handleArchiveAnimalRow: (animalId: string) => void | Promise<void>;
-  handleUnarchiveAnimalRow: (animalId: string) => void | Promise<void>;
   handleUpdateDataPagination: (data: {page?: number, pageSize?: number}) => void;
+  handleUnarchiveAnimalRow: (animalId: string) => void | Promise<void>;
+  handleArchiveAnimalRow: (animalId: string) => void | Promise<void>;
   setPagination: (pagination: AnimalPagination) => void;
   setSelectedAnimal: (animal: Animal) => void;
   animalPagination: AnimalPagination;
-  animals: Animal[];
   setOpen: (open: boolean) => void;
+  animals: Animal[];
 }
 
 export function AnimalsList({
@@ -38,18 +38,9 @@ export function AnimalsList({
   setOpen,
 }: AnimalsListProps) {
   const [selectedAnimals, setSelectedAnimals] = useState<string[]>([])
-  const [view, setView] = useState<"table" | "grid">("table")
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  const { view, setView } = useResponsiveTableGridView()
   const params = useParams();
   const labId = params.labId as string;
-
-  useEffect(() => {
-    if (isMobile) {
-      setView("grid")
-    } else {
-      setView("table")
-    }
-  }, [isMobile]);
   
   const currentAnimals = animals
   const currentPage = animalPagination.currentPage
