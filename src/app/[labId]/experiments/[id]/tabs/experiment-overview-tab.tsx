@@ -1,22 +1,43 @@
 "use client"
 
-import { Calendar, Clock, Plus, Search, Trash2 } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/src/components/ui/dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
-import { TabsContent } from "@/src/components/ui/tabs"
-import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
+import type { Experiment, ExperimentAnimalRecordRow } from "../../types"
+import { Calendar, Clock, Plus, Search, Trash2 } from "lucide-react"
 import { Avatar, AvatarFallback } from "@/src/components/ui/avatar"
 import { calculateProgress, getInitials } from "@/src/lib/utils"
-import { StatusBadge } from "@/src/components/status-badge"
 import type { InitialMembersTypes } from "../../../team/types"
+import { StatusBadge } from "@/src/components/status-badge"
 import { Progress } from "@/src/components/ui/progress"
+import { TabsContent } from "@/src/components/ui/tabs"
 import { Button } from "@/src/components/ui/button"
 import type { Role } from "@/src/app/account/types"
 import { Input } from "@/src/components/ui/input"
-import type { Experiment } from "../../types"
+import Link from "next/link"
+
+function humanizeRecordEnum(value: string) {
+  return value
+    .split("_")
+    .map((part) => part.charAt(0) + part.slice(1).toLowerCase())
+    .join(" ")
+}
+
+function measurementsJoined(rows: ExperimentAnimalRecordRow["measurements"]) {
+  if (!rows?.length) return ""
+  return rows.map((m) => `${m.parameter}: ${m.value}${m.unit ? ` ${m.unit}` : ""}`).join(", ")
+}
+
+function formatMeasurementsSummary(rows: ExperimentAnimalRecordRow["measurements"]) {
+  const full = measurementsJoined(rows)
+  if (!full) return "—"
+  return full.length > 96 ? `${full.slice(0, 93)}…` : full
+}
 
 export interface ExperimentOverviewTabProps {
+  animalRecords: ExperimentAnimalRecordRow[]
   experiment: Experiment
+  labId: string
   userId: string
   canManageMembers: boolean
   creatorLabRole: Role | undefined
@@ -31,7 +52,9 @@ export interface ExperimentOverviewTabProps {
 
 export function ExperimentOverviewTab(props: ExperimentOverviewTabProps) {
   const {
+    animalRecords,
     experiment,
+    labId,
     userId,
     canManageMembers,
     creatorLabRole,
@@ -233,27 +256,86 @@ export function ExperimentOverviewTab(props: ExperimentOverviewTabProps) {
       <Card>
         <CardHeader>
           <CardTitle>Results</CardTitle>
+          <CardDescription>
+            Animal records logged with this experiment (latest 200, newest first).
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-md border border-gray-100">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Parameter</TableHead>
-                  <TableHead>Control Group</TableHead>
-                  <TableHead>Experimental Group</TableHead>
-                  <TableHead>Difference</TableHead>
-                  <TableHead>Statistical Significance</TableHead>
+                <TableRow className="bg-gray-50/80 hover:bg-gray-50/80">
+                  <TableHead className="whitespace-nowrap">Date</TableHead>
+                  <TableHead>Animal</TableHead>
+                  <TableHead className="whitespace-nowrap">Type</TableHead>
+                  <TableHead className="whitespace-nowrap text-right">Temp. (°C)</TableHead>
+                  <TableHead className="whitespace-nowrap text-right">Weight</TableHead>
+                  <TableHead className="whitespace-nowrap">Activity</TableHead>
+                  <TableHead className="whitespace-nowrap text-right">Feed</TableHead>
+                  <TableHead className="whitespace-nowrap text-right">Water</TableHead>
+                  <TableHead className="min-w-[140px]">Parameters</TableHead>
+                  <TableHead className="min-w-[160px]">Notes</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableRow>
-                  <TableCell className="font-medium">Parameter</TableCell>
-                  <TableCell>Control Group</TableCell>
-                  <TableCell>Experimental Group</TableCell>
-                  <TableCell>Difference</TableCell>
-                  <TableCell>Statistical Significance</TableCell>
-                </TableRow>
+                {animalRecords.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={10} className="h-24 text-center text-sm text-gray-500">
+                      No animal records for this experiment yet. Link animals and add measurements with experiment
+                      context.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  animalRecords.map((row) => (
+                    <TableRow key={row.id}>
+                      <TableCell className="whitespace-nowrap align-top text-sm tabular-nums text-gray-700">
+                        {new Date(row.date).toLocaleString()}
+                      </TableCell>
+                      <TableCell className="align-top">
+                        <Link
+                          href={`/${labId}/animals/${row.animal.id}`}
+                          className="font-medium text-blue-600 hover:underline"
+                        >
+                          {row.animal.name || row.animal.identifier}
+                        </Link>
+                        <div className="text-xs text-gray-400">{row.animal.identifier}</div>
+                      </TableCell>
+                      <TableCell className="align-top text-sm whitespace-nowrap">
+                        {humanizeRecordEnum(row.recordType)}
+                      </TableCell>
+                      <TableCell className="align-top text-right text-sm tabular-nums">
+                        {row.temperature != null ? row.temperature.toFixed(1) : "—"}
+                      </TableCell>
+                      <TableCell className="align-top text-right text-sm tabular-nums">
+                        {row.weight != null ? row.weight.toFixed(2) : "—"}
+                      </TableCell>
+                      <TableCell className="align-top text-sm whitespace-nowrap">
+                        {row.activityLevel ? humanizeRecordEnum(row.activityLevel) : "—"}
+                      </TableCell>
+                      <TableCell className="align-top text-right text-sm tabular-nums">
+                        {row.feedIntake != null ? row.feedIntake.toFixed(1) : "—"}
+                      </TableCell>
+                      <TableCell className="align-top text-right text-sm tabular-nums">
+                        {row.waterIntake != null ? row.waterIntake.toFixed(1) : "—"}
+                      </TableCell>
+                      <TableCell
+                        className="align-top max-w-[220px] text-xs text-gray-700"
+                        title={measurementsJoined(row.measurements) || undefined}
+                      >
+                        {formatMeasurementsSummary(row.measurements)}
+                      </TableCell>
+                      <TableCell className="align-top max-w-[220px] text-sm text-gray-600">
+                        {row.notes ? (
+                          <span className="line-clamp-2" title={row.notes}>
+                            {row.notes}
+                          </span>
+                        ) : (
+                          "—"
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </div>

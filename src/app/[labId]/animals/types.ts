@@ -24,6 +24,7 @@ export interface Animal {
     name?: string;
     id?: string;
     sex?: Sex;
+    archivedAt?: string | null;
 }
 
 export interface AnimalType {
@@ -96,6 +97,7 @@ export interface FiltersType {
     animalTypes?: string[];
     ageGroups?: AgeGroup[];
     sex?: Sex | null;
+    includeArchived?: boolean;
 }
 
 export enum RecordType {

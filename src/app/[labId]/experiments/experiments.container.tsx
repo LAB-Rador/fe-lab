@@ -21,8 +21,24 @@ export default function ExperimentsContainer(props: ExperimentProps) {
     const [experimentsData, setExperimentsData] = useState<Experiment[]>(experiments);
     const [openExperimentDialog, setOpenExperimentDialog] = useState(false)
     const [statusFilter, setStatusFilter] = useState<string>("all");
+    const [includeArchived, setIncludeArchived] = useState(false);
     const [dateFilter, setDateFilter] = useState<string>("all");
     const [searchQuery, setSearchQuery] = useState<string>("");
+
+    const onIncludeArchivedChange = useCallback(
+        (value: boolean) => {
+            setIncludeArchived(value);
+            void (async () => {
+                const res = await apiClient.get(
+                    `/api/experiments/${userId}/${labId}?includeArchived=${value}`,
+                );
+                if (res?.success && Array.isArray(res.data)) {
+                    setExperimentsData(res.data);
+                }
+            })();
+        },
+        [userId, labId],
+    );
 
 
     // Filter experiments based on search query and filters
@@ -74,9 +90,11 @@ export default function ExperimentsContainer(props: ExperimentProps) {
     return (
         <>
             <ExperimentsView
+                onIncludeArchivedChange={onIncludeArchivedChange}
                 filteredExperiments={filteredExperiments}
                 setStatusFilter={setStatusFilter}
                 setOpen={setOpenExperimentDialog}
+                includeArchived={includeArchived}
                 setSearchQuery={setSearchQuery}
                 setDateFilter={setDateFilter}
                 statusFilter={statusFilter}

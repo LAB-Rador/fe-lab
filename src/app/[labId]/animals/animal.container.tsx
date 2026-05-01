@@ -25,6 +25,7 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
     const [animalSearch, setAnimalSearch] = useState<string>("")
     const [filters, setFilters] = useState<FiltersType>({})
     const [filterView, setFilterView] = useState<boolean>(false)
+    const [includeArchivedAnimals, setIncludeArchivedAnimals] = useState(false)
     const isMobile = useMediaQuery("(max-width: 768px)");
 
     useEffect(() => {
@@ -36,10 +37,41 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
       }, [isMobile]);
 
     const handleUpdateDataPagination = useCallback(async (data: {page?: number, pageSize?: number, filters?: any}) => {
-        const response = await apiClient.get(`/api/animals/${userId}/${labId}/${data.pageSize || pagination.pageSize}/${data.page || pagination.currentPage}/${JSON.stringify(data.filters) || JSON.stringify(filters)}`)
+        const baseFilters =
+            data.filters !== undefined ? { ...filters, ...data.filters } : { ...filters }
+        const mergedForRequest: FiltersType = { ...baseFilters }
+        if (includeArchivedAnimals) {
+            mergedForRequest.includeArchived = true
+        } else {
+            delete mergedForRequest.includeArchived
+        }
+        const response = await apiClient.get(`/api/animals/${userId}/${labId}/${data.pageSize || pagination.pageSize}/${data.page || pagination.currentPage}/${JSON.stringify(mergedForRequest)}`)
         setPagination(response.pagination)
         setAnimalsData(response.data)
-    }, [userId, labId, pagination, filters])
+        if (data.filters !== undefined) {
+            setFilters({ ...filters, ...data.filters })
+        }
+    }, [userId, labId, pagination, filters, includeArchivedAnimals])
+
+    const onIncludeArchivedAnimalsChange = useCallback(
+        (value: boolean) => {
+            setIncludeArchivedAnimals(value)
+            void (async () => {
+                const mergedForRequest: FiltersType = { ...filters }
+                if (value) {
+                    mergedForRequest.includeArchived = true
+                } else {
+                    delete mergedForRequest.includeArchived
+                }
+                const response = await apiClient.get(
+                    `/api/animals/${userId}/${labId}/${pagination.pageSize}/1/${JSON.stringify(mergedForRequest)}`,
+                )
+                setPagination(response.pagination)
+                setAnimalsData(response.data)
+            })()
+        },
+        [userId, labId, pagination.pageSize, filters],
+    )
 
     const handleSearch = useCallback((search: string) => {
         setAnimalSearch(search)
@@ -134,6 +166,40 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
         }
     }, [userId, labId, newAnimalType, animalsData])
 
+    const handleArchiveAnimalRow = useCallback(
+        async (animalId: string) => {
+            try {
+                const res = await apiClient.post(`/api/animals/animal/${userId}/${labId}/${animalId}/archive`, {})
+                if (res?.success) {
+                    toast.success("Animal archived")
+                    await handleUpdateDataPagination({})
+                } else {
+                    toast.error((res as { message?: string })?.message ?? "Failed to archive")
+                }
+            } catch {
+                toast.error("Failed to archive")
+            }
+        },
+        [userId, labId, handleUpdateDataPagination],
+    )
+
+    const handleUnarchiveAnimalRow = useCallback(
+        async (animalId: string) => {
+            try {
+                const res = await apiClient.post(`/api/animals/animal/${userId}/${labId}/${animalId}/unarchive`, {})
+                if (res?.success) {
+                    toast.success("Animal unarchived")
+                    await handleUpdateDataPagination({})
+                } else {
+                    toast.error((res as { message?: string })?.message ?? "Failed to unarchive")
+                }
+            } catch {
+                toast.error("Failed to unarchive")
+            }
+        },
+        [userId, labId, handleUpdateDataPagination],
+    )
+
     const handleAddAnimalType = useCallback(async (typeName: string): Promise<string> => {
         
         const newAnimalType: AnimalType = {
@@ -190,9 +256,13 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
                         animalTypes={animalTypesData}
                         animalEnums={animalEnums}
                         setFilters={setFilters}
+                        includeArchived={includeArchivedAnimals}
+                        onIncludeArchivedChange={onIncludeArchivedAnimalsChange}
                     />
                 }
                 <AnimalsList
+                    handleArchiveAnimalRow={handleArchiveAnimalRow}
+                    handleUnarchiveAnimalRow={handleUnarchiveAnimalRow}
                     handleUpdateDataPagination={handleUpdateDataPagination}
                     setSelectedAnimal={setSelectedAnimal}
                     setOpen={setOpenEditAnimalDialog}

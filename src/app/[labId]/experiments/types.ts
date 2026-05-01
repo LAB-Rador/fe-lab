@@ -53,6 +53,34 @@ export interface ExperimentMetricsData {
     animalCount: number
 }
 
+/** Row from GET /api/experiments/unique/.../records (AnimalRecord for this experiment). */
+export interface ExperimentAnimalRecordMeasurement {
+    parameter: string
+    value: number
+    unit: string | null
+}
+
+export interface ExperimentAnimalRecordRow {
+    id: string
+    animalId: string
+    experimentId: string | null
+    recordType: string
+    date: string
+    createdById: string
+    temperature: number | null
+    weight: number | null
+    feedIntake: number | null
+    waterIntake: number | null
+    activityLevel: string | null
+    notes: string | null
+    animal: {
+        id: string
+        name: string | null
+        identifier: string
+    }
+    measurements: ExperimentAnimalRecordMeasurement[]
+}
+
 export interface Experiment {
     status?: ExperimentStatus;
     laboratoryId: string;
@@ -62,6 +90,7 @@ export interface Experiment {
     startDate: string;
     endDate?: string;
     title: string;
+    archivedAt?: string | null;
     createdBy?: {
         id: string;
         email: string;
@@ -69,7 +98,9 @@ export interface Experiment {
         lastName?: string;
     };
     id: string;
-    animals: ExperimentLinkedAnimal[];
-    tasks: Task[];
+    /** Present on list responses from GET experiments; detail loads full `animals`. */
+    animalCount?: number;
+    animals?: ExperimentLinkedAnimal[];
+    tasks?: Task[];
     members?: ExperimentMemberRow[];
 }

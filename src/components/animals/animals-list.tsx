@@ -17,6 +17,8 @@ import { useParams } from "next/navigation"
 import Link from "next/link"
 
 interface AnimalsListProps {
+  handleArchiveAnimalRow: (animalId: string) => void | Promise<void>;
+  handleUnarchiveAnimalRow: (animalId: string) => void | Promise<void>;
   handleUpdateDataPagination: (data: {page?: number, pageSize?: number}) => void;
   setPagination: (pagination: AnimalPagination) => void;
   setSelectedAnimal: (animal: Animal) => void;
@@ -25,12 +27,21 @@ interface AnimalsListProps {
   setOpen: (open: boolean) => void;
 }
 
-export function AnimalsList({animals, animalPagination, setPagination, handleUpdateDataPagination, setSelectedAnimal, setOpen}: AnimalsListProps) {
+export function AnimalsList({
+  animals,
+  animalPagination,
+  setPagination,
+  handleUpdateDataPagination,
+  handleArchiveAnimalRow,
+  handleUnarchiveAnimalRow,
+  setSelectedAnimal,
+  setOpen,
+}: AnimalsListProps) {
   const [selectedAnimals, setSelectedAnimals] = useState<string[]>([])
   const [view, setView] = useState<"table" | "grid">("table")
   const isMobile = useMediaQuery("(max-width: 768px)");
   const params = useParams();
-  const { userId, labId } = params;
+  const labId = params.labId as string;
 
   useEffect(() => {
     if (isMobile) {
@@ -108,6 +119,21 @@ export function AnimalsList({animals, animalPagination, setPagination, handleUpd
     }
   }
 
+  /** Distinct from workflow statuses (green/yellow/blue/indigo/red/purple/gray). */
+  const archivedOnlyBadgeClass =
+    "bg-violet-100 text-violet-900 border-violet-400 hover:bg-violet-100"
+
+  const renderStatusBadges = (animal: Animal) =>
+    animal.archivedAt ? (
+      <Badge variant="outline" className={archivedOnlyBadgeClass}>
+        ARCHIVED
+      </Badge>
+    ) : (
+      <Badge variant="outline" className={getStatusColor(animal.status)}>
+        {animal.status}
+      </Badge>
+    )
+
   return (
     <Card>
       <div className="flex items-center justify-between border-b border-gray-200 p-4">
@@ -173,11 +199,7 @@ export function AnimalsList({animals, animalPagination, setPagination, handleUpd
                   <TableCell>{animal.laboratory?.name}</TableCell>
                   <TableCell>{animal.sex}</TableCell>
                   <TableCell>{animal.strain}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className={getStatusColor(animal.status)}>
-                      {animal.status}
-                    </Badge>
-                  </TableCell>
+                  <TableCell>{renderStatusBadges(animal)}</TableCell>
                   <TableCell>
                     <span className="text-sm text-gray-600">
                       {animal.location || "Not specified"}
@@ -222,7 +244,24 @@ export function AnimalsList({animals, animalPagination, setPagination, handleUpd
                             </Link>
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-red-600">Archive animal</DropdownMenuItem>
+                          {animal.archivedAt ? (
+                            <DropdownMenuItem
+                              onClick={() => {
+                                if (animal.id) void handleUnarchiveAnimalRow(animal.id)
+                              }}
+                            >
+                              Unarchive animal
+                            </DropdownMenuItem>
+                          ) : (
+                            <DropdownMenuItem
+                              className="text-red-600 focus:text-red-600"
+                              onClick={() => {
+                                if (animal.id) void handleArchiveAnimalRow(animal.id)
+                              }}
+                            >
+                              Archive animal
+                            </DropdownMenuItem>
+                          )}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
@@ -364,9 +403,7 @@ export function AnimalsList({animals, animalPagination, setPagination, handleUpd
                   </div>
                   <div>
                     <p className="font-medium">Status</p>
-                    <Badge variant="outline" className={getStatusColor(animal.status)}>
-                      {animal.status}
-                    </Badge>
+                    <div className="mt-1">{renderStatusBadges(animal)}</div>
                   </div>
                   <div className="col-span-2">
                     <p className="font-medium">Location</p>
@@ -411,7 +448,24 @@ export function AnimalsList({animals, animalPagination, setPagination, handleUpd
                           </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-red-600">Archive animal</DropdownMenuItem>
+                      {animal.archivedAt ? (
+                        <DropdownMenuItem
+                          onClick={() => {
+                            if (animal.id) void handleUnarchiveAnimalRow(animal.id)
+                          }}
+                        >
+                          Unarchive animal
+                        </DropdownMenuItem>
+                      ) : (
+                        <DropdownMenuItem
+                          className="text-red-600 focus:text-red-600"
+                          onClick={() => {
+                            if (animal.id) void handleArchiveAnimalRow(animal.id)
+                          }}
+                        >
+                          Archive animal
+                        </DropdownMenuItem>
+                      )}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>

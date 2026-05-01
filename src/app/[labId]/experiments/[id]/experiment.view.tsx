@@ -1,16 +1,17 @@
 "use client"
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/src/components/ui/dropdown-menu"
-import { ArrowLeft, ChevronDown, Download, Edit, FileText, Share } from "lucide-react"
+import { ArrowLeft, Archive, ArchiveRestore, ChevronDown, Download, Edit, FileText, Share } from "lucide-react"
 import { Tabs, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
 import { ExperimentOverviewTab } from "./tabs/experiment-overview-tab"
 import { ExperimentAnimalsTab } from "./tabs/experiment-animals-tab"
 import { ExperimentMetricsTab } from "./tabs/experiment-metrics-tab"
-import type { Experiment, ExperimentMetricsData } from "../types"
+import type { Experiment, ExperimentAnimalRecordRow, ExperimentMetricsData } from "../types"
 import { ExperimentTasksTab } from "./tabs/experiment-tasks-tab"
 import { StatusBadge } from "@/src/components/status-badge"
 import type { InitialMembersTypes } from "../../team/types"
 import { Button } from "@/src/components/ui/button"
+import { Badge } from "@/src/components/ui/badge"
 import type { Role } from "@/src/app/account/types"
 import type { Animal } from "../../animals/types"
 import Link from "next/link"
@@ -31,16 +32,20 @@ interface ExperimentViewProps {
   canManageMembers: boolean
   addMembersOpen: boolean
   addAnimalsOpen: boolean
+  animalRecords: ExperimentAnimalRecordRow[]
   experiment: Experiment
   metrics: ExperimentMetricsData | null
   memberSearch: string
   animalSearch: string
   userId: string
   labId: string
+  onArchiveExperiment: () => void | Promise<void>
+  onUnarchiveExperiment: () => void | Promise<void>
 }
 
 export const ExperimentView = (props: ExperimentViewProps) => {
   const {
+    animalRecords,
     experiment,
     labId,
     userId,
@@ -62,6 +67,8 @@ export const ExperimentView = (props: ExperimentViewProps) => {
     onRemoveMember,
     onAddAnimal,
     onRemoveAnimal,
+    onArchiveExperiment,
+    onUnarchiveExperiment,
   } = props
 
   return (
@@ -76,14 +83,40 @@ export const ExperimentView = (props: ExperimentViewProps) => {
           </Button>
           <div>
             <h1 className="text-2xl font-bold tracking-tight">{experiment?.title}</h1>
-            <div className="flex items-center gap-2 text-sm text-gray-500">
+            <div className="flex items-center gap-2 text-sm text-gray-500 flex-wrap">
               <span>ID: {experiment?.id}</span>
               <span>•</span>
               <StatusBadge status={experiment?.status as any} />
+              {experiment?.archivedAt ? (
+                <Badge variant="secondary" className="text-xs">
+                  Archived
+                </Badge>
+              ) : null}
             </div>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          {canManageMembers ? (
+            experiment?.archivedAt ? (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => void onUnarchiveExperiment()}
+              >
+                <ArchiveRestore className="mr-2 h-4 w-4" />
+                Unarchive
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => void onArchiveExperiment()}
+              >
+                <Archive className="mr-2 h-4 w-4" />
+                Archive
+              </Button>
+            )
+          ) : null}
           <Button variant="outline">
             <Edit className="mr-2 h-4 w-4" />
             Edit
@@ -122,6 +155,7 @@ export const ExperimentView = (props: ExperimentViewProps) => {
         </TabsList>
 
         <ExperimentOverviewTab
+          animalRecords={animalRecords}
           onAddMembersOpenChange={onAddMembersOpenChange}
           onMemberSearchChange={onMemberSearchChange}
           canManageMembers={canManageMembers}
@@ -132,6 +166,7 @@ export const ExperimentView = (props: ExperimentViewProps) => {
           memberSearch={memberSearch}
           onAddMember={onAddMember}
           experiment={experiment}
+          labId={labId}
           userId={userId}
         />
 

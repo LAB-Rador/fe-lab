@@ -1,6 +1,6 @@
 "use client"
 
-import type { Experiment, ExperimentMetricsData } from "../types"
+import type { Experiment, ExperimentAnimalRecordRow, ExperimentMetricsData } from "../types"
 import type { InitialMembersTypes } from "../../team/types"
 import { AccessStatus } from "@/src/app/account/types"
 import { useState, useCallback, useMemo } from "react"
@@ -10,6 +10,7 @@ import { apiClient } from "@/src/lib/apiClient"
 import { toast } from "sonner"
 
 interface ExperimentContainerProps {
+  initialAnimalRecords: ExperimentAnimalRecordRow[]
   initialMetrics: ExperimentMetricsData | null
   labMembers: InitialMembersTypes[]
   experiment: Experiment
@@ -20,7 +21,8 @@ interface ExperimentContainerProps {
 }
 
 export const ExperimentContainer = (props: ExperimentContainerProps) => {
-  const { experiment, experimentId, labId, userId, labMembers, labAnimals, initialMetrics } = props
+  const { experiment, experimentId, labId, userId, labMembers, labAnimals, initialMetrics, initialAnimalRecords } =
+    props
   const [experimentData, setExperimentData] = useState<Experiment>({
     ...experiment,
     animals: experiment.animals ?? [],
@@ -136,7 +138,7 @@ export const ExperimentContainer = (props: ExperimentContainerProps) => {
         if (response?.success && response.data) {
           setExperimentData((prev) => ({
             ...prev,
-            animals: [...prev.animals, response.data],
+            animals: [...(prev.animals ?? []), response.data],
           }))
           setAddAnimalsOpen(false)
           setAnimalSearch("")
@@ -161,7 +163,7 @@ export const ExperimentContainer = (props: ExperimentContainerProps) => {
         if (response?.success) {
           setExperimentData((prev) => ({
             ...prev,
-            animals: prev.animals.filter((a) => a.id !== animalId),
+            animals: (prev.animals ?? []).filter((a) => a.id !== animalId),
           }))
           toast.success("Animal removed from experiment")
           void refreshMetrics()
@@ -175,8 +177,53 @@ export const ExperimentContainer = (props: ExperimentContainerProps) => {
     [userId, labId, experimentId, refreshMetrics],
   )
 
+  const reloadExperiment = useCallback(async () => {
+    try {
+      const res = await apiClient.get(`/api/experiments/unique/${userId}/${labId}/${experimentId}`)
+      if (res?.success && res.data) {
+        setExperimentData({
+          ...res.data,
+          animals: res.data.animals ?? [],
+          members: res.data.members ?? [],
+        })
+      }
+    } catch {
+      toast.error("Failed to reload experiment")
+    }
+  }, [userId, labId, experimentId])
+
+  const handleArchiveExperiment = useCallback(async () => {
+    try {
+      const res = await apiClient.post(`/api/experiments/${userId}/${labId}/${experimentId}/archive`, {})
+      if (res?.success) {
+        toast.success("Experiment archived")
+        await reloadExperiment()
+      } else {
+        toast.error(res?.message ?? "Failed to archive")
+      }
+    } catch {
+      toast.error("Failed to archive")
+    }
+  }, [userId, labId, experimentId, reloadExperiment])
+
+  const handleUnarchiveExperiment = useCallback(async () => {
+    try {
+      const res = await apiClient.post(`/api/experiments/${userId}/${labId}/${experimentId}/unarchive`, {})
+      if (res?.success) {
+        toast.success("Experiment unarchived")
+        await reloadExperiment()
+      } else {
+        toast.error(res?.message ?? "Failed to unarchive")
+      }
+    } catch {
+      toast.error("Failed to unarchive")
+    }
+  }, [userId, labId, experimentId, reloadExperiment])
+
   return (
     <ExperimentView
+      onUnarchiveExperiment={handleUnarchiveExperiment}
+      onArchiveExperiment={handleArchiveExperiment}
       onAddMembersOpenChange={setAddMembersOpen}
       onAddAnimalsOpenChange={setAddAnimalsOpen}
       animalAddCandidates={animalAddCandidates}
@@ -192,6 +239,7 @@ export const ExperimentContainer = (props: ExperimentContainerProps) => {
       onAddAnimal={handleAddAnimal}
       onAddMember={handleAddMember}
       experiment={experimentData}
+      animalRecords={initialAnimalRecords}
       memberSearch={memberSearch}
       animalSearch={animalSearch}
       labMembers={labMembers}

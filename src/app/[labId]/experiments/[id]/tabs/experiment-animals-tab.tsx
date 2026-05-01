@@ -1,27 +1,28 @@
 "use client"
 
-import { MousePointer, Plus, Search, Trash2 } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/src/components/ui/dialog"
-import { TabsContent } from "@/src/components/ui/tabs"
+import { MousePointer, Plus, Search, Trash2 } from "lucide-react"
 import { Card, CardContent } from "@/src/components/ui/card"
+import { Badge } from "@/src/components/ui/badge"
 import { StatusBadge } from "@/src/components/status-badge"
+import { TabsContent } from "@/src/components/ui/tabs"
+import type { Animal } from "../../../animals/types"
 import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
-import type { Animal } from "../../../animals/types"
 import type { Experiment } from "../../types"
 import Link from "next/link"
 
 export interface ExperimentAnimalsTabProps {
-  experiment: Experiment
-  labId: string
-  canManageMembers: boolean
-  addAnimalsOpen: boolean
+  onRemoveAnimal: (animalId: string) => void | Promise<void>
+  onAddAnimal: (animalId: string) => void | Promise<void>
   onAddAnimalsOpenChange: (open: boolean) => void
-  animalSearch: string
   onAnimalSearchChange: (value: string) => void
   animalAddCandidates: Animal[]
-  onAddAnimal: (animalId: string) => void | Promise<void>
-  onRemoveAnimal: (animalId: string) => void | Promise<void>
+  canManageMembers: boolean
+  addAnimalsOpen: boolean
+  experiment: Experiment
+  animalSearch: string
+  labId: string
 }
 
 export function ExperimentAnimalsTab(props: ExperimentAnimalsTabProps) {
@@ -107,47 +108,84 @@ export function ExperimentAnimalsTab(props: ExperimentAnimalsTabProps) {
           </p>
         ) : (
           (experiment.animals ?? []).map((animal) => (
-            <Card key={animal.id} className="overflow-hidden">
+            <Card
+              key={animal.id}
+              className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
+            >
               <CardContent className="p-0">
-                <div className="p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex items-center gap-2">
-                      <MousePointer className="h-5 w-5 text-blue-600" />
-                      <StatusBadge status={animal.status as any} />
+                <div className="border-b border-gray-100 bg-gradient-to-b from-slate-50/90 to-white px-5 py-4">
+                  <div className="flex gap-3">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-blue-100 bg-blue-50">
+                      <MousePointer className="h-5 w-5 text-blue-600" aria-hidden />
                     </div>
-                    <div className="text-sm text-gray-500">ID: {animal.id}</div>
-                  </div>
-                  <h3 className="font-semibold text-lg mb-2">{animal.name || animal.identifier}</h3>
-                  <div className="grid grid-cols-2 gap-y-2 text-sm">
-                    <div className="text-gray-500">Species</div>
-                    <div>{animal.animalType?.name}</div>
-                    <div className="text-gray-500">Strain</div>
-                    <div>{animal.strain ?? "—"}</div>
-                    <div className="text-gray-500">Sex</div>
-                    <div>{animal.sex || "—"}</div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="truncate text-lg font-semibold tracking-tight text-gray-900">
+                        {animal.name || animal.identifier}
+                      </h3>
+                      <p
+                        className="mt-1 truncate font-mono text-[11px] leading-snug text-gray-400"
+                        title={animal.id}
+                      >
+                        {animal.id}
+                      </p>
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <StatusBadge status={animal.status as any} />
+                        {animal.archivedAt ? (
+                          <Badge
+                            variant="outline"
+                            className="border-violet-400 bg-violet-100 text-xs font-medium text-violet-900 hover:bg-violet-100"
+                          >
+                            ARCHIVED
+                          </Badge>
+                        ) : null}
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div className="bg-gray-50 p-4 border-t border-gray-100 flex justify-between gap-2">
-                  <Button variant="ghost" size="sm" asChild>
-                    <Link href={`/${labId}/animals/${animal.id}`}>View Details</Link>
-                  </Button>
-                  <div className="flex gap-1">
-                    <Button variant="ghost" size="sm" type="button">
-                      Update Status
+
+                <div className="space-y-2.5 px-5 py-4">
+                  {(
+                    [
+                      { label: "Species", value: animal.animalType?.name ?? "—" },
+                      { label: "Strain", value: animal.strain ?? "—" },
+                      { label: "Sex", value: animal.sex ?? "—" },
+                    ] as const
+                  ).map((row) => (
+                    <div
+                      key={row.label}
+                      className="flex items-baseline justify-between gap-3 border-b border-gray-50 pb-2 text-sm last:border-0 last:pb-0"
+                    >
+                      <span className="shrink-0 text-gray-500">{row.label}</span>
+                      <span className="truncate text-right font-medium text-gray-900">{row.value}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex flex-wrap items-center justify-between gap-2 border-t border-gray-100 bg-gray-50/90 px-4 py-3">
+                  <div className="flex flex-wrap gap-2">
+                    <Button variant="outline" size="sm" className="border-gray-200 bg-white shadow-none" asChild>
+                      <Link href={`/${labId}/animals/${animal.id}`}>View details</Link>
                     </Button>
-                    {canManageMembers && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="shrink-0 text-red-600 hover:bg-red-50 hover:text-red-700"
-                        onClick={() => onRemoveAnimal(animal.id)}
-                        aria-label="Remove animal from experiment"
+                    <Button size="sm" className="bg-blue-600 hover:bg-blue-700" asChild>
+                      <Link
+                        href={`/${labId}/animals/${animal.id}/measurements/new?experimentId=${experiment.id}`}
                       >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    )}
+                        New record
+                      </Link>
+                    </Button>
                   </div>
+                  {canManageMembers ? (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="shrink-0 text-red-600 hover:bg-red-50 hover:text-red-700"
+                      onClick={() => onRemoveAnimal(animal.id)}
+                      aria-label="Remove animal from experiment"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  ) : null}
                 </div>
               </CardContent>
             </Card>

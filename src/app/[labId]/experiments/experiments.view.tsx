@@ -1,23 +1,28 @@
 "use client"
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/src/components/ui/dropdown-menu"
+import { Beaker, Calendar, ChevronDown, Filter, MousePointer, Plus, Search, SlidersHorizontal } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
-import { Beaker, Calendar, ChevronDown, Filter, Plus, Search, SlidersHorizontal } from "lucide-react"
 import { Card, CardContent, CardFooter } from "@/src/components/ui/card"
 import { StatusBadge } from "@/src/components/status-badge"
+import { Checkbox } from "@/src/components/ui/checkbox"
 import type { Dispatch, SetStateAction } from "react"
 import { calculateProgress } from "@/src/lib/utils"
 import { Button } from "@/src/components/ui/button"
+import { Label } from "@/src/components/ui/label"
+import { Badge } from "@/src/components/ui/badge"
 import { Input } from "@/src/components/ui/input"
 import type { Experiment } from "./types"
 import Link from "next/link"
 
 interface ExperimentsViewProps {
     setStatusFilter: Dispatch<SetStateAction<string>>;
+    onIncludeArchivedChange: (value: boolean) => void;
     setSearchQuery: Dispatch<SetStateAction<string>>;
     setDateFilter: Dispatch<SetStateAction<string>>;
     filteredExperiments: Experiment[];
     setOpen: (open: boolean) => void;
+    includeArchived: boolean;
     statusFilter: string;
     searchQuery: string;
     dateFilter: string;
@@ -25,7 +30,10 @@ interface ExperimentsViewProps {
 }
 
 export default function ExperimentsView(props: ExperimentsViewProps) {
-    const { filteredExperiments, setStatusFilter, setSearchQuery, setDateFilter, setOpen, statusFilter, searchQuery, dateFilter, labId } = props;
+    const { filteredExperiments, setStatusFilter, setSearchQuery, setDateFilter, setOpen, statusFilter, searchQuery, dateFilter, labId, includeArchived, onIncludeArchivedChange } = props;
+
+    const linkedAnimalCount = (experiment: Experiment) =>
+      experiment.animalCount ?? (experiment.animals?.length ?? 0)
 
     return (
       <div className="space-y-6">
@@ -104,6 +112,17 @@ export default function ExperimentsView(props: ExperimentsViewProps) {
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
+
+            <div className="flex items-center space-x-2 sm:items-center">
+              <Checkbox
+                id="include-archived-experiments"
+                checked={includeArchived}
+                onCheckedChange={(c) => onIncludeArchivedChange(Boolean(c))}
+              />
+              <Label htmlFor="include-archived-experiments" className="text-sm font-normal whitespace-nowrap">
+                Include archived
+              </Label>
+            </div>
           </div>
         </div>
   
@@ -113,9 +132,14 @@ export default function ExperimentsView(props: ExperimentsViewProps) {
               <Card className="h-full hover:shadow-md transition-shadow">
                 <CardContent className="p-6">
                   <div className="flex justify-between items-start mb-4">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <Beaker className="h-5 w-5 text-blue-600" />
                       <StatusBadge status={experiment.status as any} />
+                      {experiment.archivedAt ? (
+                        <Badge variant="secondary" className="text-xs">
+                          Archived
+                        </Badge>
+                      ) : null}
                     </div>
                     <div className="text-sm text-gray-500">Dates: {experiment.startDate ? new Date(experiment.startDate).toLocaleDateString() : 'N/A'} - {experiment.endDate ? new Date(experiment.endDate).toLocaleDateString() : 'N/A'}</div>
                   </div>
@@ -132,10 +156,17 @@ export default function ExperimentsView(props: ExperimentsViewProps) {
                     </div>
                   </div>
                 </CardContent>
-                <CardFooter className="px-6 py-4 bg-gray-50 border-t border-gray-100 text-sm text-gray-500 flex justify-between">
-                  {/* <div>Animals: {experiment.animalCount}</div> */}
-                  <div>{experiment.createdBy?.firstName} {experiment.createdBy?.lastName}</div>
-                  <div>- {experiment.createdBy?.email}</div>
+                <CardFooter className="px-6 py-4 bg-gray-50 border-t border-gray-100 text-sm text-gray-500 flex flex-wrap gap-3 justify-between items-center">
+                  <div className="inline-flex items-center gap-1.5 font-medium text-gray-700">
+                    <MousePointer className="h-4 w-4 shrink-0 text-blue-600" aria-hidden />
+                    <span>
+                      Animals: <span className="tabular-nums">{linkedAnimalCount(experiment)}</span>
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 min-w-0 justify-end">
+                    <span className="truncate">{experiment.createdBy?.firstName} {experiment.createdBy?.lastName}</span>
+                    <span className="truncate">{experiment.createdBy?.email ? `· ${experiment.createdBy.email}` : ''}</span>
+                  </div>
                 </CardFooter>
               </Card>
             </Link>
