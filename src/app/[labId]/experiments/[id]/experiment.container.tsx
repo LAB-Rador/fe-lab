@@ -1,15 +1,16 @@
 "use client"
 
+import type { Experiment, ExperimentMetricsData } from "../types"
 import type { InitialMembersTypes } from "../../team/types"
 import { AccessStatus } from "@/src/app/account/types"
 import { useState, useCallback, useMemo } from "react"
 import { ExperimentView } from "./experiment.view"
 import type { Animal } from "../../animals/types"
 import { apiClient } from "@/src/lib/apiClient"
-import type { Experiment } from "../types"
 import { toast } from "sonner"
 
 interface ExperimentContainerProps {
+  initialMetrics: ExperimentMetricsData | null
   labMembers: InitialMembersTypes[]
   experiment: Experiment
   experimentId: string
@@ -19,18 +20,32 @@ interface ExperimentContainerProps {
 }
 
 export const ExperimentContainer = (props: ExperimentContainerProps) => {
-  const { experiment, experimentId, labId, userId, labMembers, labAnimals } = props
+  const { experiment, experimentId, labId, userId, labMembers, labAnimals, initialMetrics } = props
   const [experimentData, setExperimentData] = useState<Experiment>({
     ...experiment,
     animals: experiment.animals ?? [],
     members: experiment.members ?? [],
   })
+  const [metrics, setMetrics] = useState<ExperimentMetricsData | null>(initialMetrics)
   const [addMembersOpen, setAddMembersOpen] = useState(false)
   const [memberSearch, setMemberSearch] = useState("")
   const [addAnimalsOpen, setAddAnimalsOpen] = useState(false)
   const [animalSearch, setAnimalSearch] = useState("")
 
   const canManageMembers = experimentData.createdById === userId
+
+  const refreshMetrics = useCallback(async () => {
+    try {
+      const res = await apiClient.get(
+        `/api/experiments/unique/${userId}/${labId}/${experimentId}/metrics`,
+      )
+      if (res?.success && res.data) {
+        setMetrics(res.data as ExperimentMetricsData)
+      }
+    } catch {
+      /* keep existing metrics */
+    }
+  }, [userId, labId, experimentId])
 
   const creatorLabRole = useMemo(
     () => labMembers.find((m) => m.userId === experimentData.createdById)?.role,
@@ -126,6 +141,7 @@ export const ExperimentContainer = (props: ExperimentContainerProps) => {
           setAddAnimalsOpen(false)
           setAnimalSearch("")
           toast.success("Animal added to experiment")
+          void refreshMetrics()
         } else {
           toast.error(response?.message ?? "Failed to add animal")
         }
@@ -133,7 +149,7 @@ export const ExperimentContainer = (props: ExperimentContainerProps) => {
         toast.error("Failed to add animal")
       }
     },
-    [userId, labId, experimentId],
+    [userId, labId, experimentId, refreshMetrics],
   )
 
   const handleRemoveAnimal = useCallback(
@@ -148,6 +164,7 @@ export const ExperimentContainer = (props: ExperimentContainerProps) => {
             animals: prev.animals.filter((a) => a.id !== animalId),
           }))
           toast.success("Animal removed from experiment")
+          void refreshMetrics()
         } else {
           toast.error(response?.message ?? "Failed to remove animal")
         }
@@ -155,7 +172,7 @@ export const ExperimentContainer = (props: ExperimentContainerProps) => {
         toast.error("Failed to remove animal")
       }
     },
-    [userId, labId, experimentId],
+    [userId, labId, experimentId, refreshMetrics],
   )
 
   return (
@@ -178,6 +195,7 @@ export const ExperimentContainer = (props: ExperimentContainerProps) => {
       memberSearch={memberSearch}
       animalSearch={animalSearch}
       labMembers={labMembers}
+      metrics={metrics}
       userId={userId}
       labId={labId}
     />

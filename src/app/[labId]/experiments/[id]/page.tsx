@@ -1,5 +1,6 @@
 "use server"
 import { ExperimentContainer } from "./experiment.container";
+import type { ExperimentMetricsData } from "../types";
 import { apiClient } from "@/src/lib/apiClient";
 import { cookies } from "next/headers";
 interface ExperimentDetailPageProps {
@@ -22,14 +23,27 @@ export default async function ExperimentDetailPage({ params }: ExperimentDetailP
     ),
   ])
 
+  let initialMetrics: ExperimentMetricsData | null = null
+  try {
+    const metricsRes = await apiClient.get(
+      `/api/experiments/unique/${userId}/${labId}/${experimentId}/metrics`,
+    )
+    if (metricsRes?.success && metricsRes.data) {
+      initialMetrics = metricsRes.data as ExperimentMetricsData
+    }
+  } catch {
+    initialMetrics = null
+  }
+
   return (
     <ExperimentContainer
-      experiment={experimentRes.data}
-      experimentId={experimentId}
-      labId={labId}
-      userId={userId}
-      labMembers={laboratoryMembersRes.data}
       labAnimals={Array.isArray(labAnimalsRes?.data) ? labAnimalsRes.data : []}
+      labMembers={laboratoryMembersRes.data}
+      experiment={experimentRes.data}
+      initialMetrics={initialMetrics}
+      experimentId={experimentId}
+      userId={userId}
+      labId={labId}
     />
   )
 }

@@ -34,6 +34,25 @@ export interface CreateExperimentType {
     title: string;
 }
 
+/** Daily aggregates for animals linked to an experiment (from AnimalRecord). */
+export interface ExperimentMetricsDayPoint {
+    day: string
+    temperature: number | null
+    activity: number | null
+    weight: number | null
+}
+
+export interface ExperimentMetricsData {
+    series: ExperimentMetricsDayPoint[]
+    averages: {
+        temperature: number | null
+        activity: number | null
+        weight: number | null
+    }
+    recordCount: number
+    animalCount: number
+}
+
 export interface Experiment {
     status?: ExperimentStatus;
     laboratoryId: string;

@@ -6,13 +6,13 @@ import { Tabs, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
 import { ExperimentOverviewTab } from "./tabs/experiment-overview-tab"
 import { ExperimentAnimalsTab } from "./tabs/experiment-animals-tab"
 import { ExperimentMetricsTab } from "./tabs/experiment-metrics-tab"
+import type { Experiment, ExperimentMetricsData } from "../types"
 import { ExperimentTasksTab } from "./tabs/experiment-tasks-tab"
 import { StatusBadge } from "@/src/components/status-badge"
 import type { InitialMembersTypes } from "../../team/types"
 import { Button } from "@/src/components/ui/button"
 import type { Role } from "@/src/app/account/types"
 import type { Animal } from "../../animals/types"
-import type { Experiment } from "../types"
 import Link from "next/link"
 
 interface ExperimentViewProps {
@@ -32,6 +32,7 @@ interface ExperimentViewProps {
   addMembersOpen: boolean
   addAnimalsOpen: boolean
   experiment: Experiment
+  metrics: ExperimentMetricsData | null
   memberSearch: string
   animalSearch: string
   userId: string
@@ -43,6 +44,7 @@ export const ExperimentView = (props: ExperimentViewProps) => {
     experiment,
     labId,
     userId,
+    metrics,
     labMembers,
     canManageMembers,
     creatorLabRole,
@@ -120,33 +122,33 @@ export const ExperimentView = (props: ExperimentViewProps) => {
         </TabsList>
 
         <ExperimentOverviewTab
-          experiment={experiment}
-          userId={userId}
+          onAddMembersOpenChange={onAddMembersOpenChange}
+          onMemberSearchChange={onMemberSearchChange}
           canManageMembers={canManageMembers}
+          onRemoveMember={onRemoveMember}
           creatorLabRole={creatorLabRole}
           addMembersOpen={addMembersOpen}
-          onAddMembersOpenChange={onAddMembersOpenChange}
-          memberSearch={memberSearch}
-          onMemberSearchChange={onMemberSearchChange}
           addCandidates={addCandidates}
+          memberSearch={memberSearch}
           onAddMember={onAddMember}
-          onRemoveMember={onRemoveMember}
+          experiment={experiment}
+          userId={userId}
         />
 
         <ExperimentAnimalsTab
-          experiment={experiment}
-          labId={labId}
-          canManageMembers={canManageMembers}
-          addAnimalsOpen={addAnimalsOpen}
           onAddAnimalsOpenChange={onAddAnimalsOpenChange}
-          animalSearch={animalSearch}
           onAnimalSearchChange={onAnimalSearchChange}
           animalAddCandidates={animalAddCandidates}
-          onAddAnimal={onAddAnimal}
+          canManageMembers={canManageMembers}
+          addAnimalsOpen={addAnimalsOpen}
           onRemoveAnimal={onRemoveAnimal}
+          animalSearch={animalSearch}
+          onAddAnimal={onAddAnimal}
+          experiment={experiment}
+          labId={labId}
         />
 
-        <ExperimentMetricsTab />
+        <ExperimentMetricsTab metrics={metrics} />
 
         <ExperimentTasksTab experiment={experiment} />
       </Tabs>
