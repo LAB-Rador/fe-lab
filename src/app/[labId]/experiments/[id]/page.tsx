@@ -2,7 +2,7 @@
 
 import type { ExperimentAnimalRecordRow, ExperimentMetricsData, ExperimentTasksPagePayload } from "../types";
 import { ExperimentContainer } from "./experiment.container";
-import { apiClient } from "@/src/lib/apiClient";
+import { createServerApiClient } from "@/src/lib/serverApiClient";
 import { cookies } from "next/headers";
 interface ExperimentDetailPageProps {
   params: Promise<{
@@ -13,6 +13,7 @@ interface ExperimentDetailPageProps {
 export default async function ExperimentDetailPage({ params }: ExperimentDetailPageProps) {
   const { id: experimentId, labId } = await params;
   const cookieStore = await cookies();
+  const api = createServerApiClient(cookieStore);
   const userId = await cookieStore.get('USER_ID')?.value || 'default';
   const labAnimalsRows = 500
   const labAnimalsPage = 1
@@ -25,18 +26,18 @@ export default async function ExperimentDetailPage({ params }: ExperimentDetailP
     recordsRes,
     experimentTasksRes,
   ] = await Promise.all([
-    apiClient.get(`/api/experiments/unique/${userId}/${labId}/${experimentId}`),
-    apiClient.get(`/api/laboratory/${userId}/${labId}`),
-    apiClient.get(
+    api.get(`/api/experiments/unique/${userId}/${labId}/${experimentId}`),
+    api.get(`/api/laboratory/${userId}/${labId}`),
+    api.get(
       `/api/animals/${userId}/${labId}/${labAnimalsRows}/${labAnimalsPage}/${JSON.stringify({})}`,
     ),
-    apiClient.get(`/api/experiments/unique/${userId}/${labId}/${experimentId}/metrics`).catch(() => ({
+    api.get(`/api/experiments/unique/${userId}/${labId}/${experimentId}/metrics`).catch(() => ({
       success: false as const,
     })),
-    apiClient
+    api
       .get(`/api/experiments/unique/${userId}/${labId}/${experimentId}/records?limit=200`)
       .catch(() => ({ success: false as const })),
-    apiClient
+    api
       .get(
         `/api/experiments/unique/${userId}/${labId}/${experimentId}/tasks?page=1&pageSize=${initialTasksPageSize}`,
       )
