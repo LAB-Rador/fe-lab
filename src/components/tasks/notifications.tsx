@@ -1,8 +1,10 @@
 "use client"
 
 import { Bell, FlaskConical, HeartPulse, Settings, ListTodo, Clock } from "lucide-react"
+import { decreaseUnread } from "@/src/redux/slices/notificationsSlice"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { Badge } from "@/src/components/ui/badge"
+import { useAppDispatch } from "@/src/lib/hooks"
 import { apiClient } from "@/src/lib/apiClient"
 
 export type AppNotification = {
@@ -43,6 +45,7 @@ function typeIcon(type: string) {
 
 export default function TasksNotifications(props: { userId: string; initialItems: AppNotification[] }) {
   const { userId, initialItems } = props
+  const dispatch = useAppDispatch()
   const [items, setItems] = useState<AppNotification[]>(initialItems)
   const [patchingId, setPatchingId] = useState<string | null>(null)
 
@@ -80,7 +83,9 @@ export default function TasksNotifications(props: { userId: string; initialItems
         const res = (await apiClient.patch(`/api/users/${userId}/notifications/${id}/read`, {})) as {
           success?: boolean
         }
-        if (!res?.success) {
+        if (res?.success) {
+          dispatch(decreaseUnread(1))
+        } else {
           setItems((prev) => prev.map((n) => (n.id === id ? { ...n, isRead: false } : n)))
         }
       } catch {
@@ -89,7 +94,7 @@ export default function TasksNotifications(props: { userId: string; initialItems
         setPatchingId(null)
       }
     },
-    [items, patchingId, userId],
+    [dispatch, items, patchingId, userId],
   )
 
   if (items.length === 0) {

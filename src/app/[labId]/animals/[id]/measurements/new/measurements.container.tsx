@@ -1,10 +1,13 @@
 "use client";
 
+import { mapCreatedRecordToExperimentRow, type CreatedAnimalRecordApi, type AnimalSummaryForRecord } from "@/src/app/[labId]/experiments/map-created-record-to-experiment-row";
+import { prependExperimentRecord } from "@/src/redux/slices/experimentRecordsSlice";
 import type { CreateParameterData } from "@/src/components/animals/types";
 import { ActivityLevel, AnimalEnums, RecordType } from "../../../types";
 import type { AnimalRecordMeasurement } from "../../types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import MeasurementsView from "./measurements.view";
+import { useAppDispatch } from "@/src/lib/hooks";
 import type { BaseSyntheticEvent } from "react";
 import { apiClient } from "@/src/lib/apiClient";
 import type { NewAnimalRecord } from "./types";
@@ -21,6 +24,7 @@ export interface MeasurementsContainerProps {
     animalEnums: AnimalEnums;
     measurements: AnimalRecordMeasurement[];
     experimentId?: string;
+    animalSummary: AnimalSummaryForRecord;
 }
 
 export const formSchema = z.object({
@@ -40,7 +44,8 @@ export const formSchema = z.object({
     })).optional(),
 });
 
-export default function MeasurementsContainer({userId, labId, animalId, animalEnums, measurements, experimentId}: MeasurementsContainerProps) {
+export default function MeasurementsContainer({userId, labId, animalId, animalEnums, measurements, experimentId, animalSummary}: MeasurementsContainerProps) {
+    const dispatch = useAppDispatch()
     const [additionalParameters, setAdditionalParameters] = useState<CreateParameterData[] | []>(measurements.map((measurement: AnimalRecordMeasurement) => ({
         parameterName: measurement.parameter,
         parameterValue: 0,
@@ -93,6 +98,13 @@ export default function MeasurementsContainer({userId, labId, animalId, animalEn
                 description: `${newAnimalRecord.animalId} - ${newAnimalRecord.recordType}`
             });
             if(response.success) {
+                if (experimentId && response.data) {
+                    const row = mapCreatedRecordToExperimentRow(
+                        response.data as CreatedAnimalRecordApi,
+                        animalSummary,
+                    )
+                    dispatch(prependExperimentRecord({ experimentId, record: row }))
+                }
                 setAdditionalParameters((prev) => {
                     return prev.map((parameter) => ({
                         ...parameter,
@@ -104,7 +116,7 @@ export default function MeasurementsContainer({userId, labId, animalId, animalEn
         } catch (error) {
             console.error("Error adding animal:", error)
         }  
-    }, [userId, labId, animalId, additionalParameters, experimentId])
+    }, [userId, labId, animalId, additionalParameters, experimentId, animalSummary, dispatch])
 
     const handleAddParameter = useCallback(async (data: CreateParameterData, event?: BaseSyntheticEvent) => {
         if (event) {
@@ -134,11 +146,11 @@ export default function MeasurementsContainer({userId, labId, animalId, animalEn
             openParameterDialog={openParameterDialog}
             handleAddParameter={handleAddParameter}
             handleSubmit={handleAddAnimalRecord}
+            experimentId={experimentId}
             animalEnums={animalEnums}
             userId={userId as string}
             labId={labId as string}
             animalId={animalId}
-            experimentId={experimentId}
             router={router}
             form={form}
         />

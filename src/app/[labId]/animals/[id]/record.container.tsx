@@ -1,23 +1,47 @@
 "use client"
 
+import { useCallback, useEffect, useRef, useState } from "react";
 import AnimalDetailPage from "./animal.record.view";
 import type { AnimalPagination } from "../types";
 import { apiClient } from "@/src/lib/apiClient";
-import { useCallback, useState } from "react";
 import type { Animal } from "./types";
 import { toast } from "sonner";
 
 export interface RecordContainerProps {
-    userId: string;
-    labId: string;
-    animalId: string;
-    animal: Animal;
     animalPagination: AnimalPagination;
+    animalId: string;
+    userId: string;
+    animal: Animal;
+    labId: string;
 }
 
 export default function RecordContainer({userId, labId, animalId, animal, animalPagination}: RecordContainerProps) {
     const [pagination, setPagination] = useState<AnimalPagination>(animalPagination);
     const [animalData, setAnimalData] = useState(animal);
+
+    const paginationRef = useRef(pagination)
+    paginationRef.current = pagination
+
+    useEffect(() => {
+        let cancelled = false
+        async function loadAnimalFromApi() {
+            try {
+                const pg = paginationRef.current
+                const response = await apiClient.get(
+                    `/api/animals/animal/${userId}/${labId}/${animalId}/${pg.pageSize}/${pg.currentPage}`,
+                )
+                if (cancelled) return
+                setPagination(response.pagination)
+                setAnimalData(response.data)
+            } catch {
+                /* keep SSR snapshot */
+            }
+        }
+        void loadAnimalFromApi()
+        return () => {
+            cancelled = true
+        }
+    }, [userId, labId, animalId])
 
     const handleUpdateDataPagination = useCallback(async (data: {page?: number, pageSize?: number}) => {
         const response = await apiClient.get(`/api/animals/animal/${userId}/${labId}/${animalId}/${data.pageSize || pagination.pageSize}/${data.page || pagination.currentPage}`)
@@ -63,9 +87,9 @@ export default function RecordContainer({userId, labId, animalId, animal, animal
 
     return (
         <AnimalDetailPage
-            handleArchiveAnimal={handleArchiveAnimal}
-            handleUnarchiveAnimal={handleUnarchiveAnimal}
             handleUpdateDataPagination={handleUpdateDataPagination}
+            handleUnarchiveAnimal={handleUnarchiveAnimal}
+            handleArchiveAnimal={handleArchiveAnimal}
             pagination={pagination}
             animalId={animalId}
             animal={animalData}

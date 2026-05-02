@@ -3,11 +3,14 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/src/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/src/components/ui/avatar"
 import type { InitialMembersTypes } from "@/src/app/[labId]/team/types"
+import { setUnreadCount } from "@/src/redux/slices/notificationsSlice"
+import { useAppDispatch, useAppSelector } from "@/src/lib/hooks"
 import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
 import { Badge } from "@/src/components/ui/badge"
 import { getInitials } from "@/src/lib/utils"
 import { Bell, Search } from "lucide-react"
+import { useLayoutEffect } from "react"
 
 export function DashboardHeader({
   laboratoryMembers,
@@ -16,6 +19,13 @@ export function DashboardHeader({
   laboratoryMembers: InitialMembersTypes[]
   unreadNotificationsCount?: number
 }) {
+  const dispatch = useAppDispatch()
+  const unreadFromRedux = useAppSelector((s) => s.notifications.unreadCount)
+
+  useLayoutEffect(() => {
+    dispatch(setUnreadCount(unreadNotificationsCount))
+  }, [dispatch, unreadNotificationsCount])
+
     return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 md:px-6">
       <div className="flex flex-1 items-center gap-4 md:gap-8">
@@ -59,9 +69,9 @@ export function DashboardHeader({
         </div>
         <Button variant="ghost" size="icon" className="relative" type="button" aria-label="Notifications">
           <Bell className="h-5 w-5" />
-          {unreadNotificationsCount > 0 ? (
+          {unreadFromRedux > 0 ? (
             <Badge className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 p-0 text-xs text-white">
-              {unreadNotificationsCount > 99 ? "99+" : unreadNotificationsCount}
+              {unreadFromRedux > 99 ? "99+" : unreadFromRedux}
             </Badge>
           ) : null}
           <span className="sr-only">Notifications</span>
