@@ -9,7 +9,13 @@ import { Badge } from "@/src/components/ui/badge"
 import { getInitials } from "@/src/lib/utils"
 import { Bell, Search } from "lucide-react"
 
-export function DashboardHeader({laboratoryMembers}: {laboratoryMembers: InitialMembersTypes[]}) {
+export function DashboardHeader({
+  laboratoryMembers,
+  unreadNotificationsCount = 0,
+}: {
+  laboratoryMembers: InitialMembersTypes[]
+  unreadNotificationsCount?: number
+}) {
     return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 md:px-6">
       <div className="flex flex-1 items-center gap-4 md:gap-8">
@@ -51,11 +57,13 @@ export function DashboardHeader({laboratoryMembers}: {laboratoryMembers: Initial
             )
           })}
         </div>
-        <Button variant="ghost" size="icon" className="relative">
+        <Button variant="ghost" size="icon" className="relative" type="button" aria-label="Notifications">
           <Bell className="h-5 w-5" />
-          <Badge className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 p-0 text-xs text-white">
-            3
-          </Badge>
+          {unreadNotificationsCount > 0 ? (
+            <Badge className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 p-0 text-xs text-white">
+              {unreadNotificationsCount > 99 ? "99+" : unreadNotificationsCount}
+            </Badge>
+          ) : null}
           <span className="sr-only">Notifications</span>
         </Button>
       </div>

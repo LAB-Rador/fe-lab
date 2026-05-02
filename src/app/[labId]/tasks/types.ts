@@ -19,8 +19,15 @@ export interface Task {
     dueDate?: string | null;
     status: TaskStatus;
     priority: TaskPriority;
+    createdById: string;
     assignedToId: string;
     experimentId?: string | null;
+    createdBy: {
+        id: string;
+        email: string;
+        firstName?: string;
+        lastName?: string;
+    };
     assignedTo: {
         id: string;
         email: string;
@@ -28,3 +35,21 @@ export interface Task {
         lastName?: string;
     };
 }
+
+export interface LaboratoryTasksPagination {
+    currentPage: number;
+    totalPages: number;
+    pageSize: number;
+    totalCount: number;
+    hasPreviousPage: boolean;
+    hasNextPage: boolean;
+}
+
+export interface LaboratoryTasksPagePayload {
+    items: Task[];
+    pagination: LaboratoryTasksPagination;
+}
+
+export type AssigneeScopeFilter = "all" | "mine";
+export type TaskStatusFilterValue = TaskStatus | "all";
+export type TaskPriorityFilterValue = TaskPriority | "all";

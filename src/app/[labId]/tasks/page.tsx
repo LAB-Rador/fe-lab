@@ -1,82 +1,64 @@
-import { Button } from "@/src/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
-import { Calendar, Plus, Filter, ChevronDown } from "lucide-react"
-import TasksCalendarView from "@/src/components/tasks/calendar-view"
-import TasksList from "@/src/components/tasks/tasks-list"
-import TasksNotifications from "@/src/components/tasks/notifications"
+import type { AppNotification } from "@/src/components/tasks/notifications"
+import type { LaboratoryTasksPagePayload } from "./types"
+import type { InitialMembersTypes } from "../team/types"
+import { apiClient } from "@/src/lib/apiClient"
+import TasksContainer from "./tasks.container"
+import { cookies } from "next/headers"
 
-export default function TasksPage() {
-    return (
-        <div className="space-y-4">
-            <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-bold tracking-tight">Tasks</h1>
-                <Button className="bg-primary hover:bg-primary/90">
-                <Plus className="mr-2 h-4 w-4" /> New Task
-                </Button>
-            </div>
+type PageProps = {
+  params: Promise<{ labId: string }>
+}
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="md:col-span-2">
-                    <Tabs defaultValue="list" className="w-full">
-                        <div className="flex justify-between items-center mb-4">
-                        <TabsList>
-                            <TabsTrigger value="list">List View</TabsTrigger>
-                            <TabsTrigger value="calendar">Calendar View</TabsTrigger>
-                        </TabsList>
+export default async function TasksPage({ params }: PageProps) {
+  const { labId } = await params
+  const cookieStore = await cookies()
+  const userId = cookieStore.get("USER_ID")?.value ?? "default"
+  const initialTasksPageSize = 10
 
-                        <div className="flex space-x-2">
-                            <Button variant="outline" size="sm">
-                            <Filter className="mr-2 h-4 w-4" />
-                            Filter
-                            <ChevronDown className="ml-2 h-4 w-4" />
-                            </Button>
-                            <Button variant="outline" size="sm">
-                            Status
-                            <ChevronDown className="ml-2 h-4 w-4" />
-                            </Button>
-                            <Button variant="outline" size="sm">
-                            Priority
-                            <ChevronDown className="ml-2 h-4 w-4" />
-                            </Button>
-                        </div>
-                        </div>
+  const [membersRes, tasksRes, notificationsRes] = await Promise.all([
+    apiClient.get(`/api/laboratory/${userId}/${labId}`),
+    apiClient.get(
+      `/api/tasks/laboratory/${userId}/${labId}?page=1&pageSize=${initialTasksPageSize}`,
+    ),
+    apiClient.get(`/api/users/${userId}/notifications?limit=40`),
+  ])
 
-                        <TabsContent value="list" className="mt-0">
-                        <Card>
-                            <CardContent className="p-0">
-                            <TasksList />
-                            </CardContent>
-                        </Card>
-                        </TabsContent>
+  const laboratoryMembers = (membersRes && "data" in membersRes && Array.isArray(membersRes.data)
+    ? membersRes.data
+    : []) as InitialMembersTypes[]
 
-                        <TabsContent value="calendar" className="mt-0">
-                        <Card>
-                            <CardHeader className="pb-0">
-                            <CardTitle className="text-lg flex items-center">
-                                <Calendar className="mr-2 h-5 w-5" />
-                                June 2025
-                            </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                            <TasksCalendarView />
-                            </CardContent>
-                        </Card>
-                        </TabsContent>
-                    </Tabs>
-                </div>
+  let initialTasks: LaboratoryTasksPagePayload | undefined
+  if (
+    tasksRes &&
+    typeof tasksRes === "object" &&
+    "success" in tasksRes &&
+    tasksRes.success &&
+    tasksRes.data &&
+    typeof tasksRes.data === "object"
+  ) {
+    const d = tasksRes.data as { items?: unknown; pagination?: unknown }
+    initialTasks = {
+      items: d.items as LaboratoryTasksPagePayload["items"],
+      pagination: d.pagination as LaboratoryTasksPagePayload["pagination"],
+    }
+  }
 
-                <div>
-                    <Card>
-                        <CardHeader>
-                        <CardTitle className="text-lg">Notifications</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                        <TasksNotifications />
-                        </CardContent>
-                    </Card>
-                </div>
-            </div>
-        </div>
-    )
+  const initialNotifications =
+    notificationsRes &&
+    typeof notificationsRes === "object" &&
+    "success" in notificationsRes &&
+    notificationsRes.success &&
+    Array.isArray(notificationsRes.data)
+      ? (notificationsRes.data as AppNotification[])
+      : []
+
+  return (
+    <TasksContainer
+    initialNotifications={initialNotifications}
+    laboratoryMembers={laboratoryMembers}
+    initialTasks={initialTasks}
+    userId={userId}
+    labId={labId}
+    />
+  )
 }

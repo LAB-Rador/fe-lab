@@ -23,6 +23,18 @@ export default async function DashboardLayout({
   const laboratory = await laboratories.data.find((laboratory: Laboratory) => laboratory.name === labId);
   const laboratoryMembers = await apiClient.get(`/api/laboratory/${userId}/${labId}`);
 
+  let unreadNotificationsCount = 0
+  try {
+    const notifRes = (await apiClient.get(`/api/users/${userId}/notifications?limit=100`)) as
+      | { success?: boolean; data?: { isRead: boolean }[] }
+      | undefined
+    if (notifRes?.success && Array.isArray(notifRes.data)) {
+      unreadNotificationsCount = notifRes.data.filter((n) => !n.isRead).length
+    }
+  } catch {
+    unreadNotificationsCount = 0
+  }
+
   if(!laboratory) {
     redirect('/account');
   }
@@ -32,7 +44,10 @@ export default async function DashboardLayout({
       <div className="flex min-h-screen bg-gray-50">
         <Sidebar />
         <div className="flex flex-1 flex-col">
-          <DashboardHeader laboratoryMembers={laboratoryMembers.data} />
+          <DashboardHeader
+            laboratoryMembers={laboratoryMembers.data}
+            unreadNotificationsCount={unreadNotificationsCount}
+          />
           <main className="flex-1 p-6">{children}</main>
         </div>
       </div>
