@@ -9,6 +9,7 @@ import type { MeasurementsViewProps } from "./types";
 import { ArrowLeft, ImageIcon } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
+import { Alert, AlertDescription, AlertTitle } from "@/src/components/ui/alert";
 import Link from "next/link";
 
 export default function MeasurementsView({
@@ -23,6 +24,7 @@ export default function MeasurementsView({
         router,
         userId,
         labId,
+        experimentId,
         form,
     }: MeasurementsViewProps) {
     return (
@@ -46,6 +48,15 @@ export default function MeasurementsView({
                         <Separator orientation="vertical" className="h-6" />
                         <h1 className="text-2xl font-bold">New Measurement</h1>
                     </div>
+                    {experimentId ? (
+                        <Alert>
+                            <AlertTitle>Experiment context</AlertTitle>
+                            <AlertDescription>
+                                This record will be linked to experiment ID {experimentId} and included in experiment
+                                metrics.
+                            </AlertDescription>
+                        </Alert>
+                    ) : null}
             
                     <Card>
                         <CardHeader>

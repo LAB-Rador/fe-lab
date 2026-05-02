@@ -4,8 +4,10 @@ import { apiClient } from "@/src/lib/apiClient";
 import type { PageProps } from "./types";
 import { cookies } from "next/headers";
 
-export default async function Page({ params }: PageProps) {
+export default async function Page({ params, searchParams }: PageProps) {
   const { labId, id: animalId } = await params;
+  const sp = await searchParams;
+  const experimentId = typeof sp.experimentId === "string" && sp.experimentId.length > 0 ? sp.experimentId : undefined;
   const cookieStore = await cookies();
   const userId = await cookieStore.get('USER_ID')?.value || 'default';
 
@@ -30,6 +32,7 @@ export default async function Page({ params }: PageProps) {
       animalId={animalId}
       userId={userId}
       labId={labId}
+      experimentId={experimentId}
     />
   )
 }

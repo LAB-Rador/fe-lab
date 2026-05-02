@@ -20,6 +20,7 @@ export interface MeasurementsContainerProps {
     animalId: string;
     animalEnums: AnimalEnums;
     measurements: AnimalRecordMeasurement[];
+    experimentId?: string;
 }
 
 export const formSchema = z.object({
@@ -39,7 +40,7 @@ export const formSchema = z.object({
     })).optional(),
 });
 
-export default function MeasurementsContainer({userId, labId, animalId, animalEnums, measurements}: MeasurementsContainerProps) {
+export default function MeasurementsContainer({userId, labId, animalId, animalEnums, measurements, experimentId}: MeasurementsContainerProps) {
     const [additionalParameters, setAdditionalParameters] = useState<CreateParameterData[] | []>(measurements.map((measurement: AnimalRecordMeasurement) => ({
         parameterName: measurement.parameter,
         parameterValue: 0,
@@ -83,6 +84,9 @@ export default function MeasurementsContainer({userId, labId, animalId, animalEn
                 notes: data.notes || "",
                 measurements: additionalParameters,
             }
+            if (experimentId) {
+                newAnimalRecord.experimentId = experimentId;
+            }
 
             const response = await apiClient.post(`/api/animal-records`, newAnimalRecord);
             toast(response.message || response.error, {
@@ -100,7 +104,7 @@ export default function MeasurementsContainer({userId, labId, animalId, animalEn
         } catch (error) {
             console.error("Error adding animal:", error)
         }  
-    }, [userId, labId, animalId, additionalParameters])
+    }, [userId, labId, animalId, additionalParameters, experimentId])
 
     const handleAddParameter = useCallback(async (data: CreateParameterData, event?: BaseSyntheticEvent) => {
         if (event) {
@@ -134,6 +138,7 @@ export default function MeasurementsContainer({userId, labId, animalId, animalEn
             userId={userId as string}
             labId={labId as string}
             animalId={animalId}
+            experimentId={experimentId}
             router={router}
             form={form}
         />

@@ -26,10 +26,9 @@ interface AnimalMeasurementsProps {
   pagination: AnimalPagination;
   animalId: string;
   animal: Animal;
-  userId: string;
   labId: string;
 }
-export function AnimalMeasurements({ animal, animalId, userId, labId, handleUpdateDataPagination, pagination }: AnimalMeasurementsProps) {
+export function AnimalMeasurements({ animal, animalId, labId, handleUpdateDataPagination, pagination }: AnimalMeasurementsProps) {
   const [view, setView] = useState<"charts" | "table">("charts")
   const records = animal?.records?.map((record) => ({...record})) || [];
   const currentPage = pagination.currentPage

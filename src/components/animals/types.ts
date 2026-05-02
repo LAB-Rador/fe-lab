@@ -37,6 +37,7 @@ export interface Animal {
     name?: string;
     sex?: Sex;
     id?: string;
+    archivedAt?: string | null;
 }
 
 export interface AnimalType {

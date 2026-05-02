@@ -1,50 +1,18 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { Button } from "@/src/components/ui/button"
 import { Badge } from "@/src/components/ui/badge"
-import { Calendar, Clock, Download, ExternalLink, Filter, Search, Users } from "lucide-react"
+import { Calendar, Download, ExternalLink, Filter, Search, Users } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
 import { Input } from "@/src/components/ui/input"
 import Link from "next/link"
+import type { AnimalExperimentParticipation } from "@/src/app/[labId]/animals/[id]/types"
 
 interface AnimalExperimentsProps {
-  animalId: string
+  labId: string
+  experiments: AnimalExperimentParticipation[]
 }
 
-export function AnimalExperiments({ animalId }: AnimalExperimentsProps) {
-  // This would be fetched from an API in a real application
-  const experiments = [
-    {
-      id: "EXP-2024-001",
-      title: "Neurotransmitter Response Study",
-      status: "Active",
-      startDate: "2024-02-15",
-      endDate: "2024-04-30",
-      principalInvestigator: "Dr. Emily Chen",
-      department: "Neuroscience",
-      role: "Test Subject",
-    },
-    {
-      id: "EXP-2023-089",
-      title: "Behavioral Response to Environmental Stimuli",
-      status: "Completed",
-      startDate: "2023-10-10",
-      endDate: "2023-12-20",
-      principalInvestigator: "Dr. Michael Johnson",
-      department: "Behavioral Science",
-      role: "Control Group",
-    },
-    {
-      id: "EXP-2023-045",
-      title: "Immune System Response to Vaccine Candidates",
-      status: "Completed",
-      startDate: "2023-05-05",
-      endDate: "2023-08-15",
-      principalInvestigator: "Dr. Sarah Williams",
-      department: "Immunology",
-      role: "Test Subject",
-    },
-  ]
-
+export function AnimalExperiments({ labId, experiments }: AnimalExperimentsProps) {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -82,37 +50,53 @@ export function AnimalExperiments({ animalId }: AnimalExperimentsProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {experiments.map((experiment) => (
-                <TableRow key={experiment.id}>
-                  <TableCell className="font-medium">{experiment.id}</TableCell>
-                  <TableCell>{experiment.title}</TableCell>
-                  <TableCell>
-                    <ExperimentStatusBadge status={experiment.status} />
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-3.5 w-3.5 text-gray-500" />
-                      <span className="text-sm">
-                        {experiment.startDate} - {experiment.endDate}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      <Users className="h-3.5 w-3.5 text-gray-500" />
-                      <span className="text-sm">{experiment.principalInvestigator}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Link href={`/experiments/${experiment.id}`}>
-                      <Button variant="ghost" size="sm" className="flex items-center gap-1">
-                        <ExternalLink className="h-3.5 w-3.5" />
-                        View
-                      </Button>
-                    </Link>
+              {experiments.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center text-sm text-gray-500 py-10">
+                    This animal is not linked to any experiment yet.
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                experiments.map((row) => {
+                  const exp = row.experiment
+                  const pi = [exp.createdBy?.firstName, exp.createdBy?.lastName].filter(Boolean).join(" ").trim()
+                  const start = exp.startDate ? new Date(exp.startDate).toLocaleDateString() : "—"
+                  const end = exp.endDate ? new Date(exp.endDate).toLocaleDateString() : "—"
+                  return (
+                    <TableRow key={row.id}>
+                      <TableCell className="font-medium max-w-[120px] truncate" title={exp.id}>
+                        {exp.id}
+                      </TableCell>
+                      <TableCell>{exp.title}</TableCell>
+                      <TableCell>
+                        <ExperimentStatusBadge status={exp.status} />
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          <Calendar className="h-3.5 w-3.5 text-gray-500 shrink-0" />
+                          <span className="text-sm">
+                            {start} – {end}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          <Users className="h-3.5 w-3.5 text-gray-500 shrink-0" />
+                          <span className="text-sm">{pi || "—"}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="sm" className="flex items-center gap-1" asChild>
+                          <Link href={`/${labId}/experiments/${exp.id}`}>
+                            <ExternalLink className="h-3.5 w-3.5" />
+                            View
+                          </Link>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })
+              )}
             </TableBody>
           </Table>
         </CardContent>
@@ -123,55 +107,9 @@ export function AnimalExperiments({ animalId }: AnimalExperimentsProps) {
           <CardTitle>Experiment Schedule</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-center p-3 bg-blue-50 border border-blue-200 rounded-md">
-              <div className="flex-shrink-0 w-2 h-2 bg-blue-600 rounded-full mr-3"></div>
-              <div className="flex-1">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div>
-                    <p className="font-medium">Blood Sample Collection</p>
-                    <p className="text-sm text-gray-600">EXP-2024-001: Neurotransmitter Response Study</p>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-3.5 w-3.5 text-gray-500" />
-                    <span className="text-sm">Tomorrow, 9:00 AM</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center p-3 bg-purple-50 border border-purple-200 rounded-md">
-              <div className="flex-shrink-0 w-2 h-2 bg-purple-600 rounded-full mr-3"></div>
-              <div className="flex-1">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div>
-                    <p className="font-medium">Behavioral Test Session</p>
-                    <p className="text-sm text-gray-600">EXP-2024-001: Neurotransmitter Response Study</p>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-3.5 w-3.5 text-gray-500" />
-                    <span className="text-sm">March 25, 2:00 PM</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center p-3 bg-green-50 border border-green-200 rounded-md">
-              <div className="flex-shrink-0 w-2 h-2 bg-green-600 rounded-full mr-3"></div>
-              <div className="flex-1">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div>
-                    <p className="font-medium">Final Assessment</p>
-                    <p className="text-sm text-gray-600">EXP-2024-001: Neurotransmitter Response Study</p>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-3.5 w-3.5 text-gray-500" />
-                    <span className="text-sm">April 28, 10:00 AM</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <p className="text-sm text-gray-500">
+            Procedure scheduling for experiments will appear here when available.
+          </p>
         </CardContent>
       </Card>
     </div>
@@ -183,24 +121,39 @@ interface ExperimentStatusBadgeProps {
 }
 
 function ExperimentStatusBadge({ status }: ExperimentStatusBadgeProps) {
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "active":
+  const getStatusColor = (s: string) => {
+    switch (s.toUpperCase()) {
+      case "ACTIVE":
         return "bg-green-100 text-green-800 hover:bg-green-100"
-      case "scheduled":
+      case "PLANNED":
         return "bg-blue-100 text-blue-800 hover:bg-blue-100"
-      case "completed":
+      case "PAUSED":
+        return "bg-amber-100 text-amber-800 hover:bg-amber-100"
+      case "COMPLETED":
         return "bg-gray-100 text-gray-800 hover:bg-gray-100"
-      case "cancelled":
+      case "CANCELLED":
         return "bg-red-100 text-red-800 hover:bg-red-100"
       default:
-        return "bg-gray-100 text-gray-800 hover:bg-gray-100"
+        switch (s.toLowerCase()) {
+          case "active":
+            return "bg-green-100 text-green-800 hover:bg-green-100"
+          case "scheduled":
+            return "bg-blue-100 text-blue-800 hover:bg-blue-100"
+          case "completed":
+            return "bg-gray-100 text-gray-800 hover:bg-gray-100"
+          case "cancelled":
+            return "bg-red-100 text-red-800 hover:bg-red-100"
+          default:
+            return "bg-gray-100 text-gray-800 hover:bg-gray-100"
+        }
     }
   }
 
+  const label = status ? status.charAt(0) + status.slice(1).toLowerCase().replace(/_/g, " ") : status
+
   return (
     <Badge variant="outline" className={`${getStatusColor(status)}`}>
-      {status}
+      {label}
     </Badge>
   )
 }

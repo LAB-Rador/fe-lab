@@ -6,10 +6,11 @@ import type { useRouter } from "next/navigation";
 import type { z } from "zod";
 
 export interface PageProps {
-    params: {
+    params: Promise<{
         labId: string;
         id: string
-    }
+    }>
+    searchParams: Promise<{ experimentId?: string }>
 }
 
 export interface MeasurementsViewProps {
@@ -25,6 +26,7 @@ export interface MeasurementsViewProps {
     animalId: string;
     userId: string;
     labId: string;
+    experimentId?: string;
 }
 
 export interface NewAnimalRecord {
@@ -39,4 +41,5 @@ export interface NewAnimalRecord {
     weight: number;
     notes: string;
     date: string;
+    experimentId?: string;
 }

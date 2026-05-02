@@ -1,5 +1,6 @@
 "use client"
 
+import { Archive, ArchiveRestore, ArrowLeft, Calendar, Clock, MapPin, Plus } from "lucide-react"
 import { AnimalMedicalRecords } from "@/src/components/animals/animal/animal-medical-records"
 import { AnimalMeasurements } from "@/src/components/animals/animal/animal-measurements"
 import { AnimalExperiments } from "@/src/components/animals/animal/animal-experiments"
@@ -8,14 +9,16 @@ import { AnimalBasicInfo } from "@/src/components/animals/animal/animal-basic-in
 import { AnimalGenealogy } from "@/src/components/animals/animal/animal-genealogy"
 import { Avatar, AvatarFallback, AvatarImage } from "@/src/components/ui/avatar"
 import { QuickActionPanel } from "@/src/components/animals/quick-action-panel"
-import { Calendar, Clock, Edit, MapPin, Plus } from "lucide-react"
 import { Button } from "@/src/components/ui/button"
 import { Badge } from "@/src/components/ui/badge"
 import type { AnimalPagination } from "../types"
+import { getInitials } from "@/src/lib/utils"
 import { useRouter } from "next/navigation"
 import type { Animal } from "./types"
 
 export interface AnimalDetailPageProps {
+    handleArchiveAnimal: () => void | Promise<void>
+    handleUnarchiveAnimal: () => void | Promise<void>
     handleUpdateDataPagination: (data: {page?: number, pageSize?: number}) => void;
     pagination: AnimalPagination;
     animalId: string;
@@ -24,18 +27,30 @@ export interface AnimalDetailPageProps {
     labId: string;
 }
 
-export default function AnimalDetailPage({userId, labId, animalId, animal, handleUpdateDataPagination, pagination}: AnimalDetailPageProps) {
+export default function AnimalDetailPage({userId, labId, animalId, animal, handleUpdateDataPagination, pagination, handleArchiveAnimal, handleUnarchiveAnimal}: AnimalDetailPageProps) {
   const router = useRouter();
 
   return (
     <div className="container mx-auto p-4 md:p-6">
       <div className="grid gap-6">
+        <div className="flex items-center">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="-ml-2 gap-1.5 text-muted-foreground hover:text-foreground"
+            onClick={() => router.back()}
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
+        </div>
+
         {/* Animal Header */}
         <div className="flex flex-col md:flex-row gap-6 items-start">
           <Avatar className="h-24 w-24 rounded-md border">
-            <AvatarImage src={"/placeholder.svg"} alt={animal.name} />
-            <AvatarFallback className="rounded-md bg-blue-100 text-blue-600">
-              {animal.animalType.name}
+            <AvatarFallback className="rounded-md bg-blue-100 text-blue-600 text-2xl font-semibold">
+              {getInitials(animal.name || "-", "")}
             </AvatarFallback>
           </Avatar>
 
@@ -44,6 +59,11 @@ export default function AnimalDetailPage({userId, labId, animalId, animal, handl
               <h1 className="text-2xl font-bold">{animal.name}</h1>
               <Badge className="w-fit bg-blue-600 hover:bg-blue-700">{animal.id}</Badge>
               <StatusBadge status={animal.status} />
+              {animal.archivedAt ? (
+                <Badge variant="secondary" className="w-fit">
+                  Archived
+                </Badge>
+              ) : null}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -64,7 +84,18 @@ export default function AnimalDetailPage({userId, labId, animalId, animal, handl
             </div>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            {animal.archivedAt ? (
+              <Button type="button" variant="outline" size="sm" onClick={() => void handleUnarchiveAnimal()}>
+                <ArchiveRestore className="h-4 w-4 mr-2" />
+                Unarchive
+              </Button>
+            ) : (
+              <Button type="button" variant="outline" size="sm" onClick={() => void handleArchiveAnimal()}>
+                <Archive className="h-4 w-4 mr-2" />
+                Archive
+              </Button>
+            )}
             <Button
               onClick={() => {
                 router.push(`/${labId}/animals/${animalId}/measurements/new`)
@@ -124,7 +155,6 @@ export default function AnimalDetailPage({userId, labId, animalId, animal, handl
                     pagination={pagination}
                     animalId={animalId}
                     animal={animal}
-                    userId={userId}
                     labId={labId}
                 />
               </TabsContent>
@@ -134,7 +164,7 @@ export default function AnimalDetailPage({userId, labId, animalId, animal, handl
               </TabsContent>
 
               <TabsContent value="experiments" className="pt-6">
-                <AnimalExperiments animalId={animal.id || ""} />
+                <AnimalExperiments labId={labId} experiments={animal.experimentAnimals ?? []} />
               </TabsContent>
 
               <TabsContent value="genealogy" className="pt-6">
@@ -144,7 +174,12 @@ export default function AnimalDetailPage({userId, labId, animalId, animal, handl
           </div>
 
           <div>
-            <QuickActionPanel animalId={animal.id || ""} />
+            <QuickActionPanel
+              labId={labId}
+              animalId={animal.id || ""}
+              userId={userId}
+              linkedExperimentIds={(animal.experimentAnimals ?? []).map((ea) => ea.experimentId)}
+            />
           </div>
         </div>
       </div>

@@ -14,9 +14,11 @@ interface AnimalsFilterProps {
   setFilters: (filters: FiltersType) => void;
   animalTypes: AnimalType[];
   animalEnums: AnimalEnums;
+  includeArchived: boolean;
+  onIncludeArchivedChange: (value: boolean) => void;
 }
 
-export function AnimalsFilter({ animalTypes, animalEnums, handleUpdateDataPagination, setFilters }: AnimalsFilterProps) {
+export function AnimalsFilter({ animalTypes, animalEnums, handleUpdateDataPagination, setFilters, includeArchived, onIncludeArchivedChange }: AnimalsFilterProps) {
   // Состояние для фильтров
   const [selectedAnimalTypes, setSelectedAnimalTypes] = useState<string[]>([])
   const [selectedAgeGroups, setSelectedAgeGroups] = useState<string[]>([])
@@ -163,6 +165,17 @@ export function AnimalsFilter({ animalTypes, animalEnums, handleUpdateDataPagina
               <Label htmlFor="senior">Senior (12+ months)</Label>
             </div>
           </div>
+        </div>
+        <Separator />
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="include-archived-animals"
+            checked={includeArchived}
+            onCheckedChange={(checked) => {
+              onIncludeArchivedChange(Boolean(checked))
+            }}
+          />
+          <Label htmlFor="include-archived-animals">Include archived animals</Label>
         </div>
         <Button onClick={applyFilters} className="w-full">
           <Filter className="mr-1 h-4 w-4" />
