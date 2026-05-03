@@ -1,4 +1,4 @@
-import { Building2, Plus, Users, Calendar, MapPin, Mail, User, ChevronRight, Search, BriefcaseBusiness } from "lucide-react"
+import { Building2, Plus, Users, Calendar, MapPin, Mail, User, ChevronRight, Search, BriefcaseBusiness, LogOut } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { Avatar, AvatarFallback } from "@/src/components/ui/avatar"
 import type { LaboratoriesViewProps } from "./types"
@@ -13,6 +13,7 @@ export default function LaboratoriesView(
         handleLabClick,
         setSearchTerm,
         handleJoinLab,
+        handleLogout,
         getInitials,
         formatDate,
         searchTerm,
@@ -98,7 +99,16 @@ export default function LaboratoriesView(
                             </div>
                         </div>
 
-                        <div className="flex space-x-3 m-auto md:m-0">
+                        <div className="flex flex-wrap gap-3 m-auto md:m-0">
+                            <Button
+                                type="button"
+                                onClick={handleLogout}
+                                variant="outline"
+                                className="flex items-center text-red-700 border-red-200 hover:bg-red-50 hover:text-red-800"
+                            >
+                                <LogOut className="h-4 w-4 mr-2" aria-hidden />
+                                Logout
+                            </Button>
                             <Button onClick={handleJoinLab} variant="outline" className="flex items-center">
                                 <Users className="h-4 w-4 mr-2" />
                                 Join Lab

@@ -15,12 +15,17 @@ export default async function TasksPage({ params }: PageProps) {
   const userId = cookieStore.get("USER_ID")?.value ?? "default"
   const initialTasksPageSize = 10
 
+  const notificationsQuery = new URLSearchParams({
+    limit: String(initialTasksPageSize),
+    labId,
+  }).toString()
+
   const [membersRes, tasksRes, notificationsRes] = await Promise.all([
     serverApiClient.get(`/api/laboratory/${userId}/${labId}`),
     serverApiClient.get(
       `/api/tasks/laboratory/${userId}/${labId}?page=1&pageSize=${initialTasksPageSize}`,
     ),
-    serverApiClient.get(`/api/users/${userId}/notifications?limit=40`),
+    serverApiClient.get(`/api/users/${userId}/notifications?${notificationsQuery}`),
   ])
 
   const laboratoryMembers = (membersRes && "data" in membersRes && Array.isArray(membersRes.data)

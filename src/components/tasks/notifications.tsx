@@ -10,6 +10,7 @@ import { apiClient } from "@/src/lib/apiClient"
 export type AppNotification = {
   id: string
   userId: string
+  laboratoryId?: string
   title: string
   message: string
   isRead: boolean
@@ -17,7 +18,15 @@ export type AppNotification = {
   createdAt?: string
 }
 
-function formatNotificationWhen(iso: string | undefined): { line: string; dateTime: string } {
+export function notificationsQueryParams(labId: string, limit?: number, onlyUnread?: boolean): string {
+  const q = new URLSearchParams()
+  q.set("labId", labId)
+  if (limit !== undefined) q.set("limit", String(limit))
+  if (onlyUnread) q.set("onlyUnread", "true")
+  return q.toString()
+}
+
+export function formatNotificationWhen(iso: string | undefined): { line: string; dateTime: string } {
   if (!iso) return { line: "—", dateTime: "" }
   const d = new Date(iso)
   if (Number.isNaN(d.getTime())) return { line: "—", dateTime: "" }
@@ -27,7 +36,7 @@ function formatNotificationWhen(iso: string | undefined): { line: string; dateTi
   }
 }
 
-function typeIcon(type: string) {
+export function typeIcon(type: string) {
   switch (type) {
     case "TASK":
       return <ListTodo className="h-5 w-5 text-blue-600" aria-hidden />
@@ -43,8 +52,8 @@ function typeIcon(type: string) {
   }
 }
 
-export default function TasksNotifications(props: { userId: string; initialItems: AppNotification[] }) {
-  const { userId, initialItems } = props
+export default function TasksNotifications(props: { userId: string; labId: string; initialItems: AppNotification[] }) {
+  const { userId, labId, initialItems } = props
   const dispatch = useAppDispatch()
   const [items, setItems] = useState<AppNotification[]>(initialItems)
   const [patchingId, setPatchingId] = useState<string | null>(null)
@@ -53,7 +62,9 @@ export default function TasksNotifications(props: { userId: string; initialItems
     let cancelled = false
     async function refresh() {
       try {
-        const res = (await apiClient.get(`/api/users/${userId}/notifications?limit=40`)) as
+        const res = (await apiClient.get(
+          `/api/users/${userId}/notifications?${notificationsQueryParams(labId, 40)}`,
+        )) as
           | { success?: boolean; data?: AppNotification[] }
           | undefined
         if (cancelled) return
@@ -68,7 +79,7 @@ export default function TasksNotifications(props: { userId: string; initialItems
     return () => {
       cancelled = true
     }
-  }, [userId])
+  }, [userId, labId])
 
   const unreadCount = useMemo(() => items.filter((n) => !n.isRead).length, [items])
 
@@ -80,7 +91,10 @@ export default function TasksNotifications(props: { userId: string; initialItems
       setPatchingId(id)
       setItems((prev) => prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)))
       try {
-        const res = (await apiClient.patch(`/api/users/${userId}/notifications/${id}/read`, {})) as {
+        const res = (await apiClient.patch(
+          `/api/users/${userId}/notifications/${id}/read?${notificationsQueryParams(labId)}`,
+          {},
+        )) as {
           success?: boolean
         }
         if (res?.success) {
@@ -94,7 +108,7 @@ export default function TasksNotifications(props: { userId: string; initialItems
         setPatchingId(null)
       }
     },
-    [dispatch, items, patchingId, userId],
+    [dispatch, items, patchingId, userId, labId],
   )
 
   if (items.length === 0) {

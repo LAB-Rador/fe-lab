@@ -287,6 +287,7 @@ export default function TasksContainer(props: {
       assignees={assignees}
       mainTab={mainTab}
       userId={userId}
+      labId={labId}
       tasks={tasks}
     />
   )

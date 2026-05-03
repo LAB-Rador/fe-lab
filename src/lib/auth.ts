@@ -1,6 +1,9 @@
 import Cookies from 'js-cookie';
+import { CONFIRMED_EMAIL } from './variables';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_LOCAL_DATABASE_URL || process.env.NEXT_PUBLIC_DATABASE_URL;
+
+const USER_ID_COOKIE = 'USER_ID';
 
 export class AuthService {
   static TOKEN_KEY = 'auth-token';
@@ -54,6 +57,8 @@ export class AuthService {
   // Логаут
   static logout() {
     this.removeToken();
+    Cookies.remove(USER_ID_COOKIE, { path: '/' });
+    Cookies.remove(CONFIRMED_EMAIL, { path: '/' });
     window.location.href = '/signin';
   }
   

@@ -13,6 +13,7 @@ import { capitalizeEnum } from "@/src/lib/strings"
 
 export function TasksView(props: {
   userId: string
+  labId: string
   initialNotifications: AppNotification[]
   mainTab: "list" | "calendar"
   onMainTabChange: (v: "list" | "calendar") => void
@@ -39,6 +40,7 @@ export function TasksView(props: {
 }) {
   const {
     userId,
+    labId,
     initialNotifications,
     mainTab,
     onMainTabChange,
@@ -174,7 +176,7 @@ export function TasksView(props: {
               <CardTitle className="text-lg">Notifications</CardTitle>
             </CardHeader>
             <CardContent>
-              <TasksNotifications userId={userId} initialItems={initialNotifications} />
+              <TasksNotifications userId={userId} labId={labId} initialItems={initialNotifications} />
             </CardContent>
           </Card>
         </div>

@@ -90,6 +90,7 @@ export interface LaboratoriesViewProps {
     handleLabClick: (labId: string) => void;
     handleCreateLab: VoidFunction;
     handleJoinLab: VoidFunction;
+    handleLogout: VoidFunction;
     userInfo: UserInfo | null;
     isLoading: boolean;
     searchTerm: string;

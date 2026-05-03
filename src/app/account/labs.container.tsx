@@ -63,6 +63,9 @@ export default function LaboratoriesContainer({ userLaboratories }: Laboratories
         router.push("/laboratory-setup?tab=create")
     }, [router]);
 
+    const handleLogout = useCallback(() => {
+        AuthService.logout()
+    }, [])
 
     return (
         <LaboratoriesView
@@ -71,6 +74,7 @@ export default function LaboratoriesContainer({ userLaboratories }: Laboratories
             handleLabClick={handleLabClick}
             setSearchTerm={setSearchTerm}
             handleJoinLab={handleJoinLab}
+            handleLogout={handleLogout}
             getInitials={getInitials}
             formatDate={formatDate}
             searchTerm={searchTerm}

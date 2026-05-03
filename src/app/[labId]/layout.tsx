@@ -4,7 +4,9 @@ import { DashboardHeader } from "@/src/components/dashboard/dashboard-header"
 import { SidebarProvider } from "@/src/components/sidebar-provider"
 import { Sidebar } from "@/src/components/sidebar"
 import type { Laboratory } from "../account/types"
+import type { AppNotification } from "@/src/components/tasks/notifications"
 import { serverApiClient } from "@/src/lib/serverApiClient"
+
 import { redirect } from 'next/navigation'
 import { cookies } from "next/headers"
 import type React from "react"
@@ -24,15 +26,19 @@ export default async function DashboardLayout({
   const laboratoryMembers = await serverApiClient.get(`/api/laboratory/${userId}/${labId}`);
 
   let unreadNotificationsCount = 0
+  let initialUnreadNotifications: AppNotification[] = []
   try {
-    const notifRes = (await serverApiClient.get(`/api/users/${userId}/notifications?limit=100`)) as
-      | { success?: boolean; data?: { isRead: boolean }[] }
+    const notifQs = new URLSearchParams({ limit: "100", labId, onlyUnread: "true" }).toString()
+    const notifRes = (await serverApiClient.get(`/api/users/${userId}/notifications?${notifQs}`)) as
+      | { success?: boolean; data?: AppNotification[] }
       | undefined
     if (notifRes?.success && Array.isArray(notifRes.data)) {
-      unreadNotificationsCount = notifRes.data.filter((n) => !n.isRead).length
+      initialUnreadNotifications = notifRes.data
+      unreadNotificationsCount = initialUnreadNotifications.length
     }
   } catch {
     unreadNotificationsCount = 0
+    initialUnreadNotifications = []
   }
 
   if(!laboratory) {
@@ -47,6 +53,9 @@ export default async function DashboardLayout({
           <DashboardHeader
             laboratoryMembers={laboratoryMembers.data}
             unreadNotificationsCount={unreadNotificationsCount}
+            initialUnreadNotifications={initialUnreadNotifications}
+            userId={userId}
+            labId={labId}
           />
           <main className="flex-1 p-6">{children}</main>
         </div>
