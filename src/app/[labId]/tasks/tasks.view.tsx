@@ -9,10 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/ta
 import { ExperimentTasksTab } from "../experiments/[id]/tabs/experiment-tasks-tab"
 import TasksCalendarView from "@/src/components/tasks/calendar-view"
 import { Calendar, Filter } from "lucide-react"
-
-function capitalizeEnum(s: string): string {
-  return s.charAt(0) + s.slice(1).toLowerCase().replace(/_/g, " ")
-}
+import { capitalizeEnum } from "@/src/lib/strings"
 
 export function TasksView(props: {
   userId: string

@@ -19,6 +19,7 @@ import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
 import type { Task } from "../../../tasks/types"
 import { cn } from "@/src/lib/utils"
+import { capitalizeEnum } from "@/src/lib/strings"
 
 export interface ExperimentTaskAssigneeOption {
   id: string
@@ -59,9 +60,7 @@ function formatDueDateRaw(iso?: string | null): string {
   return Number.isNaN(d.getTime()) ? "—" : d.toLocaleDateString()
 }
 
-function capitalizeEnum(s: string): string {
-  return s.charAt(0) + s.slice(1).toLowerCase().replace(/_/g, " ")
-}
+// moved to shared util
 
 function getUserDisplay(user: {
   firstName?: string | null

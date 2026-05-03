@@ -4,7 +4,7 @@ import { DashboardHeader } from "@/src/components/dashboard/dashboard-header"
 import { SidebarProvider } from "@/src/components/sidebar-provider"
 import { Sidebar } from "@/src/components/sidebar"
 import type { Laboratory } from "../account/types"
-import { apiClient } from "@/src/lib/apiClient"
+import { serverApiClient } from "@/src/lib/serverApiClient"
 import { redirect } from 'next/navigation'
 import { cookies } from "next/headers"
 import type React from "react"
@@ -19,13 +19,13 @@ export default async function DashboardLayout({
   const {labId} = await params;
   const cookieStore = await cookies();
   const userId = await cookieStore.get('USER_ID')?.value || 'default';
-  const laboratories = await apiClient.get(`/api/laboratories/${userId}`);
+  const laboratories = await serverApiClient.get(`/api/laboratories/${userId}`);
   const laboratory = await laboratories.data.find((laboratory: Laboratory) => laboratory.name === labId);
-  const laboratoryMembers = await apiClient.get(`/api/laboratory/${userId}/${labId}`);
+  const laboratoryMembers = await serverApiClient.get(`/api/laboratory/${userId}/${labId}`);
 
   let unreadNotificationsCount = 0
   try {
-    const notifRes = (await apiClient.get(`/api/users/${userId}/notifications?limit=100`)) as
+    const notifRes = (await serverApiClient.get(`/api/users/${userId}/notifications?limit=100`)) as
       | { success?: boolean; data?: { isRead: boolean }[] }
       | undefined
     if (notifRes?.success && Array.isArray(notifRes.data)) {

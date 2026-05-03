@@ -1,7 +1,7 @@
 import type { AppNotification } from "@/src/components/tasks/notifications"
 import type { LaboratoryTasksPagePayload } from "./types"
 import type { InitialMembersTypes } from "../team/types"
-import { apiClient } from "@/src/lib/apiClient"
+import { serverApiClient } from "@/src/lib/serverApiClient"
 import TasksContainer from "./tasks.container"
 import { cookies } from "next/headers"
 
@@ -16,11 +16,11 @@ export default async function TasksPage({ params }: PageProps) {
   const initialTasksPageSize = 10
 
   const [membersRes, tasksRes, notificationsRes] = await Promise.all([
-    apiClient.get(`/api/laboratory/${userId}/${labId}`),
-    apiClient.get(
+    serverApiClient.get(`/api/laboratory/${userId}/${labId}`),
+    serverApiClient.get(
       `/api/tasks/laboratory/${userId}/${labId}?page=1&pageSize=${initialTasksPageSize}`,
     ),
-    apiClient.get(`/api/users/${userId}/notifications?limit=40`),
+    serverApiClient.get(`/api/users/${userId}/notifications?limit=40`),
   ])
 
   const laboratoryMembers = (membersRes && "data" in membersRes && Array.isArray(membersRes.data)
