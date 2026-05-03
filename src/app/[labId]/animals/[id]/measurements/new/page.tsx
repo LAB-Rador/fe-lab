@@ -29,10 +29,15 @@ export default async function Page({ params, searchParams }: PageProps) {
     <MeasurementsContainer
       measurements={uniqueMeasurements}
       animalEnums={animalEnums.data}
+      experimentId={experimentId}
       animalId={animalId}
       userId={userId}
       labId={labId}
-      experimentId={experimentId}
+      animalSummary={{
+        id: animalId,
+        name: animal.data?.name ?? null,
+        identifier: animal.data?.identifier ?? "",
+      }}
     />
   )
 }

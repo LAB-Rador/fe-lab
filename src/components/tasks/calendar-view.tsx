@@ -1,108 +1,123 @@
 "use client"
 
-import { useState } from "react"
-import { Badge } from "@/src/components/ui/badge"
+import { eachDayOfInterval, endOfMonth, endOfWeek, format, isSameDay, isSameMonth, startOfMonth, startOfWeek } from "date-fns"
+import { TaskPriority, type Task } from "@/src/app/[labId]/tasks/types"
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
 import { Button } from "@/src/components/ui/button"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { Badge } from "@/src/components/ui/badge"
+import { cn } from "@/src/lib/utils"
+import { useMemo } from "react"
 
-// Sample calendar data
-const calendarData = [
-    { date: 1, tasks: [] },
-    { date: 2, tasks: [] },
-    { date: 3, tasks: [{ id: 4, name: "Laboratory equipment maintenance", priority: "High" }] },
-    { date: 4, tasks: [{ id: 7, name: "Animal welfare assessment", priority: "High" }] },
-    { date: 5, tasks: [{ id: 1, name: "Mouse colony health check", priority: "High" }] },
-    { date: 6, tasks: [] },
-    { date: 7, tasks: [{ id: 2, name: "Fish tank water quality test", priority: "Medium" }] },
-    { date: 8, tasks: [{ id: 5, name: "Experiment data collection", priority: "Medium" }] },
-    { date: 9, tasks: [] },
-    { date: 10, tasks: [{ id: 3, name: "Bird feeding schedule update", priority: "Low" }] },
-    { date: 11, tasks: [] },
-    { date: 12, tasks: [{ id: 6, name: "Inventory restocking", priority: "Medium" }] },
-    { date: 13, tasks: [] },
-    { date: 14, tasks: [] },
-    { date: 15, tasks: [] },
-    { date: 16, tasks: [] },
-    { date: 17, tasks: [] },
-    { date: 18, tasks: [] },
-    { date: 19, tasks: [] },
-    { date: 20, tasks: [] },
-    { date: 21, tasks: [] },
-    { date: 22, tasks: [] },
-    { date: 23, tasks: [] },
-    { date: 24, tasks: [] },
-    { date: 25, tasks: [] },
-    { date: 26, tasks: [] },
-    { date: 27, tasks: [] },
-    { date: 28, tasks: [] },
-    { date: 29, tasks: [] },
-    { date: 30, tasks: [] },
-]
-
-export default function TasksCalendarView() {
-    const [currentMonth, setCurrentMonth] = useState("June 2025")
-
-    return (
-        <div className="space-y-4">
-            <div className="flex justify-between items-center">
-                <Button variant="outline" size="icon">
-                <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <h3 className="text-lg font-medium">{currentMonth}</h3>
-                <Button variant="outline" size="icon">
-                <ChevronRight className="h-4 w-4" />
-                </Button>
-            </div>
-
-            <div className="grid grid-cols-7 gap-1 text-center">
-                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-                <div key={day} className="py-2 text-sm font-medium text-gray-500">
-                    {day}
-                </div>
-                ))}
-
-                {/* Empty cells for days before the 1st of the month */}
-                {Array.from({ length: 6 }).map((_, index) => (
-                <div key={`empty-${index}`} className="h-24 border rounded-md bg-gray-50"></div>
-                ))}
-
-                {calendarData.map((day) => (
-                <div
-                    key={day.date}
-                    className={`h-24 border rounded-md p-1 overflow-hidden ${
-                    day.date === new Date().getDate() ? "ring-2 ring-primary ring-offset-2" : ""
-                    }`}
-                >
-                    <div className="flex justify-between items-start">
-                    <span className="text-sm font-medium">{day.date}</span>
-                    {day.tasks.length > 0 && <Badge className="bg-primary">{day.tasks.length}</Badge>}
-                    </div>
-                    <div className="mt-1 space-y-1 overflow-y-auto max-h-[calc(100%-20px)]">
-                    {day.tasks.map((task) => (
-                        <CalendarTask key={task.id} task={task} />
-                    ))}
-                    </div>
-                </div>
-                ))}
-            </div>
-        </div>
-    )
+export type TasksCalendarViewProps = {
+  month: Date
+  onPrevMonth: () => void
+  onNextMonth: () => void
+  tasks: Task[]
+  loading?: boolean
 }
 
-function CalendarTask({ task }: { task: { id: number; name: string; priority: string } }) {
-    const priorityColors = {
-        High: "bg-status-red/20 border-l-status-red",
-        Medium: "bg-status-yellow/20 border-l-status-yellow",
-        Low: "bg-status-green/20 border-l-status-green",
-    }
+const PRIORITY_BAR: Record<TaskPriority, string> = {
+  [TaskPriority.LOW]: "border-l-green-500 bg-green-50",
+  [TaskPriority.MEDIUM]: "border-l-amber-500 bg-amber-50",
+  [TaskPriority.HIGH]: "border-l-orange-500 bg-orange-50",
+  [TaskPriority.URGENT]: "border-l-red-600 bg-red-50",
+}
 
-    return (
-        <div
-        className={`text-xs p-1 rounded border-l-2 truncate ${
-            priorityColors[task.priority as keyof typeof priorityColors]
-        }`}
-        >
-        {task.name}
+function dayKey(d: Date): string {
+  return format(d, "yyyy-MM-dd")
+}
+
+export default function TasksCalendarView(props: TasksCalendarViewProps) {
+  const { month, onPrevMonth, onNextMonth, tasks, loading } = props
+
+  const { gridDays, tasksByDay } = useMemo(() => {
+    const monthStart = startOfMonth(month)
+    const monthEnd = endOfMonth(month)
+    const gridStart = startOfWeek(monthStart, { weekStartsOn: 0 })
+    const gridEnd = endOfWeek(monthEnd, { weekStartsOn: 0 })
+    const gridDays = eachDayOfInterval({ start: gridStart, end: gridEnd })
+    const map = new Map<string, Task[]>()
+    for (const t of tasks) {
+      if (!t.dueDate) continue
+      const k = dayKey(new Date(t.dueDate))
+      const list = map.get(k) ?? []
+      list.push(t)
+      map.set(k, list)
+    }
+    return { gridDays, tasksByDay: map }
+  }, [month, tasks])
+
+  const today = new Date()
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between gap-2">
+        <Button type="button" variant="outline" size="icon" onClick={onPrevMonth} aria-label="Previous month">
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <h3 className="text-lg font-medium tabular-nums">{format(month, "MMMM yyyy")}</h3>
+        <Button type="button" variant="outline" size="icon" onClick={onNextMonth} aria-label="Next month">
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center py-12 text-muted-foreground">
+          <Loader2 className="h-8 w-8 animate-spin" aria-label="Loading calendar" />
         </div>
-    )
+      ) : (
+        <div className="grid grid-cols-7 gap-1 text-center">
+          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+            <div key={day} className="py-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              {day}
+            </div>
+          ))}
+
+          {gridDays.map((day) => {
+            const key = dayKey(day)
+            const dayTasks = tasksByDay.get(key) ?? []
+            const inMonth = isSameMonth(day, month)
+            const isToday = isSameDay(day, today)
+
+            return (
+              <div
+                key={key}
+                className={cn(
+                  "flex min-h-[5.5rem] flex-col rounded-md border p-1 text-left",
+                  inMonth ? "bg-background" : "bg-muted/40 text-muted-foreground",
+                  isToday && "ring-2 ring-primary ring-offset-2",
+                )}
+              >
+                <div className="flex items-start justify-between gap-1">
+                  <span className="text-xs font-semibold tabular-nums">{format(day, "d")}</span>
+                  {dayTasks.length > 0 ? (
+                    <Badge variant="secondary" className="h-5 min-w-[1.25rem] px-1 text-[10px] font-medium">
+                      {dayTasks.length}
+                    </Badge>
+                  ) : null}
+                </div>
+                <div className="mt-1 flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto">
+                  {dayTasks.slice(0, 4).map((task) => (
+                    <div
+                      key={task.id}
+                      title={task.title}
+                      className={cn(
+                        "truncate rounded border-l-2 px-1 py-0.5 text-[10px] font-medium leading-tight sm:text-xs",
+                        PRIORITY_BAR[task.priority] ?? "border-l-slate-400 bg-slate-50",
+                      )}
+                    >
+                      {task.title}
+                    </div>
+                  ))}
+                  {dayTasks.length > 4 ? (
+                    <span className="text-[10px] text-muted-foreground">+{dayTasks.length - 4} more</span>
+                  ) : null}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
 }

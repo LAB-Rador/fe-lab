@@ -62,7 +62,6 @@ export const ExperimentView = (props: ExperimentViewProps) => {
     labId,
     userId,
     metrics,
-    labMembers,
     canManageMembers,
     creatorLabRole,
     addMembersOpen,

@@ -19,13 +19,21 @@ import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
 import type { Task } from "../../../tasks/types"
 import { cn } from "@/src/lib/utils"
+import { capitalizeEnum } from "@/src/lib/strings"
 
 export interface ExperimentTaskAssigneeOption {
   id: string
   label: string
 }
 
+export type TasksTabSurface = "experiment-tabs" | "standalone"
+
 export interface ExperimentTasksTabProps {
+  surface?: TasksTabSurface
+  sectionTitle?: string
+  emptyListMessage?: string
+  deleteScopeLabel?: string
+  noAssigneesLabel?: string
   onPaginationChange: (next: { page?: number; pageSize?: number }) => void | Promise<void>
   onPatchTaskStatus: (taskId: string, status: TaskStatus) => void | Promise<void>
   onCreateTask: (payload: ExperimentTaskUpsertPayload) => void | Promise<void>
@@ -52,16 +60,23 @@ function formatDueDateRaw(iso?: string | null): string {
   return Number.isNaN(d.getTime()) ? "—" : d.toLocaleDateString()
 }
 
-function capitalizeEnum(s: string): string {
-  return s.charAt(0) + s.slice(1).toLowerCase().replace(/_/g, " ")
-}
+// moved to shared util
 
-function getAssigneeDisplay(task: Task): { primary: string; secondary?: string } {
-  const composed = [task.assignedTo?.firstName, task.assignedTo?.lastName].filter(Boolean).join(" ").trim()
-  const email = (task.assignedTo?.email ?? "").trim()
+function getUserDisplay(user: {
+  firstName?: string | null
+  lastName?: string | null
+  email?: string | null
+} | null | undefined): { primary: string; secondary?: string } {
+  if (!user) return { primary: "—" }
+  const composed = [user.firstName, user.lastName].filter(Boolean).join(" ").trim()
+  const email = (user.email ?? "").trim()
   if (!composed && !email) return { primary: "—" }
   if (composed && email && composed !== email) return { primary: composed, secondary: email }
   return { primary: composed || email }
+}
+
+function getAssigneeDisplay(task: Task): { primary: string; secondary?: string } {
+  return getUserDisplay(task.assignedTo)
 }
 
 const PRIORITY_BADGE_CLASS: Record<TaskPriority, string> = {
@@ -112,12 +127,13 @@ interface TaskEditorDialogProps {
   draft: Task | null
   assignees: ExperimentTaskAssigneeOption[]
   loading?: boolean
+  noAssigneesLabel?: string
   onOpenChange: (open: boolean) => void
   onSubmit: (payload: ExperimentTaskUpsertPayload, editingId: string | null) => void | Promise<void>
 }
 
 function TaskEditorDialog(props: TaskEditorDialogProps) {
-  const { open, draft, assignees, loading, onOpenChange, onSubmit } = props
+  const { open, draft, assignees, loading, noAssigneesLabel, onOpenChange, onSubmit } = props
   const mode = draft ? ("edit" as const) : ("create" as const)
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
@@ -189,7 +205,9 @@ function TaskEditorDialog(props: TaskEditorDialogProps) {
           <div>
             <Label htmlFor="et-assign">Assignee</Label>
             {!canPickAssignee ? (
-              <p className="text-sm text-gray-500">No experiment collaborators available.</p>
+              <p className="text-sm text-gray-500">
+                {noAssigneesLabel ?? "No experiment collaborators available."}
+              </p>
             ) : (
               <Select value={assignedToId} onValueChange={setAssignedToId}>
                 <SelectTrigger id="et-assign">
@@ -257,6 +275,11 @@ function TaskEditorDialog(props: TaskEditorDialogProps) {
 
 export function ExperimentTasksTab(props: ExperimentTasksTabProps) {
   const {
+    surface = "experiment-tabs",
+    sectionTitle = "Experiment Tasks",
+    emptyListMessage = "No tasks yet. Use Add Task to assign work on this experiment.",
+    deleteScopeLabel = "experiment",
+    noAssigneesLabel,
     tasks,
     pagination,
     assignees,
@@ -425,16 +448,17 @@ export function ExperimentTasksTab(props: ExperimentTasksTabProps) {
       <Loader2 className="h-8 w-8 animate-spin" aria-label="Loading" />
     </div>
   ) : tasks.length === 0 ? (
-    <p className="py-10 text-center text-sm text-gray-500">
-      No tasks yet. Use Add Task to assign work on this experiment.
-    </p>
+    <p className="py-10 text-center text-sm text-gray-500">{emptyListMessage}</p>
   ) : view === "table" ? (
     <div className="overflow-x-auto rounded-md">
       <Table>
         <TableHeader>
           <TableRow className="border-b hover:bg-muted/40 bg-muted/30">
-            <TableHead className="min-w-[220px] max-w-xl py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            <TableHead className="min-w-[200px] max-w-xl py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Task & description
+            </TableHead>
+            <TableHead className="min-w-[140px] py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">
+              Created by
             </TableHead>
             <TableHead className="min-w-[140px] py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap">
               Assignee
@@ -456,6 +480,7 @@ export function ExperimentTasksTab(props: ExperimentTasksTabProps) {
         <TableBody>
           {tasks.map((task) => {
             const assignee = getAssigneeDisplay(task)
+            const creator = getUserDisplay(task.createdBy)
             return (
               <TableRow key={task.id} className="align-top border-b hover:bg-muted/25">
                 <TableCell className="max-w-xl py-4 align-top">
@@ -471,6 +496,14 @@ export function ExperimentTasksTab(props: ExperimentTasksTabProps) {
                     ) : (
                       <p className="text-xs italic text-muted-foreground/80">No description</p>
                     )}
+                  </div>
+                </TableCell>
+                <TableCell className="align-top py-4">
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-sm font-medium text-foreground">{creator.primary}</span>
+                    {creator.secondary ? (
+                      <span className="text-xs text-muted-foreground break-all">{creator.secondary}</span>
+                    ) : null}
                   </div>
                 </TableCell>
                 <TableCell className="align-top py-4">
@@ -536,6 +569,7 @@ export function ExperimentTasksTab(props: ExperimentTasksTabProps) {
     <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {tasks.map((task) => {
         const assignee = getAssigneeDisplay(task)
+        const creator = getUserDisplay(task.createdBy)
         return (
           <div
             key={task.id}
@@ -591,6 +625,13 @@ export function ExperimentTasksTab(props: ExperimentTasksTabProps) {
 
             <div className="mt-4 grid grid-cols-1 gap-4 border-t border-border/80 pt-4 sm:grid-cols-2">
               <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Created by</p>
+                <p className="mt-1 text-sm font-medium text-foreground">{creator.primary}</p>
+                {creator.secondary ? (
+                  <p className="mt-0.5 text-xs text-muted-foreground break-all">{creator.secondary}</p>
+                ) : null}
+              </div>
+              <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Assignee</p>
                 <p className="mt-1 text-sm font-medium text-foreground">{assignee.primary}</p>
                 {assignee.secondary ? (
@@ -619,10 +660,10 @@ export function ExperimentTasksTab(props: ExperimentTasksTabProps) {
     </div>
   )
 
-  return (
-    <TabsContent value="tasks" className="space-y-6 mt-6">
+  const inner = (
+    <>
       <div className="flex flex-wrap justify-between items-center gap-3">
-        <h2 className="text-xl font-semibold">Experiment Tasks</h2>
+        <h2 className="text-xl font-semibold">{sectionTitle}</h2>
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-1 rounded-md border border-gray-200 p-0.5">
             <Button
@@ -679,7 +720,8 @@ export function ExperimentTasksTab(props: ExperimentTasksTabProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete task?</AlertDialogTitle>
             <AlertDialogDescription>
-              This permanently removes &quot;{deleteTarget?.title ?? ""}&quot; from this experiment. This cannot be undone.
+              This permanently removes &quot;{deleteTarget?.title ?? ""}&quot; from this {deleteScopeLabel}. This
+              cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -710,12 +752,24 @@ export function ExperimentTasksTab(props: ExperimentTasksTabProps) {
         draft={editorDraft}
         assignees={assignees}
         loading={experimentsLoadingTasks}
+        noAssigneesLabel={noAssigneesLabel}
         onOpenChange={(o) => {
           setEditorOpen(o)
           if (!o) setEditorDraft(null)
         }}
         onSubmit={(payload, id) => submitEditor(payload, id)}
       />
-    </TabsContent>
+    </>
   )
+
+  const shell =
+    surface === "experiment-tabs" ? (
+      <TabsContent value="tasks" className="space-y-6 mt-6">
+        {inner}
+      </TabsContent>
+    ) : (
+      <div className="space-y-6">{inner}</div>
+    )
+
+  return shell
 }

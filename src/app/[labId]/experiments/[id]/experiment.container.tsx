@@ -1,6 +1,6 @@
 "use client"
 
-import type { Experiment, ExperimentAnimalRecordRow, ExperimentMetricsData, ExperimentTasksPagePayload, ExperimentTasksPagination, } from "../types"
+import type { Experiment, ExperimentAnimalRecordRow, ExperimentMetricsData, ExperimentTasksPagePayload, ExperimentTasksPagination } from "../types"
 import type { ExperimentTaskAssigneeOption, ExperimentTaskUpsertPayload } from "./tabs/experiment-tasks-tab"
 import { useState, useCallback, useMemo, useEffect, useRef } from "react"
 import type { InitialMembersTypes } from "../../team/types"
@@ -8,6 +8,7 @@ import { AccessStatus } from "@/src/app/account/types"
 import { ExperimentView } from "./experiment.view"
 import type { Animal } from "../../animals/types"
 import { apiClient } from "@/src/lib/apiClient"
+import { useAppSelector } from "@/src/lib/hooks"
 import { TaskStatus } from "../../tasks/types"
 import type { Task } from "../../tasks/types"
 import { toast } from "sonner"
@@ -60,6 +61,8 @@ export const ExperimentContainer = (props: ExperimentContainerProps) => {
     () => initialExperimentTasks?.pagination ?? DEFAULT_EXPERIMENT_TASKS_PAGINATION,
   )
   const [tasksLoading, setTasksLoading] = useState(false)
+  /** Fresh list from API — overrides stale SSR/cache after returning from other routes (e.g. new measurement). */
+  const [clientAnimalRecords, setClientAnimalRecords] = useState<ExperimentAnimalRecordRow[] | null>(null)
 
   const paginationRef = useRef(tasksPagination)
   useEffect(() => {
@@ -73,6 +76,18 @@ export const ExperimentContainer = (props: ExperimentContainerProps) => {
 
   const canManageMembers = experimentData.createdById === userId
 
+  const prependedExperimentRecords = useAppSelector(
+    (state) => state.experimentRecords.prependedByExperimentId[experimentId],
+  )
+
+  const baselineAnimalRecords = clientAnimalRecords ?? initialAnimalRecords
+
+  const mergedAnimalRecords = useMemo(() => {
+    const serverIds = new Set(baselineAnimalRecords.map((r) => r.id))
+    const extras = (prependedExperimentRecords ?? []).filter((r) => !serverIds.has(r.id))
+    return [...extras, ...baselineAnimalRecords]
+  }, [prependedExperimentRecords, baselineAnimalRecords])
+
   const refreshMetrics = useCallback(async () => {
     try {
       const res = await apiClient.get(
@@ -85,6 +100,26 @@ export const ExperimentContainer = (props: ExperimentContainerProps) => {
       /* keep existing metrics */
     }
   }, [userId, labId, experimentId])
+
+  useEffect(() => {
+    let cancelled = false
+    async function loadExperimentRecords() {
+      try {
+        const res = await apiClient.get(
+          `/api/experiments/unique/${userId}/${labId}/${experimentId}/records?limit=200`,
+        )
+        if (cancelled || !res?.success || !Array.isArray(res.data)) return
+        setClientAnimalRecords(res.data as ExperimentAnimalRecordRow[])
+        void refreshMetrics()
+      } catch {
+        /* keep SSR list */
+      }
+    }
+    void loadExperimentRecords()
+    return () => {
+      cancelled = true
+    }
+  }, [userId, labId, experimentId, refreshMetrics])
 
   const creatorLabRole = useMemo(
     () => labMembers.find((m) => m.userId === experimentData.createdById)?.role,
@@ -435,7 +470,7 @@ export const ExperimentContainer = (props: ExperimentContainerProps) => {
       onAnimalSearchChange={setAnimalSearch}
       experimentsLoadingTasks={tasksLoading}
       onMemberSearchChange={setMemberSearch}
-      animalRecords={initialAnimalRecords}
+      animalRecords={mergedAnimalRecords}
       onRemoveMember={handleRemoveMember}
       onRemoveAnimal={handleRemoveAnimal}
       canManageMembers={canManageMembers}
