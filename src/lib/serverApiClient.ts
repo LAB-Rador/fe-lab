@@ -13,8 +13,8 @@ class ServerApiClient {
     this.baseURL = BACKEND_URL
   }
 
-  private buildHeaders(initHeaders?: HeadersInit): HeadersInit {
-    const store = cookies()
+  private async buildHeaders(initHeaders?: HeadersInit): Promise<HeadersInit> {
+    const store = await cookies()
     const token = store.get(TOKEN_COOKIE_KEY)?.value
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
@@ -31,7 +31,7 @@ class ServerApiClient {
     const response = await fetch(`${this.baseURL}${endpoint}`, {
       credentials: "include",
       ...options,
-      headers: this.buildHeaders(options.headers),
+      headers: await this.buildHeaders(options.headers),
     })
 
     if (!response.ok) {
