@@ -6,12 +6,12 @@ import TasksContainer from "./tasks.container"
 import { cookies } from "next/headers"
 
 type PageProps = {
-  params: Promise<{ labId: string }>
+  params: { labId: string }
 }
 
 export default async function TasksPage({ params }: PageProps) {
-  const { labId } = await params
-  const cookieStore = await cookies()
+  const { labId } = params
+  const cookieStore = cookies()
   const userId = cookieStore.get("USER_ID")?.value ?? "default"
   const initialTasksPageSize = 10
 
