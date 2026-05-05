@@ -3,7 +3,7 @@ import type { LaboratoryTasksPagePayload } from "./types"
 import type { InitialMembersTypes } from "../team/types"
 import { serverApiClient } from "@/src/lib/serverApiClient"
 import TasksContainer from "./tasks.container"
-import { cookies } from "next/headers"
+import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId"
 
 type PageProps = {
   params: Promise<{ labId: string }>
@@ -11,16 +11,20 @@ type PageProps = {
 
 export default async function TasksPage({ params }: PageProps) {
   const { labId } = await params
-  const cookieStore = await cookies()
-  const userId = cookieStore.get("USER_ID")?.value ?? "default"
+  const userId = await getServerAuthenticatedUserId()
   const initialTasksPageSize = 10
+
+  const notificationsQuery = new URLSearchParams({
+    limit: String(initialTasksPageSize),
+    labId,
+  }).toString()
 
   const [membersRes, tasksRes, notificationsRes] = await Promise.all([
     serverApiClient.get(`/api/laboratory/${userId}/${labId}`),
     serverApiClient.get(
       `/api/tasks/laboratory/${userId}/${labId}?page=1&pageSize=${initialTasksPageSize}`,
     ),
-    serverApiClient.get(`/api/users/${userId}/notifications?limit=40`),
+    serverApiClient.get(`/api/users/${userId}/notifications?${notificationsQuery}`),
   ])
 
   const laboratoryMembers = (membersRes && "data" in membersRes && Array.isArray(membersRes.data)

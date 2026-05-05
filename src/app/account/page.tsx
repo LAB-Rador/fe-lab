@@ -1,13 +1,12 @@
 "use server";
 
 import LaboratoriesContainer from "./labs.container";
-import { apiClient } from "@/src/lib/apiClient";
-import { cookies } from 'next/headers';
+import { serverApiClient } from "@/src/lib/serverApiClient";
+import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId";
 
 export default async function Page() {
-    const cookieStore = await cookies();
-    const userId = await cookieStore.get('USER_ID')?.value || 'default';
-    const laboratories = await apiClient.get(`/api/laboratories/${userId}`);
+    const userId = await getServerAuthenticatedUserId()
+    const laboratories = await serverApiClient.get(`/api/laboratories/${userId}`);
     return (
         <LaboratoriesContainer
             userLaboratories={laboratories.data}
