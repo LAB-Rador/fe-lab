@@ -12,16 +12,24 @@ class ApiClient {
 
   async request(endpoint: string, options: RequestInit = {}) {
     const token = AuthService.getToken();
+    const { headers: optionHeaders, credentials = "include", ...restOptions } =
+      options
 
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
-        ...options.headers,
-      },
-      credentials: 'include' as RequestCredentials,
-      ...options,
-    };
+    const mergedHeaders: Record<string, string> = {
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
+      ...(optionHeaders instanceof Headers
+        ? Object.fromEntries(optionHeaders.entries())
+        : Array.isArray(optionHeaders)
+          ? Object.fromEntries(optionHeaders as [string, string][])
+          : (optionHeaders as Record<string, string> | undefined)),
+    }
+
+    const config: RequestInit = {
+      ...restOptions,
+      credentials,
+      headers: mergedHeaders,
+    }
 
     try {
       const response = await fetch(`${this.baseURL}${endpoint}`, config);

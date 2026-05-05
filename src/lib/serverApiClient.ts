@@ -16,15 +16,21 @@ class ServerApiClient {
   private async buildHeaders(initHeaders?: HeadersInit): Promise<HeadersInit> {
     const store = await cookies()
     const token = store.get(TOKEN_COOKIE_KEY)?.value
-    const headers: Record<string, string> = {
+    const authHeaders: Record<string, string> = {
       "Content-Type": "application/json",
     }
-    if (token) headers.Authorization = `Bearer ${token}`
-    if (initHeaders) {
-      // Merge user headers last to allow explicit overrides
-      return { ...headers, ...(initHeaders as Record<string, string>) }
-    }
-    return headers
+    if (token) authHeaders.Authorization = `Bearer ${token}`
+    if (!initHeaders) return authHeaders
+
+    const merged =
+      initHeaders instanceof Headers
+        ? Object.fromEntries(initHeaders.entries())
+        : Array.isArray(initHeaders)
+          ? Object.fromEntries(initHeaders as [string, string][])
+          : { ...(initHeaders as Record<string, string>) }
+
+    // Caller headers first so auth Content-Type / Authorization always win
+    return { ...merged, ...authHeaders }
   }
 
   async request(endpoint: string, options: RequestInit = {}) {

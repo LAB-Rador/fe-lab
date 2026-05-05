@@ -32,7 +32,7 @@ export default function ExperimentsContainer(props: ExperimentProps) {
                 const res = await apiClient.get(
                     `/api/experiments/${userId}/${labId}?includeArchived=${value}`,
                 );
-                if (res?.success && Array.isArray(res.data)) {
+                if (res && res.success && Array.isArray(res.data)) {
                     setExperimentsData(res.data);
                 }
             })();
