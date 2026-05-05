@@ -2,14 +2,13 @@ import type { AnimalRecord, AnimalRecordMeasurement } from "../../types";
 import MeasurementsContainer from "./measurements.container";
 import { apiClient } from "@/src/lib/apiClient";
 import type { PageProps } from "./types";
-import { cookies } from "next/headers";
+import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId";
 
 export default async function Page({ params, searchParams }: PageProps) {
   const { labId, id: animalId } = await params;
   const sp = await searchParams;
   const experimentId = typeof sp.experimentId === "string" && sp.experimentId.length > 0 ? sp.experimentId : undefined;
-  const cookieStore = await cookies();
-  const userId = await cookieStore.get('USER_ID')?.value || 'default';
+  const userId = await getServerAuthenticatedUserId()
 
   const rows = 100;
   const page = 1;

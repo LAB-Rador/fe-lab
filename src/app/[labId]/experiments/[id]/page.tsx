@@ -3,7 +3,7 @@
 import type { ExperimentAnimalRecordRow, ExperimentMetricsData, ExperimentTasksPagePayload } from "../types";
 import { ExperimentContainer } from "./experiment.container";
 import { apiClient } from "@/src/lib/apiClient";
-import { cookies } from "next/headers";
+import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId";
 interface ExperimentDetailPageProps {
   params: Promise<{
     id: string
@@ -12,8 +12,7 @@ interface ExperimentDetailPageProps {
 }
 export default async function ExperimentDetailPage({ params }: ExperimentDetailPageProps) {
   const { id: experimentId, labId } = await params;
-  const cookieStore = await cookies();
-  const userId = await cookieStore.get('USER_ID')?.value || 'default';
+  const userId = await getServerAuthenticatedUserId()
   const labAnimalsRows = 500
   const labAnimalsPage = 1
   const initialTasksPageSize = 10

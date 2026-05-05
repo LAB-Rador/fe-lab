@@ -8,7 +8,7 @@ import type { AppNotification } from "@/src/components/tasks/notifications"
 import { serverApiClient } from "@/src/lib/serverApiClient"
 
 import { redirect } from 'next/navigation'
-import { cookies } from "next/headers"
+import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId"
 import type React from "react"
 
 export default async function DashboardLayout({
@@ -19,8 +19,7 @@ export default async function DashboardLayout({
   children: React.ReactNode
 }) {
   const {labId} = await params;
-  const cookieStore = await cookies();
-  const userId = await cookieStore.get('USER_ID')?.value || 'default';
+  const userId = await getServerAuthenticatedUserId()
   const laboratories = await serverApiClient.get(`/api/laboratories/${userId}`);
   const laboratory = await laboratories.data.find((laboratory: Laboratory) => laboratory.name === labId);
   const laboratoryMembers = await serverApiClient.get(`/api/laboratory/${userId}/${labId}`);

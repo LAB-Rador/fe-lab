@@ -2,7 +2,7 @@
 
 import ExperimentsContainer from "./experiments.container"
 import { apiClient } from "@/src/lib/apiClient"
-import { cookies } from "next/headers"
+import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId"
 interface ExperimentsTypes {
   params: {
     labId: string
@@ -11,8 +11,7 @@ interface ExperimentsTypes {
 
 export default async function ExperimentsPage({params}: ExperimentsTypes) {
   const { labId } = await params;
-  const cookieStore = await cookies();
-  const userId = await cookieStore.get('USER_ID')?.value || 'default';
+  const userId = await getServerAuthenticatedUserId()
   const animalEnums = await apiClient.get(`/api/animals/enums`);
   const experiments = await apiClient.get(`/api/experiments/${userId}/${labId}`);
 
