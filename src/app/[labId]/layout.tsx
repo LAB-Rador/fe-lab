@@ -18,9 +18,9 @@ export default async function DashboardLayout({
   params: {labId: string},
   children: React.ReactNode
 }) {
-  const {labId} = await params;
-  const cookieStore = await cookies();
-  const userId = await cookieStore.get('USER_ID')?.value || 'default';
+  const { labId } = await params
+  const cookieStore = await cookies()
+  const userId = await cookieStore.get("USER_ID")?.value || "default"
   const laboratories = await serverApiClient.get(`/api/laboratories/${userId}`);
   const laboratory = await laboratories.data.find((laboratory: Laboratory) => laboratory.name === labId);
   const laboratoryMembers = await serverApiClient.get(`/api/laboratory/${userId}/${labId}`);
