@@ -1,7 +1,7 @@
 "use server"
 
 import RecordContainer from "./record.container";
-import { apiClient } from "@/src/lib/apiClient";
+import { serverApiClient } from "@/src/lib/serverApiClient";
 import type { PageProps } from "./types";
 import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId";
 
@@ -10,7 +10,7 @@ export default async function RecordPage({params}: PageProps) {
     const userId = await getServerAuthenticatedUserId()
     const rows = 10;
     const page = 1;
-    const animal = await apiClient.get(`/api/animals/animal/${userId}/${labId}/${animalId}/${rows}/${page}`);
+    const animal = await serverApiClient.get(`/api/animals/animal/${userId}/${labId}/${animalId}/${rows}/${page}`);
     return (
         <RecordContainer
             animalPagination={animal.pagination}

@@ -1,7 +1,7 @@
 "use server"
 
 import ExperimentsContainer from "./experiments.container"
-import { apiClient } from "@/src/lib/apiClient"
+import { serverApiClient } from "@/src/lib/serverApiClient"
 import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId"
 interface ExperimentsTypes {
   params: {
@@ -12,8 +12,8 @@ interface ExperimentsTypes {
 export default async function ExperimentsPage({params}: ExperimentsTypes) {
   const { labId } = await params;
   const userId = await getServerAuthenticatedUserId()
-  const animalEnums = await apiClient.get(`/api/animals/enums`);
-  const experiments = await apiClient.get(`/api/experiments/${userId}/${labId}`);
+  const animalEnums = await serverApiClient.get(`/api/animals/enums`);
+  const experiments = await serverApiClient.get(`/api/experiments/${userId}/${labId}`);
 
   return (
     <ExperimentsContainer

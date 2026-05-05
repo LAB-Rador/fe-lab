@@ -1,6 +1,6 @@
 "use server"
 
-import { apiClient } from "@/src/lib/apiClient";
+import { serverApiClient } from "@/src/lib/serverApiClient";
 import TeamContainer from "./team.container";
 import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId";
 interface TeamPageTypes {
@@ -12,8 +12,8 @@ interface TeamPageTypes {
 export default async function TeamPage({params}: TeamPageTypes) {
   const { labId } = await params;
   const userId = await getServerAuthenticatedUserId()
-  const animalEnums = await apiClient.get(`/api/animals/enums`);
-  const laboratoryMembers = await apiClient.get(`/api/laboratory/${userId}/${labId}`);
+  const animalEnums = await serverApiClient.get(`/api/animals/enums`);
+  const laboratoryMembers = await serverApiClient.get(`/api/laboratory/${userId}/${labId}`);
 
   return (
     <TeamContainer

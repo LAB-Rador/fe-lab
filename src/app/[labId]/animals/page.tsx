@@ -1,7 +1,7 @@
 "use server"
 
 import AnimalContainer from "./animal.container";
-import { apiClient } from "@/src/lib/apiClient";
+import { serverApiClient } from "@/src/lib/serverApiClient";
 import type { PageProps } from "./types";
 import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId";
 
@@ -12,9 +12,9 @@ export default async function AnimalsPage({params}: PageProps) {
   const rows = 10;
   const page = 1;
 
-  const animals = await apiClient.get(`/api/animals/${userId}/${labId}/${rows}/${page}/${JSON.stringify({})}`);
-  const animalTypes = await apiClient.get(`/api/animals/types/${userId}/${labId}`);
-  const animalEnums = await apiClient.get(`/api/animals/enums`);
+  const animals = await serverApiClient.get(`/api/animals/${userId}/${labId}/${rows}/${page}/${JSON.stringify({})}`);
+  const animalTypes = await serverApiClient.get(`/api/animals/types/${userId}/${labId}`);
+  const animalEnums = await serverApiClient.get(`/api/animals/enums`);
 
   return (
     <AnimalContainer

@@ -2,7 +2,7 @@
 
 import type { ExperimentAnimalRecordRow, ExperimentMetricsData, ExperimentTasksPagePayload } from "../types";
 import { ExperimentContainer } from "./experiment.container";
-import { apiClient } from "@/src/lib/apiClient";
+import { serverApiClient } from "@/src/lib/serverApiClient";
 import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId";
 interface ExperimentDetailPageProps {
   params: Promise<{
@@ -24,18 +24,18 @@ export default async function ExperimentDetailPage({ params }: ExperimentDetailP
     recordsRes,
     experimentTasksRes,
   ] = await Promise.all([
-    apiClient.get(`/api/experiments/unique/${userId}/${labId}/${experimentId}`),
-    apiClient.get(`/api/laboratory/${userId}/${labId}`),
-    apiClient.get(
+    serverApiClient.get(`/api/experiments/unique/${userId}/${labId}/${experimentId}`),
+    serverApiClient.get(`/api/laboratory/${userId}/${labId}`),
+    serverApiClient.get(
       `/api/animals/${userId}/${labId}/${labAnimalsRows}/${labAnimalsPage}/${JSON.stringify({})}`,
     ),
-    apiClient.get(`/api/experiments/unique/${userId}/${labId}/${experimentId}/metrics`).catch(() => ({
+    serverApiClient.get(`/api/experiments/unique/${userId}/${labId}/${experimentId}/metrics`).catch(() => ({
       success: false as const,
     })),
-    apiClient
+    serverApiClient
       .get(`/api/experiments/unique/${userId}/${labId}/${experimentId}/records?limit=200`)
       .catch(() => ({ success: false as const })),
-    apiClient
+    serverApiClient
       .get(
         `/api/experiments/unique/${userId}/${labId}/${experimentId}/tasks?page=1&pageSize=${initialTasksPageSize}`,
       )
