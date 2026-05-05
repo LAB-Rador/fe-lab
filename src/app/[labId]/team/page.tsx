@@ -1,8 +1,8 @@
 "use server"
 
-import { apiClient } from "@/src/lib/apiClient";
+import { serverApiClient } from "@/src/lib/serverApiClient";
 import TeamContainer from "./team.container";
-import { cookies } from "next/headers";
+import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId";
 interface TeamPageTypes {
   params: {
     labId: string
@@ -11,10 +11,9 @@ interface TeamPageTypes {
 
 export default async function TeamPage({params}: TeamPageTypes) {
   const { labId } = await params;
-  const cookieStore = await cookies();
-  const userId = await cookieStore.get('USER_ID')?.value || 'default';
-  const animalEnums = await apiClient.get(`/api/animals/enums`);
-  const laboratoryMembers = await apiClient.get(`/api/laboratory/${userId}/${labId}`);
+  const userId = await getServerAuthenticatedUserId()
+  const animalEnums = await serverApiClient.get(`/api/animals/enums`);
+  const laboratoryMembers = await serverApiClient.get(`/api/laboratory/${userId}/${labId}`);
 
   return (
     <TeamContainer
