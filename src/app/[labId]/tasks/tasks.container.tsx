@@ -76,12 +76,19 @@ export default function TasksContainer(props: {
 
   const paginationRef = useRef(pagination)
   const tasksRef = useRef(tasks)
+  const calendarLoadedKeyRef = useRef<string | null>(null)
   useEffect(() => {
     paginationRef.current = pagination
   }, [pagination])
   useEffect(() => {
     tasksRef.current = tasks
   }, [tasks])
+
+  const calendarQueryKey = useMemo(() => {
+    const start = startOfMonth(calendarMonth)
+    const end = endOfMonth(calendarMonth)
+    return [userId, labId, start.toISOString(), end.toISOString(), statusFilter, priorityFilter, assigneeFilter].join("|")
+  }, [userId, labId, calendarMonth, statusFilter, priorityFilter, assigneeFilter])
 
   const assignees = useMemo(() => membersToAssignees(laboratoryMembers), [laboratoryMembers])
 
@@ -148,14 +155,20 @@ export default function TasksContainer(props: {
     }
   }, [userId, labId, calendarMonth, statusFilter, priorityFilter, assigneeFilter])
 
+  const refreshCalendar = useCallback(async () => {
+    await loadCalendar()
+    calendarLoadedKeyRef.current = calendarQueryKey
+  }, [loadCalendar, calendarQueryKey])
+
   useEffect(() => {
     void loadList(1, paginationRef.current.pageSize)
   }, [loadList])
 
   useEffect(() => {
     if (mainTab !== "calendar") return
-    void loadCalendar()
-  }, [mainTab, loadCalendar])
+    if (calendarLoadedKeyRef.current === calendarQueryKey) return
+    void refreshCalendar()
+  }, [mainTab, calendarQueryKey, refreshCalendar])
 
   const handlePagination = useCallback(
     async (next: { page?: number; pageSize?: number }) => {
@@ -177,14 +190,15 @@ export default function TasksContainer(props: {
           priority: payload.priority,
           status: payload.status ?? TaskStatus.PENDING,
         })
-        toast.success("Task created")
-        await loadList(1, paginationRef.current.pageSize)
-        if (mainTab === "calendar") void loadCalendar()
+        toast.success("Task created");
+        await loadList(1, paginationRef.current.pageSize);
+        calendarLoadedKeyRef.current = null;
+        if (mainTab === "calendar") void refreshCalendar();
       } catch {
         toast.error("Failed to create task")
       }
     },
-    [userId, labId, loadList, loadCalendar, mainTab],
+    [userId, labId, loadList, refreshCalendar, mainTab],
   )
 
   const handleUpdate = useCallback(
@@ -198,14 +212,15 @@ export default function TasksContainer(props: {
           priority: payload.priority,
           status: payload.status,
         })
-        toast.success("Task updated")
-        await loadList(paginationRef.current.currentPage, paginationRef.current.pageSize)
-        if (mainTab === "calendar") void loadCalendar()
+        toast.success("Task updated");
+        await loadList(paginationRef.current.currentPage, paginationRef.current.pageSize);
+        calendarLoadedKeyRef.current = null;
+        if (mainTab === "calendar") void refreshCalendar();
       } catch {
         toast.error("Failed to update task")
       }
     },
-    [userId, labId, loadList, loadCalendar, mainTab],
+    [userId, labId, loadList, refreshCalendar, mainTab],
   )
 
   const handlePatchStatus = useCallback(
@@ -217,9 +232,10 @@ export default function TasksContainer(props: {
           status: nextStatus,
         })) as { success?: boolean; data?: Task } | undefined
         if (res?.success && res.data) {
-          setTasks((rows) => rows.map((t) => (t.id === taskId ? res.data! : t)))
-          toast.success("Task status updated")
-          if (mainTab === "calendar") void loadCalendar()
+          setTasks((rows) => rows.map((t) => (t.id === taskId ? res.data! : t)));
+          toast.success("Task status updated");
+          calendarLoadedKeyRef.current = null;
+          if (mainTab === "calendar") void refreshCalendar();
         } else {
           setTasks(snapshot)
           toast.error("Failed to update status")
@@ -229,7 +245,7 @@ export default function TasksContainer(props: {
         toast.error("Failed to update status")
       }
     },
-    [userId, labId, loadCalendar, mainTab],
+    [userId, labId, refreshCalendar, mainTab],
   )
 
   const handleDelete = useCallback(
@@ -245,14 +261,15 @@ export default function TasksContainer(props: {
           out.pagination.totalCount > 0 &&
           out.pagination.currentPage > out.pagination.totalPages
         ) {
-          await loadList(Math.max(1, out.pagination.totalPages), out.pagination.pageSize)
+          await loadList(Math.max(1, out.pagination.totalPages), out.pagination.pageSize);
         }
-        if (mainTab === "calendar") void loadCalendar()
+        calendarLoadedKeyRef.current = null;
+        if (mainTab === "calendar") void refreshCalendar();
       } catch {
         toast.error("Failed to delete task")
       }
     },
-    [userId, labId, loadList, loadCalendar, mainTab],
+    [userId, labId, loadList, refreshCalendar, mainTab],
   )
 
   const onPrevMonth = useCallback(() => {

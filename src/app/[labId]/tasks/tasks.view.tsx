@@ -2,14 +2,15 @@
 
 import { TaskPriority, TaskStatus, type AssigneeScopeFilter, type Task, type LaboratoryTasksPagination, type TaskPriorityFilterValue, type TaskStatusFilterValue } from "./types"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
-import TasksNotifications, { type AppNotification } from "@/src/components/tasks/notifications"
 import type { ExperimentTaskUpsertPayload } from "../experiments/[id]/tabs/experiment-tasks-tab"
+import TasksNotifications, { type AppNotification } from "@/src/components/tasks/notifications"
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
 import { ExperimentTasksTab } from "../experiments/[id]/tabs/experiment-tasks-tab"
+import { Tabs, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
 import TasksCalendarView from "@/src/components/tasks/calendar-view"
-import { Calendar, Filter } from "lucide-react"
 import { capitalizeEnum } from "@/src/lib/strings"
+import { Calendar, Filter } from "lucide-react"
+import { Activity } from "react"
 
 export function TasksView(props: {
   userId: string
@@ -129,7 +130,7 @@ export function TasksView(props: {
               </div>
             </div>
 
-            <TabsContent value="list" className="mt-0 space-y-4">
+            <Activity mode={mainTab === "list" ? "visible" : "hidden"}>
               <ExperimentTasksTab
                 surface="standalone"
                 sectionTitle="Laboratory tasks"
@@ -146,9 +147,9 @@ export function TasksView(props: {
                 onDeleteTask={onDeleteTask}
                 experimentsLoadingTasks={tasksLoading}
               />
-            </TabsContent>
+            </Activity>
 
-            <TabsContent value="calendar" className="mt-0">
+            <Activity mode={mainTab === "calendar" ? "visible" : "hidden"}>
               <Card>
                 <CardHeader className="pb-0">
                   <CardTitle className="flex items-center text-lg">
@@ -166,7 +167,7 @@ export function TasksView(props: {
                   />
                 </CardContent>
               </Card>
-            </TabsContent>
+            </Activity>
           </Tabs>
         </div>
 
