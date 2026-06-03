@@ -3,15 +3,14 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/src/components/ui/dialog"
 import { MousePointer, Plus, Search, Trash2 } from "lucide-react"
 import { Card, CardContent } from "@/src/components/ui/card"
-import { Badge } from "@/src/components/ui/badge"
 import { StatusBadge } from "@/src/components/status-badge"
-import { TabsContent } from "@/src/components/ui/tabs"
 import type { Animal } from "../../../animals/types"
 import { Button } from "@/src/components/ui/button"
+import { Badge } from "@/src/components/ui/badge"
 import { Input } from "@/src/components/ui/input"
 import type { Experiment } from "../../types"
+import { Activity } from "react"
 import Link from "next/link"
-
 export interface ExperimentAnimalsTabProps {
   onRemoveAnimal: (animalId: string) => void | Promise<void>
   onAddAnimal: (animalId: string) => void | Promise<void>
@@ -22,25 +21,27 @@ export interface ExperimentAnimalsTabProps {
   addAnimalsOpen: boolean
   experiment: Experiment
   animalSearch: string
+  activeTab: string
   labId: string
 }
 
 export function ExperimentAnimalsTab(props: ExperimentAnimalsTabProps) {
   const {
-    experiment,
-    labId,
-    canManageMembers,
-    addAnimalsOpen,
     onAddAnimalsOpenChange,
-    animalSearch,
     onAnimalSearchChange,
     animalAddCandidates,
-    onAddAnimal,
+    canManageMembers,
+    addAnimalsOpen,
     onRemoveAnimal,
+    animalSearch,
+    onAddAnimal,
+    experiment,
+    activeTab,
+    labId,
   } = props
 
   return (
-    <TabsContent value="animals" className="space-y-6 mt-6">
+    <Activity mode={activeTab === "animals" ? "visible" : "hidden"}>
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold">Experiment Animals</h2>
         {canManageMembers && (
@@ -192,6 +193,6 @@ export function ExperimentAnimalsTab(props: ExperimentAnimalsTabProps) {
           ))
         )}
       </div>
-    </TabsContent>
+    </Activity>
   )
 }

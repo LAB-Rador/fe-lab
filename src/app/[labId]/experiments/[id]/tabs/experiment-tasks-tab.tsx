@@ -11,15 +11,15 @@ import { TaskPriority, TaskStatus } from "../../../tasks/types"
 import { Card, CardContent } from "@/src/components/ui/card"
 import type { ExperimentTasksPagination } from "../../types"
 import { Textarea } from "@/src/components/ui/textarea"
-import { TabsContent } from "@/src/components/ui/tabs"
 import { useMemo, useState, useEffect } from "react"
 import { Button } from "@/src/components/ui/button"
+import { capitalizeEnum } from "@/src/lib/strings"
 import { Badge } from "@/src/components/ui/badge"
 import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
 import type { Task } from "../../../tasks/types"
 import { cn } from "@/src/lib/utils"
-import { capitalizeEnum } from "@/src/lib/strings"
+import { Activity } from "react"
 
 export interface ExperimentTaskAssigneeOption {
   id: string
@@ -29,29 +29,30 @@ export interface ExperimentTaskAssigneeOption {
 export type TasksTabSurface = "experiment-tabs" | "standalone"
 
 export interface ExperimentTasksTabProps {
-  surface?: TasksTabSurface
-  sectionTitle?: string
-  emptyListMessage?: string
-  deleteScopeLabel?: string
-  noAssigneesLabel?: string
+  onUpdateTask: (taskId: string, payload: ExperimentTaskUpsertPayload) => void | Promise<void>
   onPaginationChange: (next: { page?: number; pageSize?: number }) => void | Promise<void>
   onPatchTaskStatus: (taskId: string, status: TaskStatus) => void | Promise<void>
   onCreateTask: (payload: ExperimentTaskUpsertPayload) => void | Promise<void>
-  onUpdateTask: (taskId: string, payload: ExperimentTaskUpsertPayload) => void | Promise<void>
   onDeleteTask: (taskId: string) => void | Promise<void>
-  pagination: ExperimentTasksPagination
   assignees: ExperimentTaskAssigneeOption[]
+  pagination: ExperimentTasksPagination
   experimentsLoadingTasks?: boolean
+  surface?: TasksTabSurface
+  emptyListMessage?: string
+  deleteScopeLabel?: string
+  noAssigneesLabel?: string
+  sectionTitle?: string
+  activeTab: string
   tasks: Task[]
 }
 
 export interface ExperimentTaskUpsertPayload {
-  title: string
   description?: string | null
-  assignedToId: string
   dueDate?: string | null
   priority: TaskPriority
+  assignedToId: string
   status?: TaskStatus
+  title: string
 }
 
 function formatDueDateRaw(iso?: string | null): string {
@@ -275,20 +276,21 @@ function TaskEditorDialog(props: TaskEditorDialogProps) {
 
 export function ExperimentTasksTab(props: ExperimentTasksTabProps) {
   const {
-    surface = "experiment-tabs",
-    sectionTitle = "Experiment Tasks",
     emptyListMessage = "No tasks yet. Use Add Task to assign work on this experiment.",
+    sectionTitle = "Experiment Tasks",
     deleteScopeLabel = "experiment",
-    noAssigneesLabel,
-    tasks,
-    pagination,
-    assignees,
+    surface = "experiment-tabs",
+    experimentsLoadingTasks,
+    activeTab = "tasks",
     onPaginationChange,
     onPatchTaskStatus,
+    noAssigneesLabel,
     onCreateTask,
     onUpdateTask,
     onDeleteTask,
-    experimentsLoadingTasks,
+    pagination,
+    assignees,
+    tasks,
   } = props
 
   const { view, setView } = useResponsiveTableGridView()
@@ -764,9 +766,9 @@ export function ExperimentTasksTab(props: ExperimentTasksTabProps) {
 
   const shell =
     surface === "experiment-tabs" ? (
-      <TabsContent value="tasks" className="space-y-6 mt-6">
+      <Activity mode={activeTab === "tasks" ? "visible" : "hidden"}>
         {inner}
-      </TabsContent>
+      </Activity>
     ) : (
       <div className="space-y-6">{inner}</div>
     )
