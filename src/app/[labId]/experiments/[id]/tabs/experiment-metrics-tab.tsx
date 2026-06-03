@@ -4,11 +4,12 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContain
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/src/components/ui/chart"
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
 import type { ExperimentMetricsData } from "../../types"
-import { TabsContent } from "@/src/components/ui/tabs"
+import { Activity } from "react"
 import { useMemo } from "react"
 
 interface ExperimentMetricsTabProps {
   metrics: ExperimentMetricsData | null
+  activeTab: string
 }
 
 function formatChartDay(isoDay: string) {
@@ -20,7 +21,7 @@ function formatChartDay(isoDay: string) {
   })
 }
 
-export function ExperimentMetricsTab({ metrics }: ExperimentMetricsTabProps) {
+export function ExperimentMetricsTab({ metrics, activeTab }: ExperimentMetricsTabProps) {
   const chartData = useMemo(() => metrics?.series ?? [], [metrics?.series])
 
   const summaryLine = useMemo(() => {
@@ -36,7 +37,7 @@ export function ExperimentMetricsTab({ metrics }: ExperimentMetricsTabProps) {
   const avgWeight = metrics?.averages.weight
 
   return (
-    <TabsContent value="metrics" className="space-y-6 mt-6">
+    <Activity mode={activeTab === "metrics" ? "visible" : "hidden"}>
       <Card>
         <CardHeader>
           <CardTitle>Experiment Metrics</CardTitle>
@@ -138,6 +139,6 @@ export function ExperimentMetricsTab({ metrics }: ExperimentMetricsTabProps) {
           </CardContent>
         </Card>
       </div>
-    </TabsContent>
+    </Activity>
   )
 }

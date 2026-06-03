@@ -17,6 +17,7 @@ import { Badge } from "@/src/components/ui/badge"
 import type { Animal } from "../../animals/types"
 import { TaskStatus } from "../../tasks/types"
 import type { Task } from "../../tasks/types"
+import { useState } from "react"
 import Link from "next/link"
 
 interface ExperimentViewProps {
@@ -90,6 +91,8 @@ export const ExperimentView = (props: ExperimentViewProps) => {
     onPatchExperimentTaskStatus,
     onDeleteExperimentTask,
   } = props
+
+  const [activeTab, setActiveTab] = useState<string>("overview")
 
   return (
     <div className="space-y-6">
@@ -166,7 +169,7 @@ export const ExperimentView = (props: ExperimentViewProps) => {
         </div>
       </div>
 
-      <Tabs defaultValue="overview" className="w-full">
+      <Tabs value={activeTab} onValueChange={(v: string) => setActiveTab(v)} className="w-full">
         <TabsList className="grid grid-cols-4 md:w-[600px]">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="animals">Animals</TabsTrigger>
@@ -175,19 +178,20 @@ export const ExperimentView = (props: ExperimentViewProps) => {
         </TabsList>
 
         <ExperimentOverviewTab
-          animalRecords={animalRecords}
           onAddMembersOpenChange={onAddMembersOpenChange}
           onMemberSearchChange={onMemberSearchChange}
           canManageMembers={canManageMembers}
           onRemoveMember={onRemoveMember}
           creatorLabRole={creatorLabRole}
           addMembersOpen={addMembersOpen}
+          animalRecords={animalRecords}
           addCandidates={addCandidates}
           memberSearch={memberSearch}
           onAddMember={onAddMember}
           experiment={experiment}
-          labId={labId}
+          activeTab={activeTab}
           userId={userId}
+          labId={labId}
         />
 
         <ExperimentAnimalsTab
@@ -200,10 +204,11 @@ export const ExperimentView = (props: ExperimentViewProps) => {
           animalSearch={animalSearch}
           onAddAnimal={onAddAnimal}
           experiment={experiment}
+          activeTab={activeTab}
           labId={labId}
         />
 
-        <ExperimentMetricsTab metrics={metrics} />
+        <ExperimentMetricsTab metrics={metrics} activeTab={activeTab} />
 
         <ExperimentTasksTab
           experimentsLoadingTasks={experimentsLoadingTasks}
@@ -215,6 +220,7 @@ export const ExperimentView = (props: ExperimentViewProps) => {
           onDeleteTask={onDeleteExperimentTask}
           assignees={experimentTaskAssignees}
           tasks={experimentTasks}
+          activeTab={activeTab}
         />
       </Tabs>
     </div>

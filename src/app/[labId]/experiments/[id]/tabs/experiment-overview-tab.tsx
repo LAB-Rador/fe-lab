@@ -10,10 +10,10 @@ import { calculateProgress, getInitials } from "@/src/lib/utils"
 import type { InitialMembersTypes } from "../../../team/types"
 import { StatusBadge } from "@/src/components/status-badge"
 import { Progress } from "@/src/components/ui/progress"
-import { TabsContent } from "@/src/components/ui/tabs"
 import { Button } from "@/src/components/ui/button"
 import type { Role } from "@/src/app/account/types"
 import { Input } from "@/src/components/ui/input"
+import { Activity } from "react"
 import Link from "next/link"
 
 function humanizeRecordEnum(value: string) {
@@ -35,40 +35,42 @@ function formatMeasurementsSummary(rows: ExperimentAnimalRecordRow["measurements
 }
 
 export interface ExperimentOverviewTabProps {
-  animalRecords: ExperimentAnimalRecordRow[]
-  experiment: Experiment
-  labId: string
-  userId: string
-  canManageMembers: boolean
-  creatorLabRole: Role | undefined
-  addMembersOpen: boolean
-  onAddMembersOpenChange: (open: boolean) => void
-  memberSearch: string
-  onMemberSearchChange: (value: string) => void
-  addCandidates: InitialMembersTypes[]
-  onAddMember: (targetUserId: string) => void | Promise<void>
   onRemoveMember: (targetUserId: string) => void | Promise<void>
+  onAddMember: (targetUserId: string) => void | Promise<void>
+  onAddMembersOpenChange: (open: boolean) => void
+  onMemberSearchChange: (value: string) => void
+  animalRecords: ExperimentAnimalRecordRow[]
+  addCandidates: InitialMembersTypes[]
+  creatorLabRole: Role | undefined
+  canManageMembers: boolean
+  addMembersOpen: boolean
+  experiment: Experiment
+  memberSearch: string
+  activeTab: string
+  userId: string
+  labId: string
 }
 
 export function ExperimentOverviewTab(props: ExperimentOverviewTabProps) {
   const {
-    animalRecords,
-    experiment,
-    labId,
-    userId,
+    onAddMembersOpenChange,
+    onMemberSearchChange,
     canManageMembers,
     creatorLabRole,
     addMembersOpen,
-    onAddMembersOpenChange,
-    memberSearch,
-    onMemberSearchChange,
-    addCandidates,
-    onAddMember,
     onRemoveMember,
+    animalRecords,
+    addCandidates,
+    memberSearch,
+    onAddMember,
+    experiment,
+    activeTab,
+    userId,
+    labId,
   } = props
 
   return (
-    <TabsContent value="overview" className="space-y-6 mt-6">
+    <Activity mode={activeTab === "overview" ? "visible" : "hidden"}>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="md:col-span-2">
           <CardHeader>
@@ -341,6 +343,6 @@ export function ExperimentOverviewTab(props: ExperimentOverviewTabProps) {
           </div>
         </CardContent>
       </Card>
-    </TabsContent>
+    </Activity>
   )
 }
