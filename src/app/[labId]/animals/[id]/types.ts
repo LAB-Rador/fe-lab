@@ -1,5 +1,13 @@
 import type { AnimalStatus, AnimalType, Laboratory, Sex } from "@/src/components/animals/types";
 
+export enum AnimalTabsName {
+    BASIC_INFO = "basic-info",
+    MEASUREMENTS = "measurements",
+    MEDICAL_RECORDS = "medical-records",
+    EXPERIMENTS = "experiments",
+    GENEALOGY = "genealogy",
+}
+
 export interface PageProps {
     params: {
         labId: string;

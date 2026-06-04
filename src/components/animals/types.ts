@@ -20,8 +20,9 @@ export enum AgeGroup {
     ADULT = "ADULT",
     SENIOR = "SENIOR",
 }
-  
+
 export interface Animal {
+    archivedAt?: string | null;
     animalType: AnimalType;
     laboratory: Laboratory;
     acquisitionDate: string;
@@ -35,9 +36,8 @@ export interface Animal {
     strain?: string;
     origin?: string;
     name?: string;
-    sex?: Sex;
     id?: string;
-    archivedAt?: string | null;
+    sex?: Sex;
 }
 
 export interface AnimalType {

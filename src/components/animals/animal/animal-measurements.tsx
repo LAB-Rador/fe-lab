@@ -5,12 +5,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
 import type { Animal, AnimalRecordMeasurement } from "@/src/app/[labId]/animals/[id]/types"
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
-import type { AnimalPagination } from "@/src/app/[labId]/animals/types"
 import { TemperatureChart } from "@/src/components/animals/temperature-chart"
-import { WeightChart } from "@/src/components/animals/weight-chart"
 import { ChevronDown, Download, Filter, Plus, Check } from "lucide-react"
-import { Button } from "@/src/components/ui/button"
+import type { AnimalPagination } from "@/src/app/[labId]/animals/types"
+import { WeightChart } from "@/src/components/animals/weight-chart"
 import { useEffect, useMemo, useState } from "react"
+import { Button } from "@/src/components/ui/button"
 import Link from "next/link"
 import {
   DropdownMenu,
