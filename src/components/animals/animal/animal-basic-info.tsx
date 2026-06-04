@@ -1,8 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { differenceInYears, differenceInMonths, differenceInDays } from 'date-fns';
+import type { Animal } from "@/src/app/[labId]/animals/[id]/types"
 import { MapPin, Thermometer, Weight } from "lucide-react"
 import type React from "react"
-import type { Animal } from "@/src/app/[labId]/animals/[id]/types"
 
 export function AnimalBasicInfo({ animal }: { animal: Animal }) {
   const birthDate = new Date(animal.birthDate || "");

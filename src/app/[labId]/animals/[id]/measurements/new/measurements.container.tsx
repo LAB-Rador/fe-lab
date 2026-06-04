@@ -112,11 +112,13 @@ export default function MeasurementsContainer({userId, labId, animalId, animalEn
                     }));
                 });
                 form.reset()
+                router.push(`/${labId}/animals/${animalId}`)
+                router.refresh()
             }
         } catch (error) {
             console.error("Error adding animal:", error)
         }  
-    }, [userId, labId, animalId, additionalParameters, experimentId, animalSummary, dispatch])
+    }, [userId, labId, animalId, additionalParameters, experimentId, animalSummary, dispatch, router])
 
     const handleAddParameter = useCallback(async (data: CreateParameterData, event?: BaseSyntheticEvent) => {
         if (event) {

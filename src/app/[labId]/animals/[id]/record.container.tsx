@@ -1,10 +1,10 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { type Animal, AnimalTabsName } from "./types";
 import AnimalDetailPage from "./animal.record.view";
 import type { AnimalPagination } from "../types";
 import { apiClient } from "@/src/lib/apiClient";
-import type { Animal } from "./types";
 import { toast } from "sonner";
 
 export interface RecordContainerProps {
@@ -16,6 +16,7 @@ export interface RecordContainerProps {
 }
 
 export default function RecordContainer({userId, labId, animalId, animal, animalPagination}: RecordContainerProps) {
+    const [activeTab, setActiveTab] = useState<AnimalTabsName>(AnimalTabsName.BASIC_INFO);
     const [pagination, setPagination] = useState<AnimalPagination>(animalPagination);
     const [animalData, setAnimalData] = useState(animal);
 
@@ -23,39 +24,32 @@ export default function RecordContainer({userId, labId, animalId, animal, animal
     paginationRef.current = pagination
 
     useEffect(() => {
-        let cancelled = false
-        async function loadAnimalFromApi() {
-            try {
-                const pg = paginationRef.current
-                const response = await apiClient.get(
-                    `/api/animals/animal/${userId}/${labId}/${animalId}/${pg.pageSize}/${pg.currentPage}`,
-                )
-                if (cancelled) return
-                setPagination(response.pagination)
-                setAnimalData(response.data)
-            } catch {
-                /* keep SSR snapshot */
-            }
-        }
-        void loadAnimalFromApi()
-        return () => {
-            cancelled = true
-        }
-    }, [userId, labId, animalId])
+        setPagination(animalPagination)
+        setAnimalData(animal)
+    }, [animalPagination, animal])
+
+    const fetchAnimalPage = useCallback(
+        async(page?: number, pageSize?: number) => {
+            const response = await apiClient.get(
+                `/api/animals/animal/${userId}/${labId}/${animalId}/${pageSize}/${page}`,
+            )
+            setPagination(response.pagination)
+            setAnimalData(response.data)
+            return response
+        },
+        [userId, labId, animalId]
+    )
 
     const handleUpdateDataPagination = useCallback(async (data: {page?: number, pageSize?: number}) => {
-        const response = await apiClient.get(`/api/animals/animal/${userId}/${labId}/${animalId}/${data.pageSize || pagination.pageSize}/${data.page || pagination.currentPage}`)
-        setPagination(response.pagination)
-        setAnimalData(response.data)
-    }, [userId, labId, animalId, pagination])
+        const page = data.page ?? paginationRef.current.currentPage
+        const pageSize = data.pageSize ?? paginationRef.current.pageSize
+        await fetchAnimalPage(page, pageSize)
+    }, [fetchAnimalPage])
 
     const reloadAnimal = useCallback(async () => {
-        const response = await apiClient.get(
-            `/api/animals/animal/${userId}/${labId}/${animalId}/${pagination.pageSize}/${pagination.currentPage}`,
-        )
-        setPagination(response.pagination)
-        setAnimalData(response.data)
-    }, [userId, labId, animalId, pagination.pageSize, pagination.currentPage])
+        const pg = paginationRef.current
+        await fetchAnimalPage(pg.currentPage, pg.pageSize)
+    }, [fetchAnimalPage])
 
     const handleArchiveAnimal = useCallback(async () => {
         try {
@@ -90,7 +84,9 @@ export default function RecordContainer({userId, labId, animalId, animal, animal
             handleUpdateDataPagination={handleUpdateDataPagination}
             handleUnarchiveAnimal={handleUnarchiveAnimal}
             handleArchiveAnimal={handleArchiveAnimal}
+            setActiveTab={setActiveTab}
             pagination={pagination}
+            activeTab={activeTab}
             animalId={animalId}
             animal={animalData}
             userId={userId}

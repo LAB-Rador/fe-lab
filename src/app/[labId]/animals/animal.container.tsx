@@ -8,9 +8,9 @@ import { AnimalsHeader } from "@/src/components/animals/animals-header";
 import type { CreateAnimalData } from "@/src/components/animals/types";
 import { AnimalsList } from "@/src/components/animals/animals-list";
 import { useMediaQuery } from "@/src/components/sidebar-provider";
+import { useCallback, useEffect, useState } from "react";
 import { AnimalStatus } from "../../account/types";
 import { apiClient } from "@/src/lib/apiClient";
-import { useCallback, useEffect, useState } from "react";
 import type { Animal } from "./types";
 import { toast } from "sonner";
 
@@ -18,14 +18,14 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
     const [animalTypesData, setAnimalTypesData] = useState<AnimalType[]>(animalTypes)
     const [pagination, setPagination] = useState<AnimalPagination>(animalPagination)
     const [newAnimalType, setNewAnimalType] = useState<AnimalType | null>(null)
+    const [includeArchivedAnimals, setIncludeArchivedAnimals] = useState(false)
     const [selectedAnimal, setSelectedAnimal] = useState<Animal | null>(null)
     const [openEditAnimalDialog, setOpenEditAnimalDialog] = useState(false)
     const [openAddAnimalDialog, setOpenAddAnimalDialog] = useState(false)
     const [animalsData, setAnimalsData] = useState<Animal[]>(animals)
     const [animalSearch, setAnimalSearch] = useState<string>("")
-    const [filters, setFilters] = useState<FiltersType>({})
     const [filterView, setFilterView] = useState<boolean>(false)
-    const [includeArchivedAnimals, setIncludeArchivedAnimals] = useState(false)
+    const [filters, setFilters] = useState<FiltersType>({})
     const isMobile = useMediaQuery("(max-width: 768px)");
 
     useEffect(() => {

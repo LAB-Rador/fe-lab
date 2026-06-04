@@ -4,30 +4,33 @@ import { Archive, ArchiveRestore, ArrowLeft, Calendar, Clock, MapPin, Plus } fro
 import { AnimalMedicalRecords } from "@/src/components/animals/animal/animal-medical-records"
 import { AnimalMeasurements } from "@/src/components/animals/animal/animal-measurements"
 import { AnimalExperiments } from "@/src/components/animals/animal/animal-experiments"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
 import { AnimalBasicInfo } from "@/src/components/animals/animal/animal-basic-info"
 import { AnimalGenealogy } from "@/src/components/animals/animal/animal-genealogy"
-import { Avatar, AvatarFallback, AvatarImage } from "@/src/components/ui/avatar"
 import { QuickActionPanel } from "@/src/components/animals/quick-action-panel"
+import { Tabs, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
+import { Avatar, AvatarFallback } from "@/src/components/ui/avatar"
+import { AnimalTabsName, type Animal } from "./types"
 import { Button } from "@/src/components/ui/button"
 import { Badge } from "@/src/components/ui/badge"
 import type { AnimalPagination } from "../types"
 import { getInitials } from "@/src/lib/utils"
 import { useRouter } from "next/navigation"
-import type { Animal } from "./types"
+import { Activity } from "react"
 
 export interface AnimalDetailPageProps {
-    handleArchiveAnimal: () => void | Promise<void>
-    handleUnarchiveAnimal: () => void | Promise<void>
     handleUpdateDataPagination: (data: {page?: number, pageSize?: number}) => void;
+    handleUnarchiveAnimal: () => void | Promise<void>
+    handleArchiveAnimal: () => void | Promise<void>
+    setActiveTab: (tab: AnimalTabsName) => void;
     pagination: AnimalPagination;
+    activeTab: AnimalTabsName;
     animalId: string;
     animal: Animal;
     userId: string;
     labId: string;
 }
 
-export default function AnimalDetailPage({userId, labId, animalId, animal, handleUpdateDataPagination, pagination, handleArchiveAnimal, handleUnarchiveAnimal}: AnimalDetailPageProps) {
+export default function AnimalDetailPage({userId, labId, animalId, animal, handleUpdateDataPagination, pagination, handleArchiveAnimal, handleUnarchiveAnimal, activeTab, setActiveTab}: AnimalDetailPageProps) {
   const router = useRouter();
 
   return (
@@ -111,45 +114,45 @@ export default function AnimalDetailPage({userId, labId, animalId, animal, handl
         {/* Main Content with Tabs */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <Tabs defaultValue="basic-info" className="w-full">
+            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as AnimalTabsName)} className="w-full">
               <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent">
                 <TabsTrigger
-                  value="basic-info"
+                  value={AnimalTabsName.BASIC_INFO}
                   className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent"
                 >
                   Basic Info
                 </TabsTrigger>
                 <TabsTrigger
-                  value="measurements"
+                  value={AnimalTabsName.MEASUREMENTS}
                   className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent"
                 >
                   Measurements
                 </TabsTrigger>
                 <TabsTrigger
-                  value="medical-records"
+                  value={AnimalTabsName.MEDICAL_RECORDS}
                   className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent"
                 >
                   Medical Records
                 </TabsTrigger>
                 <TabsTrigger
-                  value="experiments"
+                  value={AnimalTabsName.EXPERIMENTS}
                   className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent"
                 >
                   Experiments
                 </TabsTrigger>
                 <TabsTrigger
-                  value="genealogy"
+                  value={AnimalTabsName.GENEALOGY}
                   className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent"
                 >
                   Genealogy
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="basic-info" className="pt-6">
+              <Activity mode={activeTab === AnimalTabsName.BASIC_INFO ? "visible" : "hidden"}>
                 <AnimalBasicInfo animal={animal} />
-              </TabsContent>
+              </Activity>
 
-              <TabsContent value="measurements" className="pt-6">
+              <Activity mode={activeTab === AnimalTabsName.MEASUREMENTS ? "visible" : "hidden"}>
                 <AnimalMeasurements
                     handleUpdateDataPagination={handleUpdateDataPagination}
                     pagination={pagination}
@@ -157,19 +160,19 @@ export default function AnimalDetailPage({userId, labId, animalId, animal, handl
                     animal={animal}
                     labId={labId}
                 />
-              </TabsContent>
+              </Activity>
 
-              <TabsContent value="medical-records" className="pt-6">
+              <Activity mode={activeTab === AnimalTabsName.MEDICAL_RECORDS ? "visible" : "hidden"}>
                 <AnimalMedicalRecords animalId={animal.id || ""} />
-              </TabsContent>
+              </Activity>
 
-              <TabsContent value="experiments" className="pt-6">
+              <Activity mode={activeTab === AnimalTabsName.EXPERIMENTS ? "visible" : "hidden"}>
                 <AnimalExperiments labId={labId} experiments={animal.experimentAnimals ?? []} />
-              </TabsContent>
+              </Activity>
 
-              <TabsContent value="genealogy" className="pt-6">
+              <Activity mode={activeTab === AnimalTabsName.GENEALOGY ? "visible" : "hidden"}>
                 <AnimalGenealogy animalId={animal.id || ""} />
-              </TabsContent>
+              </Activity>
             </Tabs>
           </div>
 
