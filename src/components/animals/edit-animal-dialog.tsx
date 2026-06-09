@@ -15,7 +15,6 @@ import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { cn } from "@/src/lib/utils"
 import { format } from "date-fns"
-import type React from "react"
 import * as z from "zod"
 import {
     Dialog,
@@ -99,11 +98,11 @@ export function EditAnimalDialog({
         animalTypeId: selectedAnimal?.animalTypeId,
         identifier: selectedAnimal?.identifier,
         sex: selectedAnimal?.sex,
-        location: selectedAnimal?.location,
-        genotype: selectedAnimal?.genotype,
-        strain: selectedAnimal?.strain,
-        origin: selectedAnimal?.origin,
-        name: selectedAnimal?.name,
+        location: selectedAnimal?.location ?? "",
+        genotype: selectedAnimal?.genotype ?? "",
+        strain: selectedAnimal?.strain ?? "",
+        origin: selectedAnimal?.origin ?? "",
+        name: selectedAnimal?.name ?? "",
         birthDate: selectedAnimal?.birthDate ? new Date(selectedAnimal.birthDate) : undefined,
         acquisitionDate: selectedAnimal?.acquisitionDate ? new Date(selectedAnimal.acquisitionDate) : undefined,
       })
@@ -125,12 +124,13 @@ export function EditAnimalDialog({
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true)
+    setOpen(false)
+    form.reset()
     try {
       await onSubmit(values)
-      form.reset()
-      setOpen(false)
     } catch (error) {
       console.error("Error adding animal:", error)
+      setOpen(true)
     } finally {
       setIsSubmitting(false)
     }

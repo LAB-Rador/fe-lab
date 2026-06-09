@@ -5,14 +5,20 @@ import { EditAnimalDialog } from "@/src/components/animals/edit-animal-dialog";
 import { AddAnimalDialog } from "@/src/components/animals/add-animal-dialog";
 import { AnimalsFilter } from "@/src/components/animals/animals-filter";
 import { AnimalsHeader } from "@/src/components/animals/animals-header";
+import { useCallback, useEffect, useOptimistic, useState, startTransition } from "react";
 import type { CreateAnimalData } from "@/src/components/animals/types";
 import { AnimalsList } from "@/src/components/animals/animals-list";
 import { useMediaQuery } from "@/src/components/sidebar-provider";
-import { useCallback, useEffect, useState } from "react";
 import { AnimalStatus } from "../../account/types";
 import { apiClient } from "@/src/lib/apiClient";
 import type { Animal } from "./types";
+import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
+
+type OptimisticAnimalAction = 
+| { type: "add", animal: Animal }
+| { type: "update", animal: Animal }
+| { type: "remove", id: string }
 
 const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, animalPagination}: AnimalTypes) => {
     const [animalTypesData, setAnimalTypesData] = useState<AnimalType[]>(animalTypes)
@@ -27,6 +33,22 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
     const [filterView, setFilterView] = useState<boolean>(false)
     const [filters, setFilters] = useState<FiltersType>({})
     const isMobile = useMediaQuery("(max-width: 768px)");
+
+    const [optimisticAnimals, applyOptimisticAnimal] = useOptimistic(
+        animalsData,
+        (state, action: OptimisticAnimalAction) => {
+            switch (action.type) {
+                case "add":
+                    return [...state, action.animal]
+                case "update":
+                    return state.map((animal) => animal.id === action.animal.id ? action.animal : animal)
+                case "remove":
+                    return state.filter((animal) => animal.id !== action.id)
+                default:
+                    return state
+            }
+        }
+    )
 
     useEffect(() => {
         if (isMobile) {
@@ -91,6 +113,40 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
     }, [animals])
 
     const handleAddAnimal = useCallback(async (data: CreateAnimalData) => {
+        const tempId = uuidv4();
+        
+        const optimisticRow: Animal = {
+            id: tempId,
+            animalType: {
+                description: "",
+                laboratoryId: labId,
+                name: "",
+            },
+            laboratory: {
+                id: data.laboratoryId,
+                name: labId,
+            },
+            identifier: data.identifier,
+            laboratoryId: data.laboratoryId,
+            animalTypeId: data.animalTypeId === "null" ? "" : data.animalTypeId,
+            name: data.name,
+            birthDate: data.birthDate?.toISOString().split('T')[0], // Конвертируем в строку формата YYYY-MM-DD
+            acquisitionDate: data.acquisitionDate?.toISOString().split('T')[0] || new Date().toISOString().split('T')[0],
+            sex: data.sex,
+            strain: data.strain,
+            genotype: data.genotype,
+            status: (data.status as any) || AnimalStatus.ACTIVE,
+            location: data.location,
+            origin: data.origin,
+        }
+
+        const previousSnapshot = animalsData
+
+        startTransition(() => {
+            applyOptimisticAnimal({ type: "add", animal: optimisticRow })
+            setAnimalsData((prev) => [...prev, optimisticRow])
+        })
+
         try {
             const newAnimal: NewAnimal = {
                 userId: userId,
@@ -118,15 +174,47 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
                 description: `${newAnimal.identifier} - ${newAnimal.name}`
             });
             if(response.success && response.data) {
-                // Предполагаем, что сервер возвращает полный объект Animal в response.data
-                setAnimalsData((prev) => [...prev, response.data as Animal])
+                setAnimalsData((prev) => [
+                    ...prev.filter((animal) => animal.id !== tempId),
+                    response.data as Animal
+                ])
+            } else {
+                setAnimalsData(previousSnapshot)
             }
         } catch (error) {
             console.error("Error adding animal:", error)
+            setAnimalsData(previousSnapshot)
         }  
-    }, [userId, labId, newAnimalType, animalsData])
+    }, [userId, labId, newAnimalType, applyOptimisticAnimal, animalsData])
 
     const handleEditAnimal = useCallback(async (data: CreateAnimalData) => {
+        if(!data.id) return;
+
+        const previous = animalsData.find((animal) => animal.id === data.id);
+
+        if(!previous) return;
+
+        const previousSnapshot = animalsData
+
+        const optimisticUpdated: Animal = {
+            ...previous,
+            identifier: data.identifier,
+            name: data.name,
+            strain: data.strain,
+            genotype: data.genotype,
+            location: data.location,
+            origin: data.origin,
+            sex: data.sex,
+            status: (data.status as AnimalStatus) ?? previous.status,
+        }
+
+        startTransition(() => {
+            applyOptimisticAnimal({ type: "update", animal: optimisticUpdated })
+            setAnimalsData((prev) =>
+                prev.map((animal) => (animal.id === data.id ? optimisticUpdated : animal)),
+            )
+        })
+
         try {
             const newAnimal: NewAnimal = {
                 id: data.id,
@@ -140,7 +228,7 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
                 customFields: [],
                 animalTypeId: data.animalTypeId === "null" ? "" : data.animalTypeId,
                 name: data.name,
-                birthDate: data.birthDate?.toISOString().split('T')[0], // Конвертируем в строку формата YYYY-MM-DD
+                birthDate: data.birthDate?.toISOString().split('T')[0],
                 acquisitionDate: data.acquisitionDate?.toISOString().split('T')[0] || new Date().toISOString().split('T')[0],
                 sex: data.sex,
                 strain: data.strain,
@@ -155,19 +243,25 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
                 description: `${newAnimal.identifier} - ${newAnimal.name}`
             });
             if(response.success && response.data) {
-                // Предполагаем, что сервер возвращает полный объект Animal в response.data
-                const updatedAnimals = animalsData.filter((animal) => {
-                    return animal.id !== newAnimal.id
-                });
-                setAnimalsData((prev) => [...updatedAnimals, response.data as Animal])
+                setAnimalsData((prev) => 
+                    prev.map((animal) => animal.id === data.id ? (response.data as Animal) : animal)
+                )
+            } else {
+                setAnimalsData(previousSnapshot)
             }
         } catch (error) {
-            console.error("Error adding animal:", error)
+            console.error("Error editing animal:", error)
+            setAnimalsData(previousSnapshot)
         }
-    }, [userId, labId, newAnimalType, animalsData])
+    }, [userId, labId, newAnimalType, animalsData, applyOptimisticAnimal])
 
     const handleArchiveAnimalRow = useCallback(
         async (animalId: string) => {
+            startTransition(() => {
+                applyOptimisticAnimal({ type: "remove", id: animalId })
+                setAnimalsData((prev) => prev.filter((animal) => animal.id !== animalId))
+            })
+            
             try {
                 const res = await apiClient.post(`/api/animals/animal/${userId}/${labId}/${animalId}/archive`, {})
                 if (res?.success) {
@@ -180,7 +274,7 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
                 toast.error("Failed to archive")
             }
         },
-        [userId, labId, handleUpdateDataPagination],
+        [userId, labId, handleUpdateDataPagination, applyOptimisticAnimal],
     )
 
     const handleUnarchiveAnimalRow = useCallback(
@@ -268,7 +362,7 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
                     setOpen={setOpenEditAnimalDialog}
                     setPagination={setPagination}
                     animalPagination={pagination}
-                    animals={animalsData}
+                    animals={optimisticAnimals}
                 />
             </div>
         </div>

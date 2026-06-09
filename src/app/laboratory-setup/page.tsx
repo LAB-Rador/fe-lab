@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/src/components/ui/input-otp"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
 import { Building2, Users, CheckCircle, AlertCircle } from "lucide-react"
-import React, { Suspense, useCallback, useMemo, useState } from "react"
+import React, { Activity, Suspense, useCallback, useMemo, useState } from "react"
 import { setLaboratory } from "@/src/redux/slices/laboratorySlice"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Textarea } from "@/src/components/ui/textarea"
@@ -143,11 +143,11 @@ const LaboratorySetupPage = () => {
                     </TabsTrigger>
                     </TabsList>
 
-                    <TabsContent value="create">
+                    <Activity mode={activeTab === "create" ? "visible" : "hidden"}>
                         <CardHeader>
                             <CardTitle>Create New Laboratory</CardTitle>
                             <CardDescription>
-                            Set up your own laboratory and become the owner. You'll be able to invite team members and manage all
+                            Set up your own laboratory and become the owner. You&apos;ll be able to invite team members and manage all
                             aspects of your lab.
                             </CardDescription>
                         </CardHeader>
@@ -235,9 +235,9 @@ const LaboratorySetupPage = () => {
                                 </Button>
                             </form>
                         </CardContent>
-                    </TabsContent>
+                    </Activity>
 
-                    <TabsContent value="join">
+                    <Activity mode={activeTab === "join" ? "visible" : "hidden"}>
                         <CardHeader>
                             <CardTitle>Join Existing Laboratory</CardTitle>
                             <CardDescription>
@@ -293,7 +293,7 @@ const LaboratorySetupPage = () => {
 
                                 <div className="text-center">
                                     <p className="text-sm text-gray-600">
-                                        Don't have an invitation code?{" "}
+                                        Don&apos;t have an invitation code?{" "}
                                         <button
                                             type="button"
                                             onClick={() => setActiveTab("create")}
@@ -305,7 +305,7 @@ const LaboratorySetupPage = () => {
                                 </div>
                             </form>
                         </CardContent>
-                    </TabsContent>
+                    </Activity>
                 </Tabs>
                 </Card>
 
