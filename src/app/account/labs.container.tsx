@@ -1,31 +1,18 @@
 "use client"
 
 import type { LaboratoriesContainerProps, Laboratory, UserInfo } from "./types"
-import { useState, useEffect, useCallback, useMemo } from "react"
+import { useState, useCallback, useMemo } from "react"
 import { getInitials } from "@/src/lib/utils"
 import { AuthService } from "@/src/lib/auth"
 import { useRouter } from "next/navigation"
 import LaboratoriesView from "./labs.view"
 
-export default function LaboratoriesContainer({ userLaboratories }: LaboratoriesContainerProps) {
+export default function LaboratoriesContainer({ userLaboratories, initialUser }: LaboratoriesContainerProps) {
     const router = useRouter()
     const [searchTerm, setSearchTerm] = useState<string>("")
     const [laboratories, setLaboratories] = useState<Laboratory[] | []>(userLaboratories)
-    const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
-    const [isLoading, setIsLoading] = useState(true)
-
-    useEffect(() => {
-        const fetchData = async () => {
-        setIsLoading(true);
-
-        const user = await AuthService.getCurrentUser();
-        setUserInfo(user);
-
-        setIsLoading(false);
-        }
-
-        fetchData()
-    }, [])
+    const userInfo = initialUser
+    const isLoading = false
 
     const filteredLaboratories = useMemo(() => 
         laboratories?.filter(

@@ -80,6 +80,7 @@ export interface UserInfo {
 
 export interface LaboratoriesContainerProps {
     userLaboratories: Laboratory[];
+    initialUser: UserInfo;
 }
 
 export interface LaboratoriesViewProps {
