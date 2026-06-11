@@ -1,57 +1,26 @@
 "use client"
 
-import { useAppDispatch, useAppSelector } from "../lib/hooks"
-import { setUser } from "@/src/redux/slices/userSlice"
-import React, { useCallback, useState } from "react"
-import { Button } from "@/src/components/ui/button"
-import { CONFIRMED_EMAIL } from "../lib/variables"
+import { guestAction, type GuestState } from "@/src/app/signin/guestAction"
+import { LoginSubmitButton } from "@/src/components/login-submit-button"
+import { loginAction, type LoginState } from "@/src/app/signin/actions"
 import { EyeIcon, EyeOffIcon } from "lucide-react"
 import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
-import { AuthService } from "@/src/lib/auth"
-import { useRouter } from "next/navigation"
-import { toast } from "sonner"
+import { useActionState } from "react"
+import { useState } from "react"
 import Link from "next/link"
 
+const initialState: LoginState = {}
+const guestInitialState: GuestState = {}
+
 export function LoginForm() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [guestState, guestFormAction] = useActionState(guestAction, guestInitialState)
+  const [state, formAction] = useActionState(loginAction, initialState)
   const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-
-  const dispatch = useAppDispatch();
-  const router = useRouter();
-
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-
-    try {
-      const response = await AuthService.login(email || process.env.NEXT_PUBLIC_GUEST_EMAIL as string, password || process.env.NEXT_PUBLIC_GUEST_PASSWORD as string);
-      toast(`${response.message || response.error}`, {
-        description: `${response?.user.firstName} ${response?.user.lastName} - ${response?.user.institution}`
-      });
-      
-      if(response.success) {
-        if(!response.laboratory) {
-          router.push("/laboratory-setup");
-        } else {
-          router.push(`account`);
-        }
-        document.cookie = `USER_ID=${response.user.userId}; path=/; SameSite=Strict`;
-        document.cookie = `${CONFIRMED_EMAIL}=${response.user.confirmedEmail}; path=/; max-age=3600`;
-        dispatch(setUser(response.user));
-      }
-    } catch (error) {
-      console.error('Login failed:', error);
-    } finally {
-      setIsLoading(false)
-    }
-  }, [email, password, router]);
-
   return (
+
     <>
-      <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+      <form action={formAction} className="mt-8 space-y-6">
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email address</Label>
@@ -62,8 +31,6 @@ export function LoginForm() {
               autoComplete="email"
               required
               placeholder="name@laboratory.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
               className="w-full"
             />
           </div>
@@ -82,8 +49,6 @@ export function LoginForm() {
                 autoComplete="current-password"
                 required
                 placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
                 className="w-full pr-10"
               />
               <button
@@ -100,14 +65,19 @@ export function LoginForm() {
             </div>
           </div>
         </div>
-
-        <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={isLoading}>
-          {isLoading ? "Signing in..." : "Sign in"}
-        </Button>
+        {state.error ? (
+          <p className="text-sm text-red-500">{state.error}</p>
+          ) : null}
+        <LoginSubmitButton label="Sign in" />
       </form>
-      <Button type="button" className="w-full bg-blue-600 hover:bg-blue-700" disabled={isLoading} onClick={handleSubmit}>
-          {isLoading ? "Accessing..." : "Guest access"}
-      </Button>
+      <form action={guestFormAction}>
+        <input type="hidden" name="email" value={process.env.NEXT_PUBLIC_GUEST_EMAIL} />
+        <input type="hidden" name="password" value={process.env.NEXT_PUBLIC_GUEST_PASSWORD} />
+        {guestState.error ? (
+          <p className="text-sm text-red-500">{guestState.error}</p>
+        ) : null}
+        <LoginSubmitButton label="Guest access" />
+      </form>
     </>
   )
 }

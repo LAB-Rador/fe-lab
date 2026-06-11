@@ -39,6 +39,12 @@ function buildLabTasksQuery(parts: {
   return q.toString()
 }
 
+type ListFilters = {
+  status?: TaskStatusFilterValue
+  priority?: TaskPriorityFilterValue
+  assigneeScope?: AssigneeScopeFilter
+}
+
 function membersToAssignees(members: InitialMembersTypes[]): ExperimentTaskAssigneeOption[] {
   const out: ExperimentTaskAssigneeOption[] = []
   for (const m of members) {
@@ -96,15 +102,16 @@ export default function TasksContainer(props: {
     async (
       page: number,
       pageSize: number,
+      filters?: ListFilters,
     ): Promise<{ items: Task[]; pagination: LaboratoryTasksPagination } | null> => {
       setTasksLoading(true)
       try {
         const qs = buildLabTasksQuery({
           page,
           pageSize,
-          status: statusFilter,
-          priority: priorityFilter,
-          assigneeScope: assigneeFilter,
+          status: filters?.status ?? statusFilter,
+          priority: filters?.priority ?? priorityFilter,
+          assigneeScope: filters?.assigneeScope ?? assigneeFilter,
         })
         const res = (await apiClient.get(`/api/tasks/laboratory/${userId}/${labId}?${qs}`)) as
           | { success?: boolean; data?: { items: Task[]; pagination: LaboratoryTasksPagination } }
@@ -160,9 +167,44 @@ export default function TasksContainer(props: {
     calendarLoadedKeyRef.current = calendarQueryKey
   }, [loadCalendar, calendarQueryKey])
 
-  useEffect(() => {
-    void loadList(1, paginationRef.current.pageSize)
-  }, [loadList])
+  const handleStatusFilter = useCallback(
+    (v: TaskStatusFilterValue) => {
+      setStatusFilter(v)
+      calendarLoadedKeyRef.current = null
+      void loadList(1, paginationRef.current.pageSize, {
+        status: v,
+        priority: priorityFilter,
+        assigneeScope: assigneeFilter,
+      })
+    },
+    [loadList, priorityFilter, assigneeFilter],
+  )
+
+  const handlePriorityFilter = useCallback(
+    (v: TaskPriorityFilterValue) => {
+      setPriorityFilter(v)
+      calendarLoadedKeyRef.current = null
+      void loadList(1, paginationRef.current.pageSize, {
+        status: statusFilter,
+        priority: v,
+        assigneeScope: assigneeFilter,
+      })
+    },
+    [loadList, statusFilter, assigneeFilter],
+  )
+
+  const handleAssigneeFilter = useCallback(
+    (v: AssigneeScopeFilter) => {
+      setAssigneeFilter(v)
+      calendarLoadedKeyRef.current = null
+      void loadList(1, paginationRef.current.pageSize, {
+        status: statusFilter,
+        priority: priorityFilter,
+        assigneeScope: v,
+      })
+    },
+    [loadList, statusFilter, priorityFilter],
+  )
 
   useEffect(() => {
     if (mainTab !== "calendar") return
@@ -284,12 +326,12 @@ export default function TasksContainer(props: {
       initialNotifications={initialNotifications}
       onPaginationChange={handlePagination}
       onPatchTaskStatus={handlePatchStatus}
-      onAssigneeFilter={setAssigneeFilter}
-      onPriorityFilter={setPriorityFilter}
+      onAssigneeFilter={handleAssigneeFilter}
+      onPriorityFilter={handlePriorityFilter}
       onCalendarPrevMonth={onPrevMonth}
       onCalendarNextMonth={onNextMonth}
       calendarLoading={calendarLoading}
-      onStatusFilter={setStatusFilter}
+      onStatusFilter={handleStatusFilter}
       priorityFilter={priorityFilter}
       assigneeFilter={assigneeFilter}
       calendarMonth={calendarMonth}

@@ -89,16 +89,17 @@ export function AddAnimalDialog({
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true)
+    setOpen(false)
+    form.reset()
     try {
       await onSubmit({
         ...values,
         acquisitionDate: values.acquisitionDate || new Date(),
         status: values.status || AnimalStatus.ACTIVE,
       })
-      form.reset()
-      setOpen(false)
     } catch (error) {
       console.error("Error adding animal:", error)
+      setOpen(true)
     } finally {
       setIsSubmitting(false)
     }

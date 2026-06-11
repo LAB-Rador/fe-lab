@@ -1,0 +1,54 @@
+"use server"
+
+import { CONFIRMED_EMAIL } from "@/src/lib/variables"
+import { redirect } from "next/navigation"
+import { cookies } from "next/headers"
+
+const BACKEND_URL =
+    process.env.NEXT_PUBLIC_LOCAL_DATABASE_URL as string ||
+    process.env.NEXT_PUBLIC_DATABASE_URL as string;
+
+export type LoginState = {
+    error?: string;
+    success?: boolean;
+}
+
+export async function loginAction(
+    _prevState: LoginState,
+    formData: FormData,
+): Promise<LoginState> {
+    const email = formData.get("email") ?? "";
+    const password = formData.get("password") ?? "";
+
+    const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
+        method: "POST",
+        headers: {
+            "Content-type": "application/json",
+        },
+        body: JSON.stringify({ email, password}),
+    })
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+        return { error: data.message ?? data.error ?? "Login failed" };
+    }
+
+    const cookieStore = await cookies();
+
+    cookieStore.set("auth-token", data.accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+        maxAge: 60 * 60 * 24,
+    })
+
+    cookieStore.set("USER_ID", data.user.userId, { path: "/", sameSite: "strict" });
+    cookieStore.set(CONFIRMED_EMAIL, String(data.user.confirmedEmail), {
+        path: "/",
+        maxAge: 3600,
+    });
+
+    redirect(data.laboratory ? "/account" : "/laboratory-setup");
+}

@@ -78,14 +78,6 @@ function processAnimalData(animals: Animal[]): { chartData: any[], animalTypes: 
 export function AnimalPopulationChart({animals}: {animals: Animal[]}) {
   const { chartData, animalTypes } = useMemo(() => processAnimalData(animals), [animals])
 
-  if (!chartData || chartData.length === 0) {
-    return (
-      <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-        No data to render!
-      </div>
-    )
-  }
-
   const config = useMemo(() => animalTypes.reduce((acc: Record<string, { label: string; color: string }>, type: string, index: number) => {
     acc[type] = {
       label: type,
@@ -93,6 +85,14 @@ export function AnimalPopulationChart({animals}: {animals: Animal[]}) {
     }
     return acc
   }, {} as Record<string, { label: string; color: string }>), [animalTypes])
+
+  if (!chartData || chartData.length === 0) {
+    return (
+      <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+        No data to render!
+      </div>
+    )
+  }
 
   return (
     <ChartContainer
