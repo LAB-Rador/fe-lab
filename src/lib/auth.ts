@@ -55,35 +55,34 @@ export class AuthService {
   }
   
   // Логаут
-  static logout() {
-    this.removeToken();
-    Cookies.remove(USER_ID_COOKIE, { path: '/' });
-    Cookies.remove(CONFIRMED_EMAIL, { path: '/' });
-    window.location.href = '/signin';
+  static async logout() {
+    try {
+      await fetch("/api/auth/logout", { method: "POST", credentials: "include" })
+    } catch {
+      /* no-op */
+    }
+    this.removeToken()
+    Cookies.remove(USER_ID_COOKIE, { path: "/" })
+    Cookies.remove(CONFIRMED_EMAIL, { path: "/" })
+    window.location.href = "/signin"
   }
   
   // Получение данных пользователя с бекенда
   static async getCurrentUser() {
-    const token = this.getToken();
-    if (!token) return null;
-    
     try {
-      const response = await fetch(`${BACKEND_URL}/api/auth/validate`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        credentials: 'include',
-      });
+      const response = await fetch("/api/backend/api/auth/validate", {
+        credentials: "include",
+      })
       
       if (!response.ok) {
-        throw new Error('Token validation failed');
+        throw new Error("Token validation failed")
       }
       
-      const data = await response.json();
-      return data.user;
+      const data = await response.json()
+      return data.user
     } catch (error) {
-      this.removeToken();
-      return null;
+      this.removeToken()
+      return null
     }
   }
 }

@@ -71,8 +71,6 @@ export function LoginForm() {
         <LoginSubmitButton label="Sign in" />
       </form>
       <form action={guestFormAction}>
-        <input type="hidden" name="email" value={process.env.NEXT_PUBLIC_GUEST_EMAIL} />
-        <input type="hidden" name="password" value={process.env.NEXT_PUBLIC_GUEST_PASSWORD} />
         {guestState.error ? (
           <p className="text-sm text-red-500">{guestState.error}</p>
         ) : null}

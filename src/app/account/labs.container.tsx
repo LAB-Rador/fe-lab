@@ -51,7 +51,7 @@ export default function LaboratoriesContainer({ userLaboratories, initialUser }:
     }, [router]);
 
     const handleLogout = useCallback(() => {
-        AuthService.logout()
+        void AuthService.logout()
     }, [])
 
     return (

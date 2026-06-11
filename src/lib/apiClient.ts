@@ -1,34 +1,29 @@
-import { AuthService } from "./auth";
-
-const BACKEND_URL =
-process.env.NEXT_PUBLIC_LOCAL_DATABASE_URL as string || process.env.NEXT_PUBLIC_DATABASE_URL as string;
-
 class ApiClient {
-  baseURL: string; // Объявите свойство baseURL
+  baseURL: string
 
   constructor() {
-    this.baseURL = BACKEND_URL;
+    this.baseURL = "/api/backend"
   }
 
   async request(endpoint: string, options: RequestInit = {}) {
-    const token = AuthService.getToken();
+    const normalizedEndpoint = endpoint.startsWith("/") ? endpoint.slice(1) : endpoint
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
         ...options.headers,
       },
-      credentials: 'include' as RequestCredentials,
+      credentials: "include" as RequestCredentials,
       ...options,
-    };
+    }
 
     try {
-      const response = await fetch(`${this.baseURL}${endpoint}`, config);
+      const response = await fetch(`${this.baseURL}/${normalizedEndpoint}`, config)
 
       if (response.status === 401) {
-        AuthService.logout();
-        return;
+        await fetch("/api/auth/logout", { method: "POST", credentials: "include" })
+        window.location.href = "/signin"
+        return
       }
 
       if (!response.ok) {
