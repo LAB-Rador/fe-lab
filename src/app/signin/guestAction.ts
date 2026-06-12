@@ -36,8 +36,8 @@ export async function guestAction(
 
     const cookieStore = await cookies();
 
+    // Client apiClient reads this cookie via js-cookie for cross-origin Bearer auth.
     cookieStore.set("auth-token", data.accessToken, {
-        httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
         path: "/",

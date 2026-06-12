@@ -5,7 +5,6 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/src/components/ui/input
 import React, { Activity, Suspense, useCallback, useMemo, useState } from "react"
 import { Building2, Users, CheckCircle, AlertCircle } from "lucide-react"
 import { Tabs, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
-import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId"
 import { setLaboratory } from "@/src/redux/slices/laboratorySlice"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Textarea } from "@/src/components/ui/textarea"
@@ -52,11 +51,15 @@ const LaboratorySetupPage = () => {
         setSuccess("")
 
         try {
-            const userId = await getServerAuthenticatedUserId()
+            const user = await AuthService.getCurrentUser()
+            if (!user?.userId) {
+                setError("Session expired. Please sign in again.")
+                return
+            }
 
             const labData = {
                 ...laboratoryData,
-                userId: userId,
+                userId: user.userId,
             }
             const response = await apiClient.post("/api/laboratory", labData);
             toast(response.success ? "Success!" : "Error!", {
@@ -85,7 +88,11 @@ const LaboratorySetupPage = () => {
         setSuccess("")
 
         try {
-            const user = await AuthService.getCurrentUser();
+            const user = await AuthService.getCurrentUser()
+            if (!user?.userId) {
+                setError("Session expired. Please sign in again.")
+                return
+            }
 
             const userData = {
                 code: invitationCode,
