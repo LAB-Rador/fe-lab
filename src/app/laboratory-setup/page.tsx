@@ -2,9 +2,10 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/src/components/ui/input-otp"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
-import { Building2, Users, CheckCircle, AlertCircle } from "lucide-react"
 import React, { Activity, Suspense, useCallback, useMemo, useState } from "react"
+import { Building2, Users, CheckCircle, AlertCircle } from "lucide-react"
+import { Tabs, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
+import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId"
 import { setLaboratory } from "@/src/redux/slices/laboratorySlice"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Textarea } from "@/src/components/ui/textarea"
@@ -15,7 +16,6 @@ import { useAppDispatch } from "@/src/lib/hooks"
 import { apiClient } from "@/src/lib/apiClient"
 import { AuthService } from "@/src/lib/auth"
 import { toast } from "sonner"
-import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId"
 
 const LaboratorySetupPage = () => {
     const router = useRouter()
