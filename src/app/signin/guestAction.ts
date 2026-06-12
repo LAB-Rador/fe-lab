@@ -36,8 +36,8 @@ export async function guestAction(
 
     const cookieStore = await cookies();
 
+    // Not httpOnly: client apiClient/AuthService read the token via js-cookie for Bearer auth to the backend API.
     cookieStore.set("auth-token", data.accessToken, {
-        httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
         path: "/",
