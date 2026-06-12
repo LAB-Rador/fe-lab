@@ -15,6 +15,7 @@ import { useAppDispatch } from "@/src/lib/hooks"
 import { apiClient } from "@/src/lib/apiClient"
 import { AuthService } from "@/src/lib/auth"
 import { toast } from "sonner"
+import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId"
 
 const LaboratorySetupPage = () => {
     const router = useRouter()
@@ -51,11 +52,11 @@ const LaboratorySetupPage = () => {
         setSuccess("")
 
         try {
-            const user = await AuthService.getCurrentUser();
+            const userId = await getServerAuthenticatedUserId()
 
             const labData = {
                 ...laboratoryData,
-                userId: user.userId,
+                userId: userId,
             }
             const response = await apiClient.post("/api/laboratory", labData);
             toast(response.success ? "Success!" : "Error!", {
