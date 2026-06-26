@@ -17,8 +17,10 @@ export async function guestAction(
     _prevState: GuestState,
     formData: FormData,
 ): Promise<GuestState> {
-    const email = process.env.NEXT_PUBLIC_GUEST_EMAIL ?? "";
-    const password = process.env.NEXT_PUBLIC_GUEST_PASSWORD ?? "";
+    const email =
+        process.env.GUEST_EMAIL ?? process.env.NEXT_PUBLIC_GUEST_EMAIL ?? "";
+    const password =
+        process.env.GUEST_PASSWORD ?? process.env.NEXT_PUBLIC_GUEST_PASSWORD ?? "";
 
     const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
         method: "POST",

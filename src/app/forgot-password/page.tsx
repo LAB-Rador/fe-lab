@@ -80,7 +80,7 @@ export default function ForgotPasswordPage() {
     } finally {
       setIsLoading(false)
     }
-  }, []);
+  }, [email]);
 
   const handleResendEmail = useCallback(async () => {
     setIsLoading(true)
@@ -121,7 +121,7 @@ export default function ForgotPasswordPage() {
     } finally {
       setIsLoading(false)
     }
-  }, []);
+  }, [confirmationCode, email, formData.password, router]);
 
   const isJoinFormValid = useMemo(() => {
     return confirmationCode.length === 6
