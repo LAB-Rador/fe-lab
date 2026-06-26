@@ -35,7 +35,7 @@ export async function loginAction(
     const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
         method: "POST",
         headers: {
-            "Content-type": "application/json",
+            "Content-Type": "application/json",
         },
         body: JSON.stringify({ email: parsed.data.email, password: parsed.data.password as string }),
     })

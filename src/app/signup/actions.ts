@@ -2,7 +2,7 @@
 
 import { CONFIRMED_EMAIL } from "@/src/lib/variables"
 import { cookies } from "next/headers"
-import z from "zod";
+import { z } from "zod";
 
 const BACKEND_URL =
     process.env.NEXT_PUBLIC_LOCAL_DATABASE_URL as string ||

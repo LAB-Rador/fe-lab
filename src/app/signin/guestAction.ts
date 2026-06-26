@@ -24,7 +24,7 @@ export async function guestAction(
         method: "POST",
         body: JSON.stringify({ email, password}),
         headers: {
-            "Content-type": "application/json",
+            "Content-Type": "application/json",
         },
     })
 
