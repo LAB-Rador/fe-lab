@@ -33,6 +33,7 @@ export function LoginForm() {
               placeholder="name@laboratory.com"
               className="w-full"
             />
+            {state.fieldErrors?.email?.[0] && <p className="text-sm text-red-500">{state.fieldErrors.email[0]}</p>}
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
@@ -51,6 +52,7 @@ export function LoginForm() {
                 placeholder="••••••••"
                 className="w-full pr-10"
               />
+              {state.fieldErrors?.password?.[0] && <p className="text-sm text-red-500">{state.fieldErrors.password[0]}</p>}
               <button
                 type="button"
                 className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-500"

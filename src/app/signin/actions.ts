@@ -3,29 +3,41 @@
 import { CONFIRMED_EMAIL } from "@/src/lib/variables"
 import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
+import { z } from "zod";
 
 const BACKEND_URL =
     process.env.NEXT_PUBLIC_LOCAL_DATABASE_URL as string ||
     process.env.NEXT_PUBLIC_DATABASE_URL as string;
 
 export type LoginState = {
-    error?: string;
-    success?: boolean;
+    error?: string
+    fieldErrors?: { email?: string[]; password?: string[] }
 }
+
+const loginSchema = z.object({
+    email: z.string().trim().min(1, "Email is required").email("Invalid email"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
+})
 
 export async function loginAction(
     _prevState: LoginState,
     formData: FormData,
 ): Promise<LoginState> {
-    const email = formData.get("email") ?? "";
-    const password = formData.get("password") ?? "";
+    const parsed = loginSchema.safeParse({
+        email: formData.get("email"),
+        password: formData.get("password"),
+    })
+
+    if (!parsed.success) {
+        return { fieldErrors: parsed.error.flatten().fieldErrors }
+      }
 
     const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
         method: "POST",
         headers: {
             "Content-type": "application/json",
         },
-        body: JSON.stringify({ email, password}),
+        body: JSON.stringify({ email: parsed.data.email, password: parsed.data.password as string }),
     })
 
     const data = await response.json();
