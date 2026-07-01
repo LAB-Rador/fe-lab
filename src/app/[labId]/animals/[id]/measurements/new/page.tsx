@@ -1,3 +1,5 @@
+"use server"
+
 import type { AnimalRecord, AnimalRecordMeasurement } from "../../types";
 import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId";
 import { getAnimalEnums } from "@/src/lib/cached/getAnimalEnums";
