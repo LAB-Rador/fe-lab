@@ -1,15 +1,15 @@
 "use server"
 
 import { DashboardHeader } from "@/src/components/dashboard/dashboard-header"
+import type { AppNotification } from "@/src/components/tasks/notifications"
+import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId"
 import { SidebarProvider } from "@/src/components/sidebar-provider"
+import { serverApiClient } from "@/src/lib/serverApiClient"
 import { Sidebar } from "@/src/components/sidebar"
 import type { Laboratory } from "../account/types"
-import type { AppNotification } from "@/src/components/tasks/notifications"
-import { serverApiClient } from "@/src/lib/serverApiClient"
-
 import { redirect } from 'next/navigation'
-import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId"
 import type React from "react"
+
 
 export default async function DashboardLayout({
   children,
@@ -20,9 +20,13 @@ export default async function DashboardLayout({
 }) {
   const {labId} = await params;
   const userId = await getServerAuthenticatedUserId()
-  const laboratories = await serverApiClient.get(`/api/laboratories/${userId}`);
+  
+  const [laboratories, laboratoryMembers] = await Promise.all([
+    serverApiClient.get(`/api/laboratories/${userId}`),
+    serverApiClient.get(`/api/laboratory/${userId}/${labId}`),
+  ])
+
   const laboratory = await laboratories.data.find((laboratory: Laboratory) => laboratory.name === labId);
-  const laboratoryMembers = await serverApiClient.get(`/api/laboratory/${userId}/${labId}`);
 
   let unreadNotificationsCount = 0
   let initialUnreadNotifications: AppNotification[] = []

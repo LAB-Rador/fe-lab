@@ -1,5 +1,6 @@
-import type { AccessStatus, AnimalStatus, Role, Sex } from "../../account/types";
+import type { ExperimentStatus, AccessStatus, AnimalStatus, Role, Sex } from "../../account/types";
 import type { ActivityLevel, RecordType } from "../animals/types";
+import type { TaskStatus } from "../tasks/types";
 
 export interface InitialMembersTypes {
     id: string;
@@ -39,9 +40,11 @@ export interface LaboratoryMembersResponse {
 }
 
 export interface AnimalEnums {
+    experimentStatus: ExperimentStatus[];
     activityLevel: ActivityLevel[];
     accessStatus: AccessStatus[]
     recordType: RecordType[];
+    taskStatus: TaskStatus[];
     status: AnimalStatus[];
     role: Role[];
     sex: Sex[];

@@ -1,8 +1,10 @@
 "use server"
 
-import ExperimentsContainer from "./experiments.container"
-import { serverApiClient } from "@/src/lib/serverApiClient"
 import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId"
+import { getAnimalEnums } from "@/src/lib/cached/getAnimalEnums"
+import { serverApiClient } from "@/src/lib/serverApiClient"
+import ExperimentsContainer from "./experiments.container"
+import type { AnimalEnums } from "../animals/types"
 interface ExperimentsTypes {
   params: {
     labId: string
@@ -12,13 +14,17 @@ interface ExperimentsTypes {
 export default async function ExperimentsPage({params}: ExperimentsTypes) {
   const { labId } = await params;
   const userId = await getServerAuthenticatedUserId()
-  const animalEnums = await serverApiClient.get(`/api/animals/enums`);
-  const experiments = await serverApiClient.get(`/api/experiments/${userId}/${labId}`);
+
+
+  const [animalEnums, experiments] = await Promise.all([
+    getAnimalEnums(),
+    serverApiClient.get(`/api/experiments/${userId}/${labId}`),
+  ]);
 
   return (
     <ExperimentsContainer
       experiments={experiments.data}
-      animalEnums={animalEnums.data}
+      animalEnums={animalEnums.data as AnimalEnums}
       userId={userId}
       labId={labId}
     />

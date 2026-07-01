@@ -1,9 +1,9 @@
 import type { AppNotification } from "@/src/components/tasks/notifications"
+import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId"
+import { serverApiClient } from "@/src/lib/serverApiClient"
 import type { LaboratoryTasksPagePayload } from "./types"
 import type { InitialMembersTypes } from "../team/types"
-import { serverApiClient } from "@/src/lib/serverApiClient"
 import TasksContainer from "./tasks.container"
-import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId"
 
 type PageProps = {
   params: Promise<{ labId: string }>

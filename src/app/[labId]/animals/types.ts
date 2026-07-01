@@ -1,5 +1,6 @@
+import type { AccessStatus, AnimalStatus, Role, Sex } from "../../account/types";
 import type { AgeGroup } from "@/src/components/animals/types";
-import type { AnimalStatus, Sex } from "../../account/types";
+import type { TaskStatus } from "../tasks/types";
 
 export interface PageProps {
     params: {
@@ -78,8 +79,11 @@ export interface AnimalPagination {
 export interface AnimalEnums {
     experimentStatus: ExperimentStatus[];
     activityLevel: ActivityLevel[];
+    accessStatus: AccessStatus[]
     recordType: RecordType[];
+    taskStatus: TaskStatus[];
     status: AnimalStatus[];
+    role: Role[];
     sex: Sex[];
 }
 
