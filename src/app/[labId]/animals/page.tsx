@@ -1,25 +1,31 @@
 "use server"
 
-import AnimalContainer from "./animal.container";
-import { serverApiClient } from "@/src/lib/serverApiClient";
-import type { PageProps } from "./types";
 import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId";
+import { getAnimalEnums } from "@/src/lib/cached/getAnimalEnums";
+import { serverApiClient } from "@/src/lib/serverApiClient";
+import AnimalContainer from "./animal.container";
+import type { AnimalEnums } from "./types";
+import type { PageProps } from "./types";
+
+const rows = 10;
+const page = 1;
 
 export default async function AnimalsPage({params}: PageProps) {
   const {labId} = await params;
   const userId = await getServerAuthenticatedUserId()
 
-  const rows = 10;
-  const page = 1;
+  const filters = JSON.stringify({})
 
-  const animals = await serverApiClient.get(`/api/animals/${userId}/${labId}/${rows}/${page}/${JSON.stringify({})}`);
-  const animalTypes = await serverApiClient.get(`/api/animals/types/${userId}/${labId}`);
-  const animalEnums = await serverApiClient.get(`/api/animals/enums`);
+  const [animals, animalTypes, animalEnums] = await Promise.all([
+    serverApiClient.get(`/api/animals/${userId}/${labId}/${rows}/${page}/${filters}`),
+    serverApiClient.get(`/api/animals/types/${userId}/${labId}`),
+    getAnimalEnums(),
+  ])
 
   return (
     <AnimalContainer
+      animalEnums={animalEnums.data as AnimalEnums}
       animalPagination={animals.pagination}
-      animalEnums={animalEnums.data}
       animalTypes={animalTypes.data}
       animals={animals.data}
       userId={userId}

@@ -1,21 +1,26 @@
 "use server"
 
 import type { ExperimentAnimalRecordRow, ExperimentMetricsData, ExperimentTasksPagePayload } from "../types";
+import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId";
 import { ExperimentContainer } from "./experiment.container";
 import { serverApiClient } from "@/src/lib/serverApiClient";
-import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId";
 interface ExperimentDetailPageProps {
   params: Promise<{
     id: string
     labId: string
   }>
 }
+
+const labAnimalsRows = 500
+const labAnimalsPage = 1
+const initialTasksPageSize = 10
+
 export default async function ExperimentDetailPage({ params }: ExperimentDetailPageProps) {
   const { id: experimentId, labId } = await params;
   const userId = await getServerAuthenticatedUserId()
-  const labAnimalsRows = 500
-  const labAnimalsPage = 1
-  const initialTasksPageSize = 10
+
+  const filters = JSON.stringify({})
+
   const [
     experimentRes,
     laboratoryMembersRes,
@@ -27,7 +32,7 @@ export default async function ExperimentDetailPage({ params }: ExperimentDetailP
     serverApiClient.get(`/api/experiments/unique/${userId}/${labId}/${experimentId}`),
     serverApiClient.get(`/api/laboratory/${userId}/${labId}`),
     serverApiClient.get(
-      `/api/animals/${userId}/${labId}/${labAnimalsRows}/${labAnimalsPage}/${JSON.stringify({})}`,
+      `/api/animals/${userId}/${labId}/${labAnimalsRows}/${labAnimalsPage}/${filters}`,
     ),
     serverApiClient.get(`/api/experiments/unique/${userId}/${labId}/${experimentId}/metrics`).catch(() => ({
       success: false as const,
