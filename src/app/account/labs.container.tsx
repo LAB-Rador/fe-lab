@@ -40,14 +40,10 @@ export default function LaboratoriesContainer({ userLaboratories, initialUser }:
 
     const handleLabClick = useCallback((labId: string) => {
         router.push(`/${labId}/dashboard`)
-    }, [userInfo, router]);
-    
-    const handleJoinLab = useCallback(() => {
-        router.push("/laboratory-setup?tab=join")
     }, [router]);
-
+    
     const handleCreateLab = useCallback(() => {
-        router.push("/laboratory-setup?tab=create")
+        router.push("/laboratory-setup")
     }, [router]);
 
     const handleLogout = useCallback(() => {
@@ -60,7 +56,6 @@ export default function LaboratoriesContainer({ userLaboratories, initialUser }:
             handleCreateLab={handleCreateLab}
             handleLabClick={handleLabClick}
             setSearchTerm={setSearchTerm}
-            handleJoinLab={handleJoinLab}
             handleLogout={handleLogout}
             getInitials={getInitials}
             formatDate={formatDate}

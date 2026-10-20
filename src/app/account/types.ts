@@ -90,7 +90,6 @@ export interface LaboratoriesViewProps {
     filteredLaboratories: Laboratory[] | [];
     handleLabClick: (labId: string) => void;
     handleCreateLab: VoidFunction;
-    handleJoinLab: VoidFunction;
     handleLogout: VoidFunction;
     userInfo: UserInfo | null;
     isLoading: boolean;

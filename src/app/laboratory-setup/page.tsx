@@ -1,12 +1,8 @@
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/src/components/ui/input-otp"
-import React, { Activity, Suspense, useCallback, useMemo, useState } from "react"
-import { Building2, Users, CheckCircle, AlertCircle } from "lucide-react"
-import { Tabs, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
 import { setLaboratory } from "@/src/redux/slices/laboratorySlice"
-import { useRouter, useSearchParams } from "next/navigation"
+import { Building2, CheckCircle, AlertCircle } from "lucide-react"
 import { Textarea } from "@/src/components/ui/textarea"
 import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
@@ -14,27 +10,22 @@ import { Label } from "@/src/components/ui/label"
 import { useAppDispatch } from "@/src/lib/hooks"
 import { apiClient } from "@/src/lib/apiClient"
 import { AuthService } from "@/src/lib/auth"
+import { useRouter } from "next/navigation"
+import { useCallback, useMemo, useState } from "react"
 import { toast } from "sonner"
 
-const LaboratorySetupPage = () => {
+export default function LaboratorySetupPage() {
     const router = useRouter()
-    const searchParams = useSearchParams()
-    const tabFromUrl = searchParams.get('tab')
+    const dispatch = useAppDispatch()
     const [error, setError] = useState("")
     const [success, setSuccess] = useState("")
     const [isLoading, setIsLoading] = useState(false)
-    const [activeTab, setActiveTab] = useState(tabFromUrl && ['create', 'join'].includes(tabFromUrl) ? tabFromUrl : 'create')
-    // Create laboratory form state
     const [laboratoryData, setLaboratoryData] = useState({
         description: "",
         username: "",
         position: "",
         name: "",
     })
-    // Join laboratory state
-    const [invitationCode, setInvitationCode] = useState("");
-
-    const dispatch = useAppDispatch();
 
     const handleLaboratoryInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target
@@ -42,7 +33,7 @@ const LaboratorySetupPage = () => {
             ...prev,
             [name]: value,
         }))
-    }, []);
+    }, [])
 
     const handleCreateLaboratory = useCallback(async (e: React.FormEvent) => {
         e.preventDefault()
@@ -51,76 +42,37 @@ const LaboratorySetupPage = () => {
         setSuccess("")
 
         try {
-            const user = await AuthService.getCurrentUser();
+            const user = await AuthService.getCurrentUser()
 
             if (!user?.userId) {
                 setError("Authentication required. Please sign in again.")
                 return
             }
 
-            const labData = {
+            const response = await apiClient.post("/api/laboratory", {
                 ...laboratoryData,
                 userId: user.userId,
-            }
-            const response = await apiClient.post("/api/laboratory", labData);
-            toast(response.success ? "Success!" : "Error!", {
-                description: response.success ? `${response?.message} - ${response?.data?.name}` : response?.message
             })
-            
-            if(response.success) {
-                dispatch(setLaboratory(response?.data));
-                setSuccess("Laboratory created successfully!");
-                router.push(`/account`);
-            } else {
-                setError(response?.message);
-            }
-        } catch (error) {
-            console.error('Failed to create laboratory:', error);
-            setError("Failed to create laboratory. Please try again.");
-        } finally {
-            setIsLoading(false);
-        }
-    }, [laboratoryData, router]);
-
-    const handleJoinLaboratory = useCallback(async (e: React.FormEvent) => {
-        e.preventDefault()
-        setIsLoading(true)
-        setError("")
-        setSuccess("")
-
-        try {
-            const user = await AuthService.getCurrentUser();
-
-            const userData = {
-                code: invitationCode,
-                userId: user.userId,
-            }
-
-            const response = await apiClient.post("/api/invitation/verification", userData);
             toast(response.success ? "Success!" : "Error!", {
-                description: response.success ? `${response?.message}` : response?.message
+                description: response.success ? `${response?.message} - ${response?.data?.name}` : response?.message,
             })
-            
-            if(response.success) {
-                setSuccess("Congratulations, you have been successfully added to the lab.");
-                router.push(`/account`);
+
+            if (response.success) {
+                dispatch(setLaboratory(response?.data))
+                setSuccess("Laboratory created successfully!")
+                router.push("/account")
             } else {
-                setError(response?.message);
+                setError(response?.message)
             }
-        } catch (err) {
-            setError("Invalid invitation code. Please check and try again.")
+        } catch (createError) {
+            console.error("Failed to create laboratory:", createError)
+            setError("Failed to create laboratory. Please try again.")
         } finally {
             setIsLoading(false)
         }
-    }, [invitationCode, router]);
+    }, [dispatch, laboratoryData, router])
 
-    const isCreateFormValid = useMemo(() => {
-        return laboratoryData.name.trim() !== ""
-    }, [laboratoryData]);
-
-    const isJoinFormValid = useMemo(() => {
-        return invitationCode.length === 6
-    }, [invitationCode]);
+    const isCreateFormValid = useMemo(() => laboratoryData.name.trim() !== "", [laboratoryData])
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -131,38 +83,23 @@ const LaboratorySetupPage = () => {
                     </div>
                     <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Set up your laboratory</h2>
                     <p className="mt-2 text-center text-sm text-gray-600">
-                        Create a new laboratory or join an existing one to get started
+                        Create a laboratory you own. Teammates join from the link in their invitation email.
                     </p>
                 </div>
 
                 <Card className="w-full">
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                    <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="create" className="flex items-center gap-2">
-                        <Building2 className="h-4 w-4" />
-                        Create Laboratory
-                    </TabsTrigger>
-                    <TabsTrigger value="join" className="flex items-center gap-2">
-                        <Users className="h-4 w-4" />
-                        Join Laboratory
-                    </TabsTrigger>
-                    </TabsList>
-
-                    <Activity mode={activeTab === "create" ? "visible" : "hidden"}>
-                        <CardHeader>
-                            <CardTitle>Create New Laboratory</CardTitle>
-                            <CardDescription>
-                            Set up your own laboratory and become the owner. You&apos;ll be able to invite team members and manage all
-                            aspects of your lab.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <form onSubmit={handleCreateLaboratory} className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                    {/* Username */}
-                                    <div className="space-y-2">
-                                        <Label htmlFor="username">Username *</Label>
-                                        <Input
+                    <CardHeader>
+                        <CardTitle>Create New Laboratory</CardTitle>
+                        <CardDescription>
+                            Set up your own laboratory and become the owner. You will be able to invite team members and manage the lab.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <form onSubmit={handleCreateLaboratory} className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="username">Username *</Label>
+                                    <Input
                                         id="username"
                                         name="username"
                                         type="text"
@@ -170,13 +107,11 @@ const LaboratorySetupPage = () => {
                                         placeholder="johndoe"
                                         value={laboratoryData.username}
                                         onChange={handleLaboratoryInputChange}
-                                        />
-                                    </div>
-
-                                    {/* Position */}
-                                    <div className="space-y-2">
-                                        <Label htmlFor="position">Position *</Label>
-                                        <Input
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="position">Position *</Label>
+                                    <Input
                                         id="position"
                                         name="position"
                                         type="text"
@@ -184,157 +119,64 @@ const LaboratorySetupPage = () => {
                                         placeholder="Researchers"
                                         value={laboratoryData.position}
                                         onChange={handleLaboratoryInputChange}
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="name">Laboratory Name *</Label>
-                                    <Input
-                                        id="name"
-                                        name="name"
-                                        type="text"
-                                        required
-                                        placeholder="Advanced Research Laboratory"
-                                        value={laboratoryData.name}
-                                        onChange={handleLaboratoryInputChange}
                                     />
                                 </div>
+                            </div>
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="description">Description</Label>
-                                    <Textarea
-                                        id="description"
-                                        name="description"
-                                        placeholder="Brief description of your laboratory's research focus and activities..."
-                                        value={laboratoryData.description}
-                                        onChange={handleLaboratoryInputChange}
-                                        rows={3}
-                                    />
+                            <div className="space-y-2">
+                                <Label htmlFor="name">Laboratory Name *</Label>
+                                <Input
+                                    id="name"
+                                    name="name"
+                                    type="text"
+                                    required
+                                    placeholder="Advanced Research Laboratory"
+                                    value={laboratoryData.name}
+                                    onChange={handleLaboratoryInputChange}
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="description">Description</Label>
+                                <Textarea
+                                    id="description"
+                                    name="description"
+                                    placeholder="Brief description of your laboratory's research focus and activities..."
+                                    value={laboratoryData.description}
+                                    onChange={handleLaboratoryInputChange}
+                                    rows={3}
+                                />
+                            </div>
+
+                            {error ? (
+                                <div className="bg-red-50 border border-red-200 rounded-md p-4">
+                                    <div className="flex items-center">
+                                        <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
+                                        <p className="text-sm text-red-700">{error}</p>
+                                    </div>
                                 </div>
+                            ) : null}
 
-                                {error && (
-                                    <div className="bg-red-50 border border-red-200 rounded-md p-4">
-                                        <div className="flex items-center">
-                                            <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
-                                            <p className="text-sm text-red-700">{error}</p>
-                                        </div>
+                            {success ? (
+                                <div className="bg-green-50 border border-green-200 rounded-md p-4">
+                                    <div className="flex items-center">
+                                        <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+                                        <p className="text-sm text-green-700">{success}</p>
                                     </div>
-                                )}
-
-                                {success && (
-                                    <div className="bg-green-50 border border-green-200 rounded-md p-4">
-                                        <div className="flex items-center">
-                                            <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
-                                            <p className="text-sm text-green-700">{success}</p>
-                                        </div>
-                                    </div>
-                                )}
-
-                                <Button
-                                    type="submit"
-                                    className="w-full bg-blue-600 hover:bg-blue-700"
-                                    disabled={!isCreateFormValid || isLoading}
-                                >
-                                    {isLoading ? "Creating Laboratory..." : "Create Laboratory"}
-                                </Button>
-                            </form>
-                        </CardContent>
-                    </Activity>
-
-                    <Activity mode={activeTab === "join" ? "visible" : "hidden"}>
-                        <CardHeader>
-                            <CardTitle>Join Existing Laboratory</CardTitle>
-                            <CardDescription>
-                                Enter the 6-digit invitation code provided by your laboratory administrator to join an existing lab.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <form onSubmit={handleJoinLaboratory} className="space-y-6">
-                                <div className="space-y-2">
-                                    <Label htmlFor="invitation-code">Invitation Code</Label>
-                                    <div className="flex justify-center">
-                                    <InputOTP maxLength={6} value={invitationCode} onChange={(value) => setInvitationCode(value)}>
-                                        <InputOTPGroup>
-                                            <InputOTPSlot index={0} />
-                                            <InputOTPSlot index={1} />
-                                            <InputOTPSlot index={2} />
-                                            <InputOTPSlot index={3} />
-                                            <InputOTPSlot index={4} />
-                                            <InputOTPSlot index={5} />
-                                        </InputOTPGroup>
-                                    </InputOTP>
-                                    </div>
-                                    <p className="text-xs text-gray-600 text-center">
-                                        Enter the 6-digit code provided by your laboratory administrator
-                                    </p>
                                 </div>
+                            ) : null}
 
-                                {error && (
-                                    <div className="bg-red-50 border border-red-200 rounded-md p-4">
-                                        <div className="flex items-center">
-                                            <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
-                                            <p className="text-sm text-red-700">{error}</p>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {success && (
-                                    <div className="bg-green-50 border border-green-200 rounded-md p-4">
-                                        <div className="flex items-center">
-                                            <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
-                                            <p className="text-sm text-green-700">{success}</p>
-                                        </div>
-                                    </div>
-                                )}
-
-                                <Button
-                                    type="submit"
-                                    className="w-full bg-blue-600 hover:bg-blue-700"
-                                    disabled={!isJoinFormValid || isLoading}
-                                >
-                                    {isLoading ? "Joining Laboratory..." : "Join Laboratory"}
-                                </Button>
-
-                                <div className="text-center">
-                                    <p className="text-sm text-gray-600">
-                                        Don&apos;t have an invitation code?{" "}
-                                        <button
-                                            type="button"
-                                            onClick={() => setActiveTab("create")}
-                                            className="font-medium text-blue-600 hover:text-blue-500"
-                                        >
-                                            Create your own laboratory
-                                        </button>
-                                    </p>
-                                </div>
-                            </form>
-                        </CardContent>
-                    </Activity>
-                </Tabs>
+                            <Button
+                                type="submit"
+                                className="w-full bg-blue-600 hover:bg-blue-700"
+                                disabled={!isCreateFormValid || isLoading}
+                            >
+                                {isLoading ? "Creating Laboratory..." : "Create Laboratory"}
+                            </Button>
+                        </form>
+                    </CardContent>
                 </Card>
-
-                {/* Help Section */}
-                <div className="text-center">
-                    <div className="bg-gray-50 rounded-md p-4">
-                        <h4 className="text-sm font-medium text-gray-900 mb-2">Need help getting started?</h4>
-                        <p className="text-xs text-gray-600 mb-3">
-                            Our team can help you set up your laboratory and get your team onboarded quickly.
-                        </p>
-                        <Button variant="outline" size="sm">
-                            Contact Support
-                        </Button>
-                    </div>
-                </div>
             </div>
         </div>
     )
 }
-
-const Page = () => (
-    <Suspense fallback={<div>Загрузка...</div>}>
-      <LaboratorySetupPage />
-    </Suspense>
-  );
-  
-  export default Page;
