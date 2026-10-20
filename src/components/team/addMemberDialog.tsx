@@ -48,6 +48,18 @@ export const AddMemberDialog = (props: AddMemberDialogProps) => {
                         </Select>
                     </div>
                     <div className="grid gap-2">
+                        <Label htmlFor="fullName">Full name *</Label>
+                        <Input
+                            id="fullName"
+                            type="text"
+                            placeholder="Jane Smith"
+                            value={newMember.fullName}
+                            onChange={(e) =>
+                                setNewMember({ ...newMember, fullName: e.target.value })
+                            }
+                        />
+                    </div>
+                    <div className="grid gap-2">
                         <Label htmlFor="email">Email *</Label>
                         <Input
                             id="email"
@@ -69,7 +81,8 @@ export const AddMemberDialog = (props: AddMemberDialogProps) => {
                         onClick={handleAddMember}
                         disabled={
                             !newMember.role ||
-                            !newMember.email
+                            !newMember.email ||
+                            !newMember.fullName.trim()
                         }
                     >
                         <Plus className="mr-2 h-4 w-4" />

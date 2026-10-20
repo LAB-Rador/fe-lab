@@ -7,7 +7,7 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
   // Публичные страницы, которые не требуют авторизации
-  const publicPaths = ['/signin', '/signup', '/forgot-password', '/'];
+  const publicPaths = ['/signin', '/auth/magic', '/'];
   
   if (publicPaths.includes(pathname)) {
     return NextResponse.next();

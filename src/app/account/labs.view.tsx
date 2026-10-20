@@ -1,6 +1,7 @@
-import { Building2, Plus, Users, Calendar, MapPin, Mail, User, ChevronRight, Search, BriefcaseBusiness, LogOut } from "lucide-react"
+import { Building2, Plus, Calendar, MapPin, Mail, User, ChevronRight, Search, BriefcaseBusiness, LogOut, Phone } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { Avatar, AvatarFallback } from "@/src/components/ui/avatar"
+import { ProfileDialog } from "./profile-dialog"
 import type { LaboratoriesViewProps } from "./types"
 import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
@@ -10,9 +11,15 @@ export default function LaboratoriesView(
     {
         filteredLaboratories,
         handleCreateLab,
+        handleSaveProfile,
         handleLabClick,
+        setProfileDraft,
+        setProfileOpen,
         setSearchTerm,
-        handleJoinLab,
+        profileSaving,
+        profileDraft,
+        profileError,
+        profileOpen,
         handleLogout,
         getInitials,
         formatDate,
@@ -95,6 +102,12 @@ export default function LaboratoriesView(
                                             {userInfo.address}
                                         </div>
                                     )}
+                                    {userInfo?.contactPhone && (
+                                        <div className="flex items-center">
+                                            <Phone className="h-4 w-4 mr-1" />
+                                            {userInfo.contactPhone}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -109,9 +122,12 @@ export default function LaboratoriesView(
                                 <LogOut className="h-4 w-4 mr-2" aria-hidden />
                                 Logout
                             </Button>
-                            <Button onClick={handleJoinLab} variant="outline" className="flex items-center">
-                                <Users className="h-4 w-4 mr-2" />
-                                Join Lab
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => setProfileOpen(true)}
+                            >
+                                Edit profile
                             </Button>
                             <Button onClick={handleCreateLab} className="bg-blue-600 hover:bg-blue-700 flex items-center">
                                 <Plus className="h-4 w-4 mr-2" />
@@ -155,13 +171,9 @@ export default function LaboratoriesView(
                     <p className="mt-1 text-sm text-gray-500">
                         {searchTerm
                             ? "Try adjusting your search terms."
-                            : "Get started by creating a new laboratory or joining an existing one."}
+                            : "Get started by creating a new laboratory."}
                     </p>
-                    <div className="mt-6 flex justify-center space-x-3">
-                        <Button onClick={handleJoinLab} variant="outline">
-                            <Users className="h-4 w-4 mr-2" />
-                            Join Lab
-                        </Button>
+                    <div className="mt-6 flex justify-center">
                         <Button onClick={handleCreateLab} className="bg-blue-600 hover:bg-blue-700">
                             <Plus className="h-4 w-4 mr-2" />
                             Create New Lab
@@ -218,6 +230,15 @@ export default function LaboratoriesView(
                 </div>
                 )}
             </div>
+            <ProfileDialog
+                setProfileDraft={setProfileDraft}
+                handleSaveProfile={handleSaveProfile}
+                setProfileOpen={setProfileOpen}
+                profileSaving={profileSaving}
+                profileDraft={profileDraft}
+                profileError={profileError}
+                profileOpen={profileOpen}
+            />
         </div>
     )
 }

@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/src/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/src/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/src/components/ui/avatar"
 import type { InitialMembersTypes } from "@/src/app/[labId]/team/types"
 import { decreaseUnread, setUnreadCount } from "@/src/redux/slices/notificationsSlice"
 import { useAppDispatch, useAppSelector } from "@/src/lib/hooks"
@@ -23,8 +23,10 @@ import {
   typeIcon,
 } from "@/src/components/tasks/notifications"
 import { apiClient } from "@/src/lib/apiClient"
+import { AuthService } from "@/src/lib/auth"
 import { Bell, Clock, Search } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useCallback, useEffect, useLayoutEffect, useState } from "react"
 
 export function DashboardHeader({
@@ -40,6 +42,7 @@ export function DashboardHeader({
   initialUnreadNotifications?: AppNotification[]
   unreadNotificationsCount?: number
 }) {
+  const router = useRouter()
   const dispatch = useAppDispatch()
   const unreadFromRedux = useAppSelector((s) => s.notifications.unreadCount)
   const [notifMenuOpen, setNotifMenuOpen] = useState(false)
@@ -118,27 +121,41 @@ export function DashboardHeader({
         </form>
       </div>
       <div className="flex items-center gap-4">
-        <div className="*:data-[slot=avatar]:ring-background flex space-x-1 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
+        <div className="flex space-x-1">
           {laboratoryMembers.map((member) => {
+            const initials = getInitials(member.user.firstName || "", member.user.lastName || "")
+            const isCurrentUser = member.userId === userId || member.user.id === userId
+            const avatar = (
+              <Avatar className="h-10 w-10">
+                <AvatarFallback className="bg-blue-600 text-white text-lg font-semibold">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+            )
+            if (!isCurrentUser) {
+              return (
+                <div key={member.id} className="flex h-10 w-10 items-center justify-center" aria-hidden>
+                  {avatar}
+                </div>
+              )
+            }
             return (
               <DropdownMenu key={member.id}>
                 <DropdownMenuTrigger asChild>
-                  <Button disabled variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-10 w-10">
-                        <AvatarFallback className="bg-blue-600 text-white text-lg font-semibold">
-                          {getInitials(member.user.firstName || "", member.user.lastName || "")}
-                        </AvatarFallback>
-                    </Avatar>
+                  <Button type="button" variant="ghost" className="relative h-10 w-10 rounded-full p-0" aria-label="My account">
+                    {avatar}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>Profile</DropdownMenuItem>
-                  <DropdownMenuItem>Settings</DropdownMenuItem>
-                  <DropdownMenuItem>Subscription</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => router.push("/account")}>Profile</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => router.push(`/${labId}/settings`)}>Settings</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => router.push(`/${labId}/settings?tab=subscription`)}>
+                    Subscription
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>Log out</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => AuthService.logout()}>Log out</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             )

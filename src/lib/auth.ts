@@ -1,5 +1,4 @@
 import Cookies from 'js-cookie';
-import { CONFIRMED_EMAIL } from './variables';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_LOCAL_DATABASE_URL || process.env.NEXT_PUBLIC_DATABASE_URL;
 
@@ -7,19 +6,8 @@ const USER_ID_COOKIE = 'USER_ID';
 
 export class AuthService {
   static TOKEN_KEY = 'auth-token';
-  
-  // Сохранение токена в cookies (безопаснее чем localStorage)
-  static setToken(token: string) {
-    Cookies.set(this.TOKEN_KEY, token, {
-      expires: 1, // 1 день
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict'
-    });
-  }
-  
-  // Получение токена
-  static getToken() {
 
+  static getToken() {
     return Cookies.get(this.TOKEN_KEY);
   }
   
@@ -28,37 +16,9 @@ export class AuthService {
     Cookies.remove(this.TOKEN_KEY);
   }
   
-  // Логин
-  static async login(email: string, password: string) {
-    try {
-      const dataSuccess = {email, password}
-      const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(dataSuccess),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Login failed');
-      }
-      
-      const data = await response.json();
-      this.setToken(data.accessToken);
-      
-      return data;
-    } catch (error) {
-      throw error;
-    }
-  }
-  
-  // Логаут
   static logout() {
     this.removeToken();
     Cookies.remove(USER_ID_COOKIE, { path: '/' });
-    Cookies.remove(CONFIRMED_EMAIL, { path: '/' });
     window.location.href = '/signin';
   }
   

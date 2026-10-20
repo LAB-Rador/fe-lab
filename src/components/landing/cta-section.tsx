@@ -34,7 +34,7 @@ export function CTASection() {
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Button 
                             onClick={() => {
-                                router.push('/signup');
+                                router.push('/signin');
                             }}
                             size="lg" 
                             className="bg-white text-[#2563EB] hover:bg-gray-100 px-8 py-3"

@@ -1,11 +1,14 @@
 "use client"
 
+import { Suspense } from "react"
 import LaboratorySettings from "./laboratory-settings"
 
 export default function Page() {
     return (
         <div>
-            <LaboratorySettings />
+            <Suspense>
+                <LaboratorySettings />
+            </Suspense>
         </div>
     )
 }

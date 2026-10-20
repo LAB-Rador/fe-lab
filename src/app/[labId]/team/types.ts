@@ -30,6 +30,7 @@ export interface InitialMembersTypes {
 
 export interface NewMemberTypes {
     email: string;
+    fullName: string;
     role: string;
 }
 
