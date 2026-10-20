@@ -1,4 +1,4 @@
-import type { SetStateAction } from "react"
+import type { Dispatch, SetStateAction } from "react"
 
 export enum Role {
     VETERINARIAN = "VETERINARIAN",
@@ -83,14 +83,29 @@ export interface LaboratoriesContainerProps {
     initialUser: UserInfo;
 }
 
+export interface ProfileDraft {
+    firstName: string
+    lastName: string
+    institution: string
+    contactPhone: string
+    address: string
+}
+
 export interface LaboratoriesViewProps {
     getInitials: (firstName: string, lastName: string) => string;
-    setSearchTerm: React.Dispatch<SetStateAction<string>>;
+    setSearchTerm: Dispatch<SetStateAction<string>>;
     formatDate: (date: Date | string) => string
     filteredLaboratories: Laboratory[] | [];
     handleLabClick: (labId: string) => void;
     handleCreateLab: VoidFunction;
+    handleSaveProfile: () => void;
     handleLogout: VoidFunction;
+    setProfileOpen: (open: boolean) => void;
+    setProfileDraft: Dispatch<SetStateAction<ProfileDraft>>;
+    profileDraft: ProfileDraft;
+    profileError: string;
+    profileSaving: boolean;
+    profileOpen: boolean;
     userInfo: UserInfo | null;
     isLoading: boolean;
     searchTerm: string;

@@ -26,6 +26,7 @@ export default function TeamContainer(props: TeamContainerProps) {
     const [searchQuery, setSearchQuery] = useState("");
     const [newMember, setNewMember] = useState({
         email: "",
+        fullName: "",
         role: "",
     });
 
@@ -46,9 +47,10 @@ export default function TeamContainer(props: TeamContainerProps) {
   // Handle add member
   const handleAddMember = useCallback(async () => {
     try {
-      if ( newMember.role && newMember.email ) {
+      if ( newMember.role && newMember.email && newMember.fullName.trim() ) {
         const member = {
           email: newMember.email,
+          fullName: newMember.fullName,
           role: newMember.role,
           invitedBy: userId,
           labId: labId,
@@ -62,6 +64,7 @@ export default function TeamContainer(props: TeamContainerProps) {
           setIsAddDialogOpen(false);
           setNewMember({
             role: "",
+            fullName: "",
             email: "",
           });
         }

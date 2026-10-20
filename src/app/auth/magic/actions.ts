@@ -12,7 +12,7 @@ type ConsumeResult = {
     message?: string
     error?: string
     accessToken?: string
-    user?: { userId: string }
+    user?: { userId: string; firstName?: string | null }
     laboratory?: unknown
     joinedLaboratory?: { id: string; name: string } | null
 }
@@ -42,6 +42,10 @@ export async function consumeMagicLinkFormAction(
 
     if (data.joinedLaboratory?.name) {
         redirect(`/${encodeURIComponent(data.joinedLaboratory.name)}/dashboard`)
+    }
+
+    if (!data.user.firstName) {
+        redirect("/account")
     }
 
     redirect(data.laboratory ? "/account" : "/laboratory-setup")
