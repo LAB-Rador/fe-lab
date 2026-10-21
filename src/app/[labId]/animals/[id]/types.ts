@@ -56,6 +56,17 @@ export interface Animal {
     archivedAt?: string | null;
 }
 
+export interface MedicalRecord {
+    id: string;
+    date: string;
+    recordType: string;
+    notes: string | null;
+    createdBy: {
+        firstName: string | null;
+        lastName: string | null;
+    } | null;
+}
+
 export interface AnimalRecord {
     activityLevel: string;
     animalId: string;

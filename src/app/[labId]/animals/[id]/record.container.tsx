@@ -2,13 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { AnimalGenealogy } from "@/src/app/[labId]/breeding/types";
-import { type Animal, AnimalTabsName } from "./types";
+import { type Animal, AnimalTabsName, type MedicalRecord } from "./types";
 import AnimalDetailPage from "./animal.record.view";
 import type { AnimalPagination } from "../types";
 import { apiClient } from "@/src/lib/apiClient";
 import { toast } from "sonner";
 
 export interface RecordContainerProps {
+    medicalRecords: MedicalRecord[];
     genealogy: AnimalGenealogy;
     animalPagination: AnimalPagination;
     animalId: string;
@@ -17,7 +18,7 @@ export interface RecordContainerProps {
     labId: string;
 }
 
-export default function RecordContainer({userId, labId, animalId, animal, animalPagination, genealogy}: RecordContainerProps) {
+export default function RecordContainer({userId, labId, animalId, animal, animalPagination, genealogy, medicalRecords}: RecordContainerProps) {
     const [activeTab, setActiveTab] = useState<AnimalTabsName>(AnimalTabsName.BASIC_INFO);
     const [pagination, setPagination] = useState<AnimalPagination>(animalPagination);
     const [animalData, setAnimalData] = useState(animal);
@@ -90,6 +91,7 @@ export default function RecordContainer({userId, labId, animalId, animal, animal
             pagination={pagination}
             activeTab={activeTab}
             animalId={animalId}
+            medicalRecords={medicalRecords}
             genealogy={genealogy}
             animal={animalData}
             userId={userId}
