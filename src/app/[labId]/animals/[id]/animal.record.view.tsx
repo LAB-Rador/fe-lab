@@ -9,6 +9,7 @@ import { AnimalGenealogy } from "@/src/components/animals/animal/animal-genealog
 import { QuickActionPanel } from "@/src/components/animals/quick-action-panel"
 import { Tabs, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
 import { Avatar, AvatarFallback } from "@/src/components/ui/avatar"
+import type { AnimalGenealogy as AnimalGenealogyData } from "@/src/app/[labId]/breeding/types"
 import { AnimalTabsName, type Animal } from "./types"
 import { Button } from "@/src/components/ui/button"
 import { Badge } from "@/src/components/ui/badge"
@@ -25,12 +26,13 @@ export interface AnimalDetailPageProps {
     pagination: AnimalPagination;
     activeTab: AnimalTabsName;
     animalId: string;
+    genealogy: AnimalGenealogyData;
     animal: Animal;
     userId: string;
     labId: string;
 }
 
-export default function AnimalDetailPage({userId, labId, animalId, animal, handleUpdateDataPagination, pagination, handleArchiveAnimal, handleUnarchiveAnimal, activeTab, setActiveTab}: AnimalDetailPageProps) {
+export default function AnimalDetailPage({userId, labId, animalId, animal, genealogy, handleUpdateDataPagination, pagination, handleArchiveAnimal, handleUnarchiveAnimal, activeTab, setActiveTab}: AnimalDetailPageProps) {
   const router = useRouter();
 
   return (
@@ -171,7 +173,7 @@ export default function AnimalDetailPage({userId, labId, animalId, animal, handl
               </Activity>
 
               <Activity mode={activeTab === AnimalTabsName.GENEALOGY ? "visible" : "hidden"}>
-                <AnimalGenealogy animalId={animal.id || ""} />
+                <AnimalGenealogy labId={labId} genealogy={genealogy} />
               </Activity>
             </Tabs>
           </div>
