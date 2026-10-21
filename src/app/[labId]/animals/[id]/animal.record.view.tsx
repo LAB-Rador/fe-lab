@@ -10,7 +10,7 @@ import { QuickActionPanel } from "@/src/components/animals/quick-action-panel"
 import { Tabs, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
 import { Avatar, AvatarFallback } from "@/src/components/ui/avatar"
 import type { AnimalGenealogy as AnimalGenealogyData } from "@/src/app/[labId]/breeding/types"
-import { AnimalTabsName, type Animal } from "./types"
+import { AnimalTabsName, type Animal, type MedicalRecord } from "./types"
 import { Button } from "@/src/components/ui/button"
 import { Badge } from "@/src/components/ui/badge"
 import type { AnimalPagination } from "../types"
@@ -26,13 +26,14 @@ export interface AnimalDetailPageProps {
     pagination: AnimalPagination;
     activeTab: AnimalTabsName;
     animalId: string;
+    medicalRecords: MedicalRecord[];
     genealogy: AnimalGenealogyData;
     animal: Animal;
     userId: string;
     labId: string;
 }
 
-export default function AnimalDetailPage({userId, labId, animalId, animal, genealogy, handleUpdateDataPagination, pagination, handleArchiveAnimal, handleUnarchiveAnimal, activeTab, setActiveTab}: AnimalDetailPageProps) {
+export default function AnimalDetailPage({userId, labId, animalId, animal, genealogy, medicalRecords, handleUpdateDataPagination, pagination, handleArchiveAnimal, handleUnarchiveAnimal, activeTab, setActiveTab}: AnimalDetailPageProps) {
   const router = useRouter();
 
   return (
@@ -165,7 +166,7 @@ export default function AnimalDetailPage({userId, labId, animalId, animal, genea
               </Activity>
 
               <Activity mode={activeTab === AnimalTabsName.MEDICAL_RECORDS ? "visible" : "hidden"}>
-                <AnimalMedicalRecords animalId={animal.id || ""} />
+                <AnimalMedicalRecords labId={labId} animalId={animalId} records={medicalRecords} />
               </Activity>
 
               <Activity mode={activeTab === AnimalTabsName.EXPERIMENTS ? "visible" : "hidden"}>
