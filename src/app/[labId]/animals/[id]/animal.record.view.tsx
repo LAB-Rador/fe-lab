@@ -28,12 +28,13 @@ export interface AnimalDetailPageProps {
     animalId: string;
     medicalRecords: MedicalRecord[];
     genealogy: AnimalGenealogyData;
+    recentRecords: Animal["records"];
     animal: Animal;
     userId: string;
     labId: string;
 }
 
-export default function AnimalDetailPage({userId, labId, animalId, animal, genealogy, medicalRecords, handleUpdateDataPagination, pagination, handleArchiveAnimal, handleUnarchiveAnimal, activeTab, setActiveTab}: AnimalDetailPageProps) {
+export default function AnimalDetailPage({userId, labId, animalId, animal, genealogy, medicalRecords, recentRecords, handleUpdateDataPagination, pagination, handleArchiveAnimal, handleUnarchiveAnimal, activeTab, setActiveTab}: AnimalDetailPageProps) {
   const router = useRouter();
 
   return (
@@ -184,6 +185,8 @@ export default function AnimalDetailPage({userId, labId, animalId, animal, genea
               labId={labId}
               animalId={animal.id || ""}
               userId={userId}
+              recentRecords={recentRecords}
+              onViewAllActivity={() => setActiveTab(AnimalTabsName.MEASUREMENTS)}
               linkedExperimentIds={(animal.experimentAnimals ?? []).map((ea) => ea.experimentId)}
             />
           </div>

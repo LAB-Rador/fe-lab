@@ -1,6 +1,7 @@
 "use client"
 
 import { QuickActionRecentActivityCard } from "@/src/components/animals/quick-action-recent-activity-card"
+import type { AnimalRecord } from "@/src/app/[labId]/animals/[id]/types"
 import { AlertCircle, Clipboard, FileText, Microscope, Pill, Stethoscope, Weight } from "lucide-react"
 import { AddToExperimentDialog } from "@/src/components/animals/add-to-experiment-dialog"
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
@@ -10,6 +11,8 @@ import Link from "next/link"
 
 interface QuickActionPanelProps {
   linkedExperimentIds: string[]
+  recentRecords: AnimalRecord[]
+  onViewAllActivity: () => void
   animalId: string
   userId: string
   labId: string
@@ -20,6 +23,8 @@ export function QuickActionPanel({
   labId,
   userId,
   linkedExperimentIds,
+  recentRecords,
+  onViewAllActivity,
 }: QuickActionPanelProps) {
   const [addToExperimentOpen, setAddToExperimentOpen] = useState(false)
 
@@ -83,7 +88,7 @@ export function QuickActionPanel({
         </CardContent>
       </Card>
 
-      <QuickActionRecentActivityCard />
+      <QuickActionRecentActivityCard records={recentRecords} onViewAll={onViewAllActivity} />
     </div>
   )
 }

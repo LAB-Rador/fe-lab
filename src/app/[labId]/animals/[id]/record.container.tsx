@@ -22,6 +22,7 @@ export default function RecordContainer({userId, labId, animalId, animal, animal
     const [activeTab, setActiveTab] = useState<AnimalTabsName>(AnimalTabsName.BASIC_INFO);
     const [pagination, setPagination] = useState<AnimalPagination>(animalPagination);
     const [animalData, setAnimalData] = useState(animal);
+    const [recentRecords, setRecentRecords] = useState(() => (animal.records ?? []).slice(0, 4));
 
     const paginationRef = useRef(pagination)
     paginationRef.current = pagination
@@ -29,6 +30,7 @@ export default function RecordContainer({userId, labId, animalId, animal, animal
     useEffect(() => {
         setPagination(animalPagination)
         setAnimalData(animal)
+        setRecentRecords((animal.records ?? []).slice(0, 4))
     }, [animalPagination, animal])
 
     const fetchAnimalPage = useCallback(
@@ -38,6 +40,9 @@ export default function RecordContainer({userId, labId, animalId, animal, animal
             )
             setPagination(response.pagination)
             setAnimalData(response.data)
+            if ((page ?? 1) === 1) {
+                setRecentRecords((response.data?.records ?? []).slice(0, 4))
+            }
             return response
         },
         [userId, labId, animalId]
@@ -93,6 +98,7 @@ export default function RecordContainer({userId, labId, animalId, animal, animal
             animalId={animalId}
             medicalRecords={medicalRecords}
             genealogy={genealogy}
+            recentRecords={recentRecords}
             animal={animalData}
             userId={userId}
             labId={labId}
