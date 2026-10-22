@@ -82,6 +82,10 @@ export interface AnimalRecord {
     updatedAt: string;
     waterIntake: number;
     weight: number;
+    createdBy?: {
+        firstName: string | null;
+        lastName: string | null;
+    } | null;
 }
 
 export interface AnimalRecordMeasurement {
