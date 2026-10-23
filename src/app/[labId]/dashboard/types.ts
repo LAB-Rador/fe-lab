@@ -1,3 +1,4 @@
+import type { AppNotification } from "@/src/components/tasks/notifications"
 import type { AnimalStatus, AnimalType, ExperimentStatus, Laboratory, Sex } from "../../account/types";
 
 export interface PageProps {
@@ -61,6 +62,7 @@ export interface UpcomingEvent {
 }
 
 export interface DashboardViewProps {
+    notifications: AppNotification[];
     upcomingEvents: UpcomingEvent[];
     experiments: Experiment[];
     animals: Animal[];
@@ -73,6 +75,7 @@ export interface DashboardViewProps {
 }
 
 export interface DashboardContainerProps {
+    notifications: AppNotification[];
     experiments: Experiment[];
     animals: Animal[];
     tasks: Task[];
