@@ -17,14 +17,7 @@ function asArray<T>(value: unknown): T[] {
     return []
 }
 
-export default async function ReportsPage({
-    params,
-}: {
-    params: Promise<{ labId: string }>
-}) {
-    const { labId } = await params
-    const userId = await getServerAuthenticatedUserId()
-
+async function loadReports(userId: string, labId: string): Promise<LaboratoryReports> {
     try {
         const response = await serverApiClient.get(`/api/reports/${userId}/${labId}`)
         if (
@@ -35,18 +28,12 @@ export default async function ReportsPage({
             response.data &&
             typeof response.data === "object"
         ) {
-            return (
-                <ReportsContainer
-                    labId={labId}
-                    reports={response.data as LaboratoryReports}
-                />
-            )
+            return response.data as LaboratoryReports
         }
     } catch {
         /* fall through to existing laboratory endpoints */
     }
 
-    let reports = emptyLaboratoryReports()
     try {
         const filters = JSON.stringify({})
         const [animalsRes, experimentsRes, tasksRes, breedingsRes, membersRes] =
@@ -60,7 +47,7 @@ export default async function ReportsPage({
                 serverApiClient.get(`/api/laboratory/${userId}/${labId}`).catch(() => ({ data: [] })),
             ])
 
-        reports = aggregateLaboratoryReports({
+        return aggregateLaboratoryReports({
             animals: asArray(animalsRes?.data),
             experiments: asArray(experimentsRes?.data),
             tasks: asArray(tasksRes?.data),
@@ -69,8 +56,18 @@ export default async function ReportsPage({
             recordCount: 0,
         })
     } catch {
-        reports = emptyLaboratoryReports()
+        return emptyLaboratoryReports()
     }
+}
+
+export default async function ReportsPage({
+    params,
+}: {
+    params: Promise<{ labId: string }>
+}) {
+    const { labId } = await params
+    const userId = await getServerAuthenticatedUserId()
+    const reports = await loadReports(userId, labId)
 
     return <ReportsContainer labId={labId} reports={reports} />
 }
