@@ -4,7 +4,7 @@ import type { AppNotification } from "@/src/components/tasks/notifications";
 import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId";
 import { serverApiClient } from "@/src/lib/serverApiClient";
 import DashboardContainer from "./deshboard.container";
-import type { PageProps } from "./types";
+import type { LaboratorySubscription, PageProps } from "./types";
 
 export default async function Page ({params}: PageProps) {
   const {labId} = await params;
@@ -29,8 +29,27 @@ export default async function Page ({params}: PageProps) {
       ? notificationsRes.data
       : []
 
+  let laboratorySubscription: LaboratorySubscription = { memberCount: 0, subscription: null }
+  try {
+    const subscriptionRes = await serverApiClient.get(`/api/subscriptions/${userId}/${labId}`)
+    if (
+      subscriptionRes &&
+      typeof subscriptionRes === "object" &&
+      "success" in subscriptionRes &&
+      subscriptionRes.success &&
+      subscriptionRes.data &&
+      typeof subscriptionRes.data === "object" &&
+      "memberCount" in subscriptionRes.data
+    ) {
+      laboratorySubscription = subscriptionRes.data
+    }
+  } catch {
+    laboratorySubscription = { memberCount: 0, subscription: null }
+  }
+
   return (
     <DashboardContainer 
+      laboratorySubscription={laboratorySubscription}
       notifications={notifications}
       experiments={experiments.data}
       animals={animals.data}

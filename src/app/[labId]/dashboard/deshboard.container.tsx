@@ -43,7 +43,7 @@ function upcomingEventsFrom(experiments: Experiment[], tasks: Task[]): UpcomingE
     return events.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 }
 
-const DashboardContainer = ({animals, experiments, tasks, notifications}: DashboardContainerProps) => {
+const DashboardContainer = ({animals, experiments, tasks, notifications, laboratorySubscription}: DashboardContainerProps) => {
     const [experimentsData, setExperimentsData] = useState<Experiment[] | []>(experiments);
     const [animalsData, setAnimalsData] = useState<Animal[] | []>(animals);
     const [tasksData, setTasksData] = useState<Task[] | []>(tasks);
@@ -91,6 +91,7 @@ const DashboardContainer = ({animals, experiments, tasks, notifications}: Dashbo
     return (
         <DashboardView 
             previousMonthData={previousMonthData}
+            laboratorySubscription={laboratorySubscription}
             notifications={notifications}
             upcomingEvents={upcomingEvents}
             experiments={experimentsData}
