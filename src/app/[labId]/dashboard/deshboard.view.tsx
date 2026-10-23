@@ -7,7 +7,7 @@ import { DashboardStatus } from "@/src/components/dashboard/dashboard-status"
 import { UpcomingEvents } from "@/src/components/dashboard/upcoming-events"
 import type { DashboardViewProps } from "./types"
 
-export default function DashboardView({animals, experiments, tasks, previousMonthData, upcomingEvents, notifications}: DashboardViewProps) {
+export default function DashboardView({animals, experiments, tasks, previousMonthData, upcomingEvents, notifications, laboratorySubscription}: DashboardViewProps) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -57,7 +57,7 @@ export default function DashboardView({animals, experiments, tasks, previousMont
           </CardContent>
         </Card>
       </div>
-      <SubscriptionStatus />
+      <SubscriptionStatus laboratorySubscription={laboratorySubscription} />
     </div>
   )
 }

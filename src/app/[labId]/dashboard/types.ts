@@ -61,7 +61,26 @@ export interface UpcomingEvent {
     date: string;
 }
 
+export interface LaboratorySubscription {
+    memberCount: number;
+    subscription: {
+        id: string;
+        status: string;
+        startDate: string;
+        endDate: string;
+        maxUsers: number;
+        autoRenew: boolean;
+        plan: {
+            name: string;
+            price: number;
+            currency: string;
+            billingCycle: string;
+        };
+    } | null;
+}
+
 export interface DashboardViewProps {
+    laboratorySubscription: LaboratorySubscription;
     notifications: AppNotification[];
     upcomingEvents: UpcomingEvent[];
     experiments: Experiment[];
@@ -75,6 +94,7 @@ export interface DashboardViewProps {
 }
 
 export interface DashboardContainerProps {
+    laboratorySubscription: LaboratorySubscription;
     notifications: AppNotification[];
     experiments: Experiment[];
     animals: Animal[];
