@@ -53,7 +53,15 @@ export interface Task {
     id: string;
 }
 
+export interface UpcomingEvent {
+    id: string;
+    title: string;
+    type: "experiment" | "task";
+    date: string;
+}
+
 export interface DashboardViewProps {
+    upcomingEvents: UpcomingEvent[];
     experiments: Experiment[];
     animals: Animal[];
     tasks: Task[];
