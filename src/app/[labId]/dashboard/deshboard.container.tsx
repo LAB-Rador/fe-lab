@@ -1,8 +1,47 @@
 "use client"
 
-import type { Animal, DashboardContainerProps, Experiment, Task } from "./types";
+import type { Animal, DashboardContainerProps, Experiment, Task, UpcomingEvent } from "./types";
 import DashboardView from "./deshboard.view";
 import { useMemo, useState } from "react";
+
+const weekMs = 7 * 24 * 60 * 60 * 1000;
+
+function inNextSevenDays(value: string | null | undefined, start: Date, end: Date) {
+    if (!value) return false;
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return false;
+    return date >= start && date < end;
+}
+
+function upcomingEventsFrom(experiments: Experiment[], tasks: Task[]): UpcomingEvent[] {
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(start.getTime() + weekMs);
+    const events: UpcomingEvent[] = [];
+
+    for (const experiment of experiments) {
+        if (experiment.status === "COMPLETED" || experiment.status === "CANCELLED") continue;
+        if (!inNextSevenDays(experiment.startDate, start, end)) continue;
+        events.push({
+            id: `experiment-${experiment.id}`,
+            title: experiment.title,
+            type: "experiment",
+            date: experiment.startDate,
+        });
+    }
+
+    for (const task of tasks) {
+        if (!inNextSevenDays(task.dueDate, start, end)) continue;
+        events.push({
+            id: `task-${task.id}`,
+            title: task.title,
+            type: "task",
+            date: task.dueDate,
+        });
+    }
+
+    return events.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+}
 
 const DashboardContainer = ({animals, experiments, tasks}: DashboardContainerProps) => {
     const [experimentsData, setExperimentsData] = useState<Experiment[] | []>(experiments);
@@ -47,9 +86,12 @@ const DashboardContainer = ({animals, experiments, tasks}: DashboardContainerPro
         }
     }, [animalsData, experimentsData, tasksData, now]);
 
+    const upcomingEvents = upcomingEventsFrom(experimentsData, tasksData);
+
     return (
         <DashboardView 
             previousMonthData={previousMonthData}
+            upcomingEvents={upcomingEvents}
             experiments={experimentsData}
             animals={animalsData}
             tasks={tasksData}
