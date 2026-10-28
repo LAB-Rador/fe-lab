@@ -1,64 +1,7 @@
 import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId"
 import { serverApiClient } from "@/src/lib/serverApiClient"
-import { aggregateLaboratoryReports } from "./aggregate-reports"
 import ReportsContainer from "./reports.container"
-import { emptyLaboratoryReports, type LaboratoryReports } from "./types"
-
-function asArray<T>(value: unknown): T[] {
-    if (Array.isArray(value)) return value as T[]
-    if (
-        value &&
-        typeof value === "object" &&
-        "items" in value &&
-        Array.isArray((value as { items: unknown }).items)
-    ) {
-        return (value as { items: T[] }).items
-    }
-    return []
-}
-
-async function loadReports(userId: string, labId: string): Promise<LaboratoryReports> {
-    try {
-        const response = await serverApiClient.get(`/api/reports/${userId}/${labId}`)
-        if (
-            response &&
-            typeof response === "object" &&
-            "success" in response &&
-            response.success &&
-            response.data &&
-            typeof response.data === "object"
-        ) {
-            return response.data as LaboratoryReports
-        }
-    } catch {
-        /* fall through to existing laboratory endpoints */
-    }
-
-    try {
-        const filters = JSON.stringify({})
-        const [animalsRes, experimentsRes, tasksRes, breedingsRes, membersRes] =
-            await Promise.all([
-                serverApiClient.get(`/api/animals/${userId}/${labId}/999999/1/${filters}`),
-                serverApiClient.get(`/api/experiments/${userId}/${labId}`),
-                serverApiClient.get(
-                    `/api/tasks/laboratory/${userId}/${labId}?page=1&pageSize=500`,
-                ),
-                serverApiClient.get(`/api/breedings/${userId}/${labId}`).catch(() => ({ data: [] })),
-                serverApiClient.get(`/api/laboratory/${userId}/${labId}`).catch(() => ({ data: [] })),
-            ])
-
-        return aggregateLaboratoryReports({
-            animals: asArray(animalsRes?.data),
-            experiments: asArray(experimentsRes?.data),
-            tasks: asArray(tasksRes?.data),
-            breedingCount: asArray(breedingsRes?.data).length,
-            memberCount: asArray(membersRes?.data).length,
-            recordCount: 0,
-        })
-    } catch {
-        return emptyLaboratoryReports()
-    }
-}
+import type { ReportsCatalog } from "./types"
 
 export default async function ReportsPage({
     params,
@@ -67,7 +10,28 @@ export default async function ReportsPage({
 }) {
     const { labId } = await params
     const userId = await getServerAuthenticatedUserId()
-    const reports = await loadReports(userId, labId)
 
-    return <ReportsContainer labId={labId} reports={reports} />
+    let catalog: ReportsCatalog | null = null
+    let error: string | null = null
+    try {
+        const response = await serverApiClient.get(`/api/reports/${userId}/${labId}`)
+        if (
+            response &&
+            typeof response === "object" &&
+            "success" in response &&
+            response.success &&
+            response.data &&
+            typeof response.data === "object" &&
+            "fields" in response.data &&
+            "reports" in response.data
+        ) {
+            catalog = response.data as ReportsCatalog
+        } else {
+            error = "Could not load reports."
+        }
+    } catch (cause) {
+        error = cause instanceof Error ? cause.message : "Could not load reports."
+    }
+
+    return <ReportsContainer userId={userId} labId={labId} catalog={catalog} error={error} />
 }
