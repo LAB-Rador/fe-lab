@@ -84,7 +84,6 @@ export default function ReportsView({
     result,
     page,
     pageSize,
-    notice,
     busy,
     onNew,
     onOpen,
@@ -106,7 +105,6 @@ export default function ReportsView({
     result: ReportResult | null
     page: number
     pageSize: number
-    notice: string | null
     busy: boolean
     onNew: () => void
     onOpen: (report: SavedReport) => void
@@ -156,8 +154,6 @@ export default function ReportsView({
                     New report
                 </Button>
             </div>
-
-            {notice ? <p className="text-sm text-red-600">{notice}</p> : null}
 
             <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
                 <Card>

@@ -11,7 +11,6 @@ export interface SavedReport {
     source: ReportSource
     columns: string[]
     statusFilter: string | null
-    updatedAt: string
     createdByName: string
 }
 

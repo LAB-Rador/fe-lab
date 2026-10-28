@@ -39,7 +39,6 @@ export default function ReportsContainer({
     const [result, setResult] = useState<ReportResult | null>(null)
     const [page, setPage] = useState(1)
     const [pageSize, setPageSize] = useState(10)
-    const [notice, setNotice] = useState<string | null>(error)
     const [busy, setBusy] = useState(false)
 
     useEffect(() => {
@@ -64,13 +63,11 @@ export default function ReportsContainer({
 
     const updateDraft = (patch: Partial<ReportDraft>) => {
         setDraft((current) => ({ ...current, ...patch }))
-        setNotice(null)
     }
 
     const changeSource = (source: ReportSource) => {
         setDraft({ id: null, name: draft.name, source, columns: defaultColumns[source], statusFilter: "" })
         replaceResult(null)
-        setNotice(null)
     }
 
     const toggleColumn = (key: string) => {
@@ -80,11 +77,9 @@ export default function ReportsContainer({
                 ? current.columns.filter((column) => column !== key)
                 : [...current.columns, key],
         }))
-        setNotice(null)
     }
 
     const fail = (message: string, id?: string | number) => {
-        setNotice(message)
         toast.error(message, id === undefined ? undefined : { id })
     }
 
@@ -94,17 +89,15 @@ export default function ReportsContainer({
             const next = await load()
             if (!next) {
                 fail("Could not generate the report.", id)
-                return false
+                return
             }
             replaceResult(next)
             toast.success("Report ready", {
                 id,
                 description: `${next.rows.length} ${next.rows.length === 1 ? "row" : "rows"}`,
             })
-            return true
         } catch (cause) {
             fail(messageFrom(cause, "Could not generate the report."), id)
-            return false
         }
     }
 
@@ -114,7 +107,6 @@ export default function ReportsContainer({
             return
         }
         setBusy(true)
-        setNotice(null)
         try {
             await generate(async () => {
                 const response = await apiClient.post(`${base}/preview`, body) as { success?: boolean; data?: ReportResult }
@@ -131,7 +123,6 @@ export default function ReportsContainer({
             return
         }
         setBusy(true)
-        setNotice(null)
         const creating = draft.id === null
         try {
             const response = draft.id
@@ -176,7 +167,6 @@ export default function ReportsContainer({
             statusFilter: report.statusFilter ?? "",
         })
         setBusy(true)
-        setNotice(null)
         try {
             await generate(() => loadSavedResult(report.id))
         } finally {
@@ -188,7 +178,6 @@ export default function ReportsContainer({
         if (!draft.id) return
         const name = draft.name
         setBusy(true)
-        setNotice(null)
         try {
             await apiClient.delete(`${base}/${draft.id}`)
             setReports((current) => current.filter((report) => report.id !== draft.id))
@@ -224,12 +213,10 @@ export default function ReportsContainer({
             result={result}
             page={page}
             pageSize={pageSize}
-            notice={notice}
             busy={busy}
             onNew={() => {
                 setDraft(emptyDraft())
                 replaceResult(null)
-                setNotice(null)
             }}
             onPageChange={setPage}
             onPageSizeChange={(next) => {
