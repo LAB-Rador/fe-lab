@@ -16,6 +16,14 @@ interface BreedingAnimalOption {
     identifier: string
     name: string | null
     sex: string | null
+    animalTypeId: string
+}
+
+interface ProtocolOption {
+    id: string
+    name: string
+    animalTypeId: string
+    instructions: string
 }
 
 function animalOptionLabel(animal: BreedingAnimalOption) {
@@ -38,8 +46,10 @@ export function CreatePairDialog({
     onCreated: (pair: BreedingPair) => void
 }) {
     const [animals, setAnimals] = useState<BreedingAnimalOption[]>([])
+    const [protocols, setProtocols] = useState<ProtocolOption[]>([])
     const [motherId, setMotherId] = useState("")
     const [fatherId, setFatherId] = useState("")
+    const [protocolId, setProtocolId] = useState("")
     const [offspringIds, setOffspringIds] = useState<string[]>([])
     const [status, setStatus] = useState<string>("SUCCESSFUL")
     const [startDate, setStartDate] = useState("")
@@ -54,14 +64,27 @@ export function CreatePairDialog({
         apiClient.get(`/api/animals/${userId}/${labId}/200/1/null`).then((response) => {
             if (cancelled) return
             const rows = Array.isArray(response?.data) ? response.data : []
-            setAnimals(rows.map((animal: BreedingAnimalOption) => ({
+            setAnimals(rows.map((animal: BreedingAnimalOption & { animalType?: { id?: string } }) => ({
                 id: animal.id,
                 identifier: animal.identifier,
                 name: animal.name,
                 sex: animal.sex,
+                animalTypeId: animal.animalType?.id ?? animal.animalTypeId ?? "",
             })))
         }).catch(() => {
             if (!cancelled) setError("Could not load animals for this laboratory.")
+        })
+        apiClient.get(`/api/breedings/${userId}/${labId}/protocols`).then((response) => {
+            if (cancelled) return
+            const rows = Array.isArray(response?.data) ? response.data : []
+            setProtocols(rows.map((protocol: ProtocolOption) => ({
+                id: protocol.id,
+                name: protocol.name,
+                animalTypeId: protocol.animalTypeId,
+                instructions: protocol.instructions,
+            })))
+        }).catch(() => {
+            if (!cancelled) setProtocols([])
         })
         return () => {
             cancelled = true
@@ -88,6 +111,7 @@ export function CreatePairDialog({
             const response = await apiClient.post(`/api/breedings/${userId}/${labId}`, {
                 motherId,
                 fatherId,
+                protocolId: protocolId || null,
                 offspringIds: offspringIds.filter((id) => id !== motherId && id !== fatherId),
                 status,
                 startDate,
@@ -100,6 +124,7 @@ export function CreatePairDialog({
             onCreated(response.data as BreedingPair)
             setMotherId("")
             setFatherId("")
+            setProtocolId("")
             setOffspringIds([])
             setNotes("")
             setStartDate("")
@@ -112,6 +137,9 @@ export function CreatePairDialog({
     }
 
     const offspringChoices = animals.filter((animal) => animal.id !== motherId && animal.id !== fatherId)
+    const mother = animals.find((animal) => animal.id === motherId)
+    const protocolChoices = protocols.filter((protocol) => protocol.animalTypeId === mother?.animalTypeId)
+    const selectedProtocol = protocolChoices.find((protocol) => protocol.id === protocolId)
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -123,7 +151,7 @@ export function CreatePairDialog({
                 <form className="space-y-4" onSubmit={handleSubmit}>
                     <div className="space-y-2">
                         <Label htmlFor="breeding-mother">Mother</Label>
-                        <Select value={motherId} onValueChange={setMotherId}>
+                        <Select value={motherId} onValueChange={(value) => { setMotherId(value); setProtocolId("") }}>
                             <SelectTrigger id="breeding-mother">
                                 <SelectValue placeholder="Select mother" />
                             </SelectTrigger>
@@ -147,6 +175,28 @@ export function CreatePairDialog({
                             </SelectContent>
                         </Select>
                     </div>
+                    {motherId ? (
+                        <div className="space-y-2">
+                            <Label htmlFor="breeding-protocol">Protocol</Label>
+                            <Select value={protocolId || "NONE"} onValueChange={(value) => setProtocolId(value === "NONE" ? "" : value)}>
+                                <SelectTrigger id="breeding-protocol">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="NONE">No protocol</SelectItem>
+                                    {protocolChoices.map((protocol) => (
+                                        <SelectItem key={protocol.id} value={protocol.id}>{protocol.name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            {protocolChoices.length === 0 ? (
+                                <p className="text-sm text-gray-500">No protocols for this animal type.</p>
+                            ) : null}
+                            {selectedProtocol?.instructions ? (
+                                <p className="text-sm text-gray-600 whitespace-pre-wrap">{selectedProtocol.instructions}</p>
+                            ) : null}
+                        </div>
+                    ) : null}
                     <div className="space-y-2">
                         <Label>Offspring</Label>
                         <div className="max-h-40 space-y-2 overflow-y-auto rounded-md border p-3">

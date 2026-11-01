@@ -1,14 +1,12 @@
 "use client"
 
-import { BreedingProtocolsSettings } from "@/src/components/settings/breeding-protocols-settings"
 import { SubscriptionSettings } from "@/src/components/settings/subscription-settings"
 import { NotificationSettings } from "@/src/components/settings/notification-settings"
-import { AnimalTypesSettings } from "@/src/components/settings/animal-type-settings"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
 import { UserRolesSettings } from "@/src/components/settings/user-roles-settings"
 import { PageHeader } from "@/src/components/settings/page-header"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useEffect, useState, type ReactNode } from "react"
 
 const SETTINGS_TABS = ["animal-types", "user-roles", "breeding", "notifications", "subscription"]
 
@@ -16,7 +14,13 @@ function settingsTab(value: string | null | undefined) {
     return value && SETTINGS_TABS.includes(value) ? value : "animal-types"
 }
 
-export default function LaboratorySettings() {
+export default function LaboratorySettings({
+    animalTypes,
+    breedingProtocols,
+}: {
+    animalTypes: ReactNode
+    breedingProtocols: ReactNode
+}) {
     const router = useRouter()
     const pathname = usePathname()
     const requestedTab = useSearchParams().get("tab")
@@ -46,7 +50,7 @@ export default function LaboratorySettings() {
                 </TabsList>
 
                 <TabsContent value="animal-types">
-                    <AnimalTypesSettings />
+                    {animalTypes}
                 </TabsContent>
 
                 <TabsContent value="user-roles">
@@ -54,7 +58,7 @@ export default function LaboratorySettings() {
                 </TabsContent>
 
                 <TabsContent value="breeding">
-                    <BreedingProtocolsSettings />
+                    {breedingProtocols}
                 </TabsContent>
 
                 <TabsContent value="notifications">
