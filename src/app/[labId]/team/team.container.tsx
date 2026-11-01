@@ -70,7 +70,10 @@ export default function TeamContainer(props: TeamContainerProps) {
         }
       }
     } catch (error) {
-      console.error("Failed to create Invitation:", error)
+      const detail = error instanceof Error && "detail" in error && typeof error.detail === "string"
+        ? error.detail
+        : "Could not send the invitation."
+      toast.error(detail)
     }
   }, [newMember, userId, labId])
 

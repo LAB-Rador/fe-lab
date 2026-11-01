@@ -2,8 +2,9 @@
 
 import { AnimalTypesSettings } from "@/src/components/settings/animal-type-settings"
 import { BreedingProtocolsSettings } from "@/src/components/settings/breeding-protocols-settings"
+import { SubscriptionSettings } from "@/src/components/settings/subscription-settings"
 import LaboratorySettings from "./laboratory-settings"
-import { readAnimalType, readBreedingProtocol, type LabAnimalType, type LabBreedingProtocol } from "./types"
+import { readAnimalType, readBreedingProtocol, type LabAnimalType, type LabBreedingProtocol, type LabSubscription } from "./types"
 import { apiClient } from "@/src/lib/apiClient"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
@@ -30,12 +31,14 @@ export default function SettingsContainer({
     labId,
     animalTypes,
     protocols,
+    subscription,
     error,
 }: {
     userId: string
     labId: string
     animalTypes: LabAnimalType[]
     protocols: LabBreedingProtocol[]
+    subscription: LabSubscription | null
     error: string | null
 }) {
     const [types, setTypes] = useState(animalTypes)
@@ -168,6 +171,7 @@ export default function SettingsContainer({
                     onDelete={(protocol) => void removeProtocol(protocol)}
                 />
             )}
+            subscription={<SubscriptionSettings subscription={subscription} />}
         />
     )
 }

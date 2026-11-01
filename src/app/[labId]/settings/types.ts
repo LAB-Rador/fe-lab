@@ -5,6 +5,14 @@ export interface LabAnimalType {
     animalCount: number
 }
 
+export interface LabSubscription {
+    memberCount: number
+    planName: string | null
+    maxUsers: number | null
+    startDate: string | null
+    endDate: string | null
+}
+
 export interface LabBreedingProtocol {
     id: string
     name: string
@@ -13,6 +21,32 @@ export interface LabBreedingProtocol {
     animalTypeId: string
     animalTypeName: string
     pairCount: number
+}
+
+export function readLabSubscription(response: unknown): LabSubscription | null {
+    if (!response || typeof response !== "object" || !("data" in response)) return null
+    const data = (response as { data?: unknown }).data
+    if (!data || typeof data !== "object") return null
+    const value = data as { memberCount?: unknown; subscription?: unknown }
+    const memberCount = typeof value.memberCount === "number" ? value.memberCount : 0
+    const subscription = value.subscription
+    if (!subscription || typeof subscription !== "object") {
+        return { memberCount, planName: null, maxUsers: null, startDate: null, endDate: null }
+    }
+    const row = subscription as Record<string, unknown>
+    const plan = row.plan as { name?: unknown } | null | undefined
+    const planName = plan && typeof plan.name === "string" ? plan.name : null
+    const maxUsers = typeof row.maxUsers === "number" ? row.maxUsers : null
+    if (!planName || maxUsers === null) {
+        return { memberCount, planName: null, maxUsers: null, startDate: null, endDate: null }
+    }
+    return {
+        memberCount,
+        planName,
+        maxUsers,
+        startDate: typeof row.startDate === "string" ? row.startDate : null,
+        endDate: typeof row.endDate === "string" ? row.endDate : null,
+    }
 }
 
 export function readAnimalType(row: unknown): LabAnimalType | null {

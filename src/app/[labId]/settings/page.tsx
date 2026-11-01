@@ -1,6 +1,6 @@
 import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId"
 import { serverApiClient } from "@/src/lib/serverApiClient"
-import { readAnimalType, readBreedingProtocol, type LabAnimalType, type LabBreedingProtocol } from "./types"
+import { readAnimalType, readBreedingProtocol, readLabSubscription, type LabAnimalType, type LabBreedingProtocol, type LabSubscription } from "./types"
 import SettingsContainer from "./settings.container"
 import { Suspense } from "react"
 
@@ -17,6 +17,7 @@ export default async function SettingsPage({ params }: { params: Promise<{ labId
 
     let animalTypes: LabAnimalType[] = []
     let protocols: LabBreedingProtocol[] = []
+    let subscription: LabSubscription | null = null
     let error: string | null = null
 
     try {
@@ -33,6 +34,13 @@ export default async function SettingsPage({ params }: { params: Promise<{ labId
         error = error ?? (cause instanceof Error ? cause.message : "Could not load breeding protocols.")
     }
 
+    try {
+        const subscriptionResponse = await serverApiClient.get(`/api/subscriptions/${userId}/${labId}`)
+        subscription = readLabSubscription(subscriptionResponse)
+    } catch (cause) {
+        error = error ?? (cause instanceof Error ? cause.message : "Could not load the subscription.")
+    }
+
     return (
         <Suspense>
             <SettingsContainer
@@ -40,6 +48,7 @@ export default async function SettingsPage({ params }: { params: Promise<{ labId
                 labId={labId}
                 animalTypes={animalTypes}
                 protocols={protocols}
+                subscription={subscription}
                 error={error}
             />
         </Suspense>

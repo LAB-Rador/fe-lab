@@ -32,7 +32,16 @@ class ApiClient {
       }
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        let detail = "";
+        try {
+          const body = await response.json();
+          if (body && typeof body.message === "string") detail = body.message;
+        } catch {
+          /* ignore */
+        }
+        const error = new Error(`HTTP error! status: ${response.status}`);
+        if (detail) (error as Error & { detail?: string }).detail = detail;
+        throw error;
       }
 
       return await response.json();

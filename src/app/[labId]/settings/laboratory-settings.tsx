@@ -1,6 +1,5 @@
 "use client"
 
-import { SubscriptionSettings } from "@/src/components/settings/subscription-settings"
 import { NotificationSettings } from "@/src/components/settings/notification-settings"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
 import { UserRolesSettings } from "@/src/components/settings/user-roles-settings"
@@ -17,9 +16,11 @@ function settingsTab(value: string | null | undefined) {
 export default function LaboratorySettings({
     animalTypes,
     breedingProtocols,
+    subscription,
 }: {
     animalTypes: ReactNode
     breedingProtocols: ReactNode
+    subscription: ReactNode
 }) {
     const router = useRouter()
     const pathname = usePathname()
@@ -66,7 +67,7 @@ export default function LaboratorySettings({
                 </TabsContent>
 
                 <TabsContent value="subscription">
-                    <SubscriptionSettings />
+                    {subscription}
                 </TabsContent>
             </Tabs>
         </div>
