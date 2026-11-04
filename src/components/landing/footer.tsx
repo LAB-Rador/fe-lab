@@ -1,10 +1,11 @@
 import { Microscope, Mail, Phone, MapPin } from "lucide-react"
+import Link from "next/link"
 
 export function Footer() {
     const footerLinks = {
         product: [
             { name: "Features", href: "#" },
-            { name: "Pricing", href: "#" },
+            { name: "Pricing", href: "/pricing" },
             { name: "Security", href: "#" },
             { name: "Integrations", href: "#" },
         ],
@@ -34,12 +35,12 @@ export function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
                     {/* Company Info */}
                     <div className="lg:col-span-2">
-                        <div className="flex items-center space-x-3 mb-6">
+                        <Link href="/" className="flex items-center space-x-3 mb-6">
                             <div className="p-2 bg-[#2563EB] rounded-lg">
                                 <Microscope className="h-6 w-6 text-white" />
                             </div>
                             <span className="text-2xl font-bold">LabAssist</span>
-                        </div>
+                        </Link>
                         <p className="text-gray-400 mb-6 leading-relaxed">
                             The leading platform for laboratory animal management, helping research institutions worldwide improve
                             animal care and research outcomes.
