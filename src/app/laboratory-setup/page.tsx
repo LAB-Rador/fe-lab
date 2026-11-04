@@ -66,7 +66,10 @@ export default function LaboratorySetupPage() {
             }
         } catch (createError) {
             console.error("Failed to create laboratory:", createError)
-            setError("Failed to create laboratory. Please try again.")
+            const detail = createError instanceof Error && "detail" in createError && typeof createError.detail === "string"
+                ? createError.detail
+                : ""
+            setError(detail || "Failed to create laboratory. Please try again.")
         } finally {
             setIsLoading(false)
         }

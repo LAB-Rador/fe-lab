@@ -11,12 +11,17 @@ function formatDate(value: string | null) {
 }
 
 export function SubscriptionSettings({ subscription }: { subscription: LabSubscription | null }) {
-    const planName = subscription?.planName
-    const maxUsers = subscription?.maxUsers
-    const hasPlan = Boolean(planName && maxUsers !== null && maxUsers !== undefined)
-    const memberCount = subscription?.memberCount ?? 0
-    const limit = maxUsers ?? 0
-    const usedPercent = limit > 0 ? Math.round((memberCount / limit) * 100) : 0
+    const planName = subscription?.planName ?? null
+    const maxUsers = subscription?.maxUsers ?? null
+    const hasPlan = planName !== null && maxUsers !== null
+    const memberCount = hasPlan ? (subscription?.memberCount ?? 0) : 0
+    const usage = hasPlan
+        ? {
+            memberCount,
+            limit: maxUsers,
+            usedPercent: maxUsers > 0 ? Math.round((memberCount / maxUsers) * 100) : 0,
+        }
+        : null
 
     return (
         <Card>
@@ -31,15 +36,15 @@ export function SubscriptionSettings({ subscription }: { subscription: LabSubscr
                     {hasPlan ? <Badge className="bg-blue-600">{planName}</Badge> : null}
                 </div>
             </CardHeader>
-            {hasPlan ? (
+            {usage ? (
                 <CardContent className="space-y-6 p-6">
                     <div className="space-y-2">
                         <h3 className="text-sm font-medium text-gray-500">Users</h3>
                         <div className="flex items-center justify-between">
-                            <p className="text-2xl font-bold text-gray-900">{memberCount} of {limit}</p>
-                            <span className="text-xs text-gray-500">{usedPercent}%</span>
+                            <p className="text-2xl font-bold text-gray-900">{usage.memberCount} of {usage.limit}</p>
+                            <span className="text-xs text-gray-500">{usage.usedPercent}%</span>
                         </div>
-                        <Progress value={Math.min(usedPercent, 100)} className="h-2" />
+                        <Progress value={Math.min(usage.usedPercent, 100)} className="h-2" />
                     </div>
                     <div className="grid gap-4 sm:grid-cols-2">
                         <div>
