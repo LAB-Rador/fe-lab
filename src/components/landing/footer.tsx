@@ -22,7 +22,7 @@ export function Footer() {
             { name: "Blog", href: "#" },
         ],
         legal: [
-            { name: "Privacy Policy", href: "#" },
+            { name: "Privacy Policy", href: "/privacy" },
             { name: "Terms of Service", href: "#" },
             { name: "GDPR", href: "#" },
             { name: "Compliance", href: "#" },
@@ -106,9 +106,9 @@ export function Footer() {
                         <ul className="space-y-2">
                             {footerLinks.legal.map((link) => (
                                 <li key={link.name}>
-                                    <a href={link.href} className="text-gray-400 transition-colors">
+                                    <Link href={link.href} className={`${link.href.includes('/') ? 'text-white' : 'text-gray-400'} transition-colors`}>
                                         {link.name}
-                                    </a>
+                                    </Link>
                                 </li>
                             ))}
                         </ul>
@@ -119,9 +119,9 @@ export function Footer() {
                     <div className="flex flex-col md:flex-row justify-between items-center">
                         <p className="text-gray-400 text-sm">© 2026 LabAssist. All rights reserved.</p>
                         <div className="flex space-x-6 mt-4 md:mt-0">
-                            <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">
+                            <Link href="/privacy" className=" text-white transition-colors text-sm">
                                 Privacy
-                            </a>
+                            </Link>
                             <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">
                                 Terms
                             </a>
