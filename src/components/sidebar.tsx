@@ -19,6 +19,7 @@ import {
   Rat,
   IdCard,
   Dna,
+  Box,
 } from "lucide-react"
 
 export function Sidebar() {
@@ -91,6 +92,13 @@ export function Sidebar() {
               icon={Rat}
               label="Animals"
               isActive={pathname.startsWith(`/${labId}/animals`)}
+              isOpen={isOpen}
+            />
+            <NavItem
+              href={`/${labId}/cages`}
+              icon={Box}
+              label="Cages"
+              isActive={pathname.startsWith(`/${labId}/cages`)}
               isOpen={isOpen}
             />
             <NavItem

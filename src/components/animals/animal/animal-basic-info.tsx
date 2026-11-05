@@ -62,7 +62,7 @@ export function AnimalBasicInfo({ animal }: { animal: Animal }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <InfoItem label="Diet" value="Standard Lab Diet" />
             <InfoItem label="Feeding Schedule" value="Twice daily" />
-            <InfoItem label="Housing Type" value="Individual cage" />
+            <InfoItem label="Housing Type" value={animal.cage?.name || ""} />
             <InfoItem label="Environmental Enrichment" value="Running wheel, nesting material" />
             <InfoItem label="Light Cycle" value="12h light/12h dark" />
             <InfoItem label="Temperature Range" value="20-22°C" />
