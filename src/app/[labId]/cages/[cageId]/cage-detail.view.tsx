@@ -3,7 +3,7 @@ import { animalCountLabel, animalLabel, type Cage, type CageAnimal } from "../ty
 import Link from "next/link"
 
 function animalDetails(animal: CageAnimal) {
-    return [animal.animalType.name, animal.sex, animal.strain].filter(Boolean).join(" · ")
+    return [animal.animalType?.name, animal.sex, animal.strain].filter(Boolean).join(" · ")
 }
 
 export default function CageDetailView({ labId, cage }: { labId: string; cage: Cage }) {
