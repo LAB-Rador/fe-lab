@@ -1,42 +1,29 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
 import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
-import { animalLabel, type Cage, type CageListAnimal } from "./types"
+import { animalCountLabel, type CageSummary } from "./types"
 import Link from "next/link"
 
 export default function CagesView({
     labId,
     cages,
-    animals,
     name,
     notes,
     busy,
-    selectedByCage,
     setName,
     setNotes,
-    setSelectedAnimal,
     onCreate,
-    onAddAnimal,
-    onRemoveAnimal,
 }: {
     labId: string
-    cages: Cage[]
-    animals: CageListAnimal[]
+    cages: CageSummary[]
     name: string
     notes: string
     busy: boolean
-    selectedByCage: Record<string, string>
     setName: (value: string) => void
     setNotes: (value: string) => void
-    setSelectedAnimal: (cageId: string, animalId: string) => void
     onCreate: () => void
-    onAddAnimal: (cageId: string) => void
-    onRemoveAnimal: (cageId: string, animalId: string) => void
 }) {
-    const cageNameById = new Map(cages.map((cage) => [cage.id, cage.name]))
-
     return (
         <div className="space-y-6">
             <div>
@@ -76,72 +63,18 @@ export default function CagesView({
             {cages.length === 0 ? (
                 <p className="text-sm text-gray-500">No cages yet.</p>
             ) : (
-                <div className="grid gap-4">
-                    {cages.map((cage) => {
-                        const options = animals.filter((animal) => animal.cageId !== cage.id)
-                        const selected = selectedByCage[cage.id] || ""
-                        return (
-                            <Card key={cage.id}>
-                                <CardHeader>
-                                    <CardTitle>
-                                        <Link href={`/${labId}/cages/${cage.id}`} className="hover:text-blue-600">
-                                            {cage.name}
-                                        </Link>
-                                    </CardTitle>
-                                    {cage.notes ? <p className="text-sm text-gray-500">{cage.notes}</p> : null}
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    {cage.animals.length === 0 ? (
-                                        <p className="text-sm text-gray-500">No animals in this cage.</p>
-                                    ) : (
-                                        <ul className="space-y-2">
-                                            {cage.animals.map((animal) => (
-                                                <li key={animal.id} className="flex items-center justify-between gap-3">
-                                                    <Link href={`/${labId}/animals/${animal.id}`} className="font-medium text-gray-900 hover:text-blue-600">
-                                                        {animalLabel(animal)}
-                                                    </Link>
-                                                    <Button type="button" variant="outline" size="sm" disabled={busy} onClick={() => onRemoveAnimal(cage.id, animal.id)}>
-                                                        Remove
-                                                    </Button>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
-
-                                    {animals.length === 0 ? (
-                                        <p className="text-sm text-gray-500">No animals in this laboratory.</p>
-                                    ) : options.length === 0 ? (
-                                        <p className="text-sm text-gray-500">Every animal in this laboratory is already in this cage.</p>
-                                    ) : (
-                                        <div className="flex flex-col gap-2 sm:flex-row">
-                                            <Select value={selected || undefined} onValueChange={(value) => setSelectedAnimal(cage.id, value)}>
-                                                <SelectTrigger className="sm:max-w-sm">
-                                                    <SelectValue placeholder="Add an animal" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {options.map((animal) => {
-                                                        const currentCage = animal.cageId ? cageNameById.get(animal.cageId) : null
-                                                        const label = currentCage
-                                                            ? `${animalLabel(animal)} · in ${currentCage}`
-                                                            : animalLabel(animal)
-                                                        return (
-                                                            <SelectItem key={animal.id} value={animal.id}>
-                                                                {label}
-                                                            </SelectItem>
-                                                        )
-                                                    })}
-                                                </SelectContent>
-                                            </Select>
-                                            <Button type="button" variant="outline" disabled={busy || !selected} onClick={() => onAddAnimal(cage.id)}>
-                                                Add
-                                            </Button>
-                                        </div>
-                                    )}
-                                </CardContent>
-                            </Card>
-                        )
-                    })}
-                </div>
+                <ul className="w-fit max-w-sm divide-y overflow-hidden rounded-lg border bg-white">
+                    {cages.map((cage) => (
+                        <li key={cage.id}>
+                            <Link href={`/${labId}/cages/${cage.id}`} className="block px-4 py-3 hover:bg-gray-50">
+                                <p className="font-medium text-gray-900">{cage.name}</p>
+                                <p className="text-sm text-gray-500">
+                                    {[cage.notes, animalCountLabel(cage.animalCount)].filter(Boolean).join(" · ")}
+                                </p>
+                            </Link>
+                        </li>
+                    ))}
+                </ul>
             )}
         </div>
     )

@@ -20,6 +20,7 @@ interface AnimalsListProps {
   handleUpdateDataPagination: (data: {page?: number, pageSize?: number}) => void;
   handleUnarchiveAnimalRow: (animalId: string) => void | Promise<void>;
   handleArchiveAnimalRow: (animalId: string) => void | Promise<void>;
+  onMoveToCage: (animal: Animal) => void;
   setPagination: (pagination: AnimalPagination) => void;
   setSelectedAnimal: (animal: Animal) => void;
   animalPagination: AnimalPagination;
@@ -33,6 +34,7 @@ export function AnimalsList({
   setPagination,
   handleUpdateDataPagination,
   handleArchiveAnimalRow,
+  onMoveToCage,
   handleUnarchiveAnimalRow,
   setSelectedAnimal,
   setOpen,
@@ -168,6 +170,7 @@ export function AnimalsList({
                   <TableHead>Strain</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Location</TableHead>
+                  <TableHead>Cage</TableHead>
                   <TableHead className="w-12">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -196,6 +199,7 @@ export function AnimalsList({
                       {animal.location || "Not specified"}
                     </span>
                   </TableCell>
+                  <TableCell>{animal.cage?.name || ""}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
                       <Button 
@@ -234,6 +238,11 @@ export function AnimalsList({
                                 Add measurement
                             </Link>
                           </DropdownMenuItem>
+                          {animal.archivedAt ? null : (
+                            <DropdownMenuItem onClick={() => onMoveToCage(animal)}>
+                              Move to cage
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuSeparator />
                           {animal.archivedAt ? (
                             <DropdownMenuItem
@@ -400,6 +409,10 @@ export function AnimalsList({
                     <p className="font-medium">Location</p>
                     <p className="text-gray-500">{animal.location || "Not specified"}</p>
                   </div>
+                  <div className="col-span-2">
+                    <p className="font-medium">Cage</p>
+                    <p className="text-gray-500">{animal.cage?.name || ""}</p>
+                  </div>
                 </div>
                 <div className="mt-4 flex items-center justify-end gap-1">
                   <Button
@@ -438,6 +451,11 @@ export function AnimalsList({
                               Add measurement
                           </Link>
                       </DropdownMenuItem>
+                      {animal.archivedAt ? null : (
+                        <DropdownMenuItem onClick={() => onMoveToCage(animal)}>
+                          Move to cage
+                        </DropdownMenuItem>
+                      )}
                       <DropdownMenuSeparator />
                       {animal.archivedAt ? (
                         <DropdownMenuItem

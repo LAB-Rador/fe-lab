@@ -1,6 +1,10 @@
 import { IdLabel } from "@/src/components/id-label"
-import { animalLabel, type Cage } from "../types"
+import { animalCountLabel, animalLabel, type Cage, type CageAnimal } from "../types"
 import Link from "next/link"
+
+function animalDetails(animal: CageAnimal) {
+    return [animal.animalType?.name, animal.sex, animal.strain].filter(Boolean).join(" · ")
+}
 
 export default function CageDetailView({ labId, cage }: { labId: string; cage: Cage }) {
     const path = `/${encodeURIComponent(labId)}/cages/${cage.id}`
@@ -20,15 +24,19 @@ export default function CageDetailView({ labId, cage }: { labId: string; cage: C
             {cage.animals.length === 0 ? (
                 <p className="text-sm text-gray-500">No animals in this cage.</p>
             ) : (
-                <ul className="space-y-2">
-                    {cage.animals.map((animal) => (
-                        <li key={animal.id}>
-                            <Link href={`/${labId}/animals/${animal.id}`} className="font-medium text-gray-900 hover:text-blue-600">
-                                {animalLabel(animal)}
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
+                <div className="space-y-3">
+                    <h2 className="text-sm font-medium text-gray-500">{animalCountLabel(cage.animals.length)}</h2>
+                    <ul className="w-fit max-w-sm divide-y overflow-hidden rounded-lg border bg-white">
+                        {cage.animals.map((animal) => (
+                            <li key={animal.id}>
+                                <Link href={`/${labId}/animals/${animal.id}`} className="block px-4 py-3 hover:bg-gray-50">
+                                    <p className="font-medium text-gray-900">{animalLabel(animal)}</p>
+                                    <p className="text-sm text-gray-500">{animalDetails(animal)}</p>
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
             )}
         </div>
     )
