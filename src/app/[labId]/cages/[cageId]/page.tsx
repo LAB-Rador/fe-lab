@@ -7,15 +7,11 @@ import type { Cage } from "../types"
 export default async function CageDetailPage({ params }: { params: Promise<{ labId: string; cageId: string }> }) {
     const { labId, cageId } = await params
     const userId = await getServerAuthenticatedUserId()
-    let cage: Cage | undefined
+    let cage: Cage
     try {
-        const response = await serverApiClient.get(`/api/cages/${userId}/${encodeURIComponent(labId)}`)
-        const data = response.data as { cages?: Cage[] } | undefined
-        cage = data?.cages?.find((item) => item.id === cageId)
+        const response = await serverApiClient.get(`/api/cages/${userId}/${encodeURIComponent(labId)}/${cageId}`)
+        cage = response.data as Cage
     } catch {
-        notFound()
-    }
-    if (!cage) {
         notFound()
     }
 
