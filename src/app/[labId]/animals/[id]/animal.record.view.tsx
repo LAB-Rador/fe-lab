@@ -14,6 +14,7 @@ import { AnimalTabsName, type Animal, type MedicalRecord } from "./types"
 import { Button } from "@/src/components/ui/button"
 import { Badge } from "@/src/components/ui/badge"
 import type { AnimalPagination } from "../types"
+import { IdLabel } from "@/src/components/id-label"
 import { getInitials } from "@/src/lib/utils"
 import { useRouter } from "next/navigation"
 import { Activity } from "react"
@@ -180,7 +181,12 @@ export default function AnimalDetailPage({userId, labId, animalId, animal, genea
             </Tabs>
           </div>
 
-          <div>
+          <div className="space-y-6">
+            <IdLabel
+              title={animal.identifier}
+              caption={animal.name || undefined}
+              path={`/${encodeURIComponent(labId)}/animals/${animalId}`}
+            />
             <QuickActionPanel
               labId={labId}
               animalId={animal.id || ""}

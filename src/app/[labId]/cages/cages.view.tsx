@@ -83,7 +83,11 @@ export default function CagesView({
                         return (
                             <Card key={cage.id}>
                                 <CardHeader>
-                                    <CardTitle>{cage.name}</CardTitle>
+                                    <CardTitle>
+                                        <Link href={`/${labId}/cages/${cage.id}`} className="hover:text-blue-600">
+                                            {cage.name}
+                                        </Link>
+                                    </CardTitle>
                                     {cage.notes ? <p className="text-sm text-gray-500">{cage.notes}</p> : null}
                                 </CardHeader>
                                 <CardContent className="space-y-4">
