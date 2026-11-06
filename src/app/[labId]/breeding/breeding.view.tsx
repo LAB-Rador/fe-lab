@@ -6,6 +6,7 @@ import { BREEDING_STATUSES, animalLabel, type BreedingPair } from "./types"
 import { Button } from "@/src/components/ui/button"
 import { Badge } from "@/src/components/ui/badge"
 import { Input } from "@/src/components/ui/input"
+import { Label } from "@/src/components/ui/label"
 import { Plus, Search } from "lucide-react"
 import Link from "next/link"
 
@@ -41,8 +42,16 @@ export default function BreedingView({
     status,
     setSearch,
     setStatus,
+    bornDate,
+    pupCount,
+    litterNotes,
+    recording,
+    setBornDate,
+    setPupCount,
+    setLitterNotes,
     onSelect,
     onCreate,
+    onRecordLitter,
 }: {
     labId: string
     counts: { total: number; active: number; planned: number; offspring: number }
@@ -50,10 +59,18 @@ export default function BreedingView({
     selected: BreedingPair | null
     search: string
     status: string
+    bornDate: string
+    pupCount: string
+    litterNotes: string
+    recording: boolean
     setSearch: (value: string) => void
     setStatus: (value: string) => void
+    setBornDate: (value: string) => void
+    setPupCount: (value: string) => void
+    setLitterNotes: (value: string) => void
     onSelect: (id: string) => void
     onCreate: () => void
+    onRecordLitter: () => void
 }) {
     const stats = [
         { label: "Pairs", value: counts.total },
@@ -160,8 +177,48 @@ export default function BreedingView({
                             : "Pair pedigree"}
                     </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className="space-y-4">
                     {selected?.notes ? <p className="text-sm text-gray-600">{selected.notes}</p> : null}
+                    {selected ? (
+                        <div className="space-y-3">
+                            <p className="text-sm font-medium text-gray-900">Litters</p>
+                            {selected.litters.length === 0 ? (
+                                <p className="text-sm text-gray-500">No litters recorded.</p>
+                            ) : (
+                                <ul className="space-y-2">
+                                    {selected.litters.map((litter) => (
+                                        <li key={litter.id} className="text-sm text-gray-700">
+                                            <span className="font-medium text-gray-900">{formatDate(litter.bornDate)}</span>
+                                            {` · ${litter.count} ${litter.count === 1 ? "pup" : "pups"}`}
+                                            {litter.notes ? ` · ${litter.notes}` : ""}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                            <div className="grid gap-3 md:grid-cols-[1fr_8rem_1fr_auto] md:items-end">
+                                <div className="space-y-2">
+                                    <Label htmlFor="litter-date">Birth date</Label>
+                                    <Input id="litter-date" type="date" value={bornDate} onChange={(event) => setBornDate(event.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="litter-count">Pups</Label>
+                                    <Input id="litter-count" type="number" min={0} step={1} value={pupCount} onChange={(event) => setPupCount(event.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="litter-notes">Notes</Label>
+                                    <Input id="litter-notes" value={litterNotes} onChange={(event) => setLitterNotes(event.target.value)} placeholder="Optional" />
+                                </div>
+                                <Button
+                                    type="button"
+                                    className="bg-blue-600 hover:bg-blue-700"
+                                    disabled={recording || !bornDate || !/^\d+$/.test(pupCount)}
+                                    onClick={onRecordLitter}
+                                >
+                                    Record litter
+                                </Button>
+                            </div>
+                        </div>
+                    ) : null}
                     {selected ? (
                         <PairCanvas
                             labId={labId}
