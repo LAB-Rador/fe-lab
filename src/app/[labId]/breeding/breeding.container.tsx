@@ -2,7 +2,9 @@
 
 import { CreatePairDialog } from "@/src/components/breeding/create-pair-dialog"
 import { useMemo, useState } from "react"
-import type { BreedingPair } from "./types"
+import { apiClient } from "@/src/lib/apiClient"
+import { toast } from "sonner"
+import type { BreedingPair, Litter } from "./types"
 import BreedingView from "./breeding.view"
 
 export default function BreedingContainer({
@@ -19,6 +21,10 @@ export default function BreedingContainer({
     const [search, setSearch] = useState("")
     const [status, setStatus] = useState("all")
     const [selectedId, setSelectedId] = useState<string | null>(breedings[0]?.id ?? null)
+    const [bornDate, setBornDate] = useState("")
+    const [pupCount, setPupCount] = useState("")
+    const [litterNotes, setLitterNotes] = useState("")
+    const [recording, setRecording] = useState(false)
 
     const filtered = useMemo(() => {
         const query = search.trim().toLowerCase()
@@ -45,6 +51,38 @@ export default function BreedingContainer({
         offspring: pairs.reduce((sum, pair) => sum + pair.offspring.length, 0),
     }), [pairs])
 
+    const clearLitterForm = () => {
+        setBornDate("")
+        setPupCount("")
+        setLitterNotes("")
+    }
+
+    const onRecordLitter = async () => {
+        if (!selected || recording) return
+        setRecording(true)
+        try {
+            const response = await apiClient.post(`/api/breedings/${userId}/${labId}/${selected.id}/litters`, {
+                bornDate,
+                count: Number(pupCount),
+                notes: litterNotes,
+            })
+            const litter = response.data as Litter
+            setPairs((current) => current.map((pair) => (
+                pair.id === selected.id
+                    ? { ...pair, litters: [litter, ...pair.litters].sort((a, b) => b.bornDate.localeCompare(a.bornDate)) }
+                    : pair
+            )))
+            clearLitterForm()
+        } catch (error) {
+            const detail = error instanceof Error && "detail" in error
+                ? (error as Error & { detail?: string }).detail
+                : undefined
+            toast.error(detail || "Failed to record litter")
+        } finally {
+            setRecording(false)
+        }
+    }
+
     return (
         <>
             <BreedingView
@@ -54,10 +92,21 @@ export default function BreedingContainer({
                 selected={selected}
                 search={search}
                 status={status}
+                bornDate={bornDate}
+                pupCount={pupCount}
+                litterNotes={litterNotes}
+                recording={recording}
                 setSearch={setSearch}
                 setStatus={setStatus}
-                onSelect={setSelectedId}
+                setBornDate={setBornDate}
+                setPupCount={setPupCount}
+                setLitterNotes={setLitterNotes}
+                onSelect={(id) => {
+                    setSelectedId(id)
+                    clearLitterForm()
+                }}
                 onCreate={() => setCreateOpen(true)}
+                onRecordLitter={() => { void onRecordLitter() }}
             />
             <CreatePairDialog
                 open={createOpen}
