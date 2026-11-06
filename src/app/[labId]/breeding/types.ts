@@ -13,6 +13,13 @@ export interface BreedingProtocolRef {
     name: string
 }
 
+export interface Litter {
+    id: string
+    bornDate: string
+    count: number
+    notes: string | null
+}
+
 export interface BreedingPair {
     id: string
     status: string
@@ -23,6 +30,7 @@ export interface BreedingPair {
     mother: PedigreeAnimal
     father: PedigreeAnimal
     offspring: PedigreeAnimal[]
+    litters: Litter[]
 }
 
 export interface AnimalGenealogy {
