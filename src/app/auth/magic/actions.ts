@@ -1,6 +1,7 @@
 "use server"
 
 import { setAuthSessionCookies } from "@/src/lib/set-auth-cookies"
+import { takeAuthNext } from "@/src/lib/take-auth-next"
 import { redirect } from "next/navigation"
 
 const BACKEND_URL =
@@ -39,6 +40,7 @@ export async function consumeMagicLinkFormAction(
     }
 
     await setAuthSessionCookies(data.accessToken, data.user.userId)
+    const next = await takeAuthNext()
 
     if (data.joinedLaboratory?.name) {
         redirect(`/${encodeURIComponent(data.joinedLaboratory.name)}/dashboard`)
@@ -48,5 +50,5 @@ export async function consumeMagicLinkFormAction(
         redirect("/account")
     }
 
-    redirect(data.laboratory ? "/account" : "/laboratory-setup")
+    redirect(next ?? (data.laboratory ? "/account" : "/laboratory-setup"))
 }

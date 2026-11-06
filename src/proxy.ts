@@ -1,4 +1,5 @@
 // frontend/middleware.js (в корне проекта Next.js)
+import { AUTH_NEXT_COOKIE, safeNextPath } from '@/src/lib/auth-next';
 import { NextRequest, NextResponse } from 'next/server';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_DATABASE_URL || 'http://localhost:3001';
@@ -18,7 +19,7 @@ export async function proxy(request: NextRequest) {
                 request.headers.get('authorization')?.replace('Bearer ', '');
   
   if (!token) {
-    return NextResponse.redirect(new URL('/signin', request.url));
+    return redirectToSignIn(request);
   }
   
   try {
@@ -53,8 +54,22 @@ export async function proxy(request: NextRequest) {
     
   } catch (error) {
     console.error('Token validation error:', error);
-    return NextResponse.redirect(new URL('/signin', request.url));
+    return redirectToSignIn(request);
   }
+}
+
+function redirectToSignIn(request: NextRequest) {
+  const response = NextResponse.redirect(new URL('/signin', request.url));
+  const next = safeNextPath(`${request.nextUrl.pathname}${request.nextUrl.search}`);
+  if (next) {
+    response.cookies.set(AUTH_NEXT_COOKIE, encodeURIComponent(next), {
+      path: '/',
+      httpOnly: true,
+      sameSite: 'lax',
+      maxAge: 60 * 30,
+    });
+  }
+  return response;
 }
 
 export const config = {

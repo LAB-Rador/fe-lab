@@ -1,6 +1,7 @@
 "use server"
 
 import { setAuthSessionCookies } from "@/src/lib/set-auth-cookies"
+import { takeAuthNext } from "@/src/lib/take-auth-next"
 import { redirect } from "next/navigation"
 
 const BACKEND_URL =
@@ -31,5 +32,6 @@ export async function guestAction(
     }
 
     await setAuthSessionCookies(data.accessToken, data.user.userId)
-    redirect(data.laboratory ? "/account" : "/laboratory-setup")
+    const next = await takeAuthNext()
+    redirect(next ?? (data.laboratory ? "/account" : "/laboratory-setup"))
 }
