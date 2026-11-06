@@ -7,6 +7,7 @@ import { AnimalsFilter } from "@/src/components/animals/animals-filter";
 import { AnimalsHeader } from "@/src/components/animals/animals-header";
 import { useCallback, useEffect, useOptimistic, useState, startTransition } from "react";
 import type { CreateAnimalData } from "@/src/components/animals/types";
+import { MoveToCageDialog } from "@/src/components/animals/move-to-cage-dialog";
 import { AnimalsList } from "@/src/components/animals/animals-list";
 import { useMediaQuery } from "@/src/components/sidebar-provider";
 import { AnimalStatus } from "../../account/types";
@@ -26,6 +27,7 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
     const [newAnimalType, setNewAnimalType] = useState<AnimalType | null>(null)
     const [includeArchivedAnimals, setIncludeArchivedAnimals] = useState(false)
     const [selectedAnimal, setSelectedAnimal] = useState<Animal | null>(null)
+    const [moveAnimal, setMoveAnimal] = useState<Animal | null>(null)
     const [openEditAnimalDialog, setOpenEditAnimalDialog] = useState(false)
     const [openAddAnimalDialog, setOpenAddAnimalDialog] = useState(false)
     const [animalsData, setAnimalsData] = useState<Animal[]>(animals)
@@ -337,6 +339,20 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
                 userId={userId}
                 labId={labId}
             />
+            <MoveToCageDialog
+                animal={moveAnimal}
+                userId={userId}
+                labId={labId}
+                onOpenChange={(open) => {
+                    if (!open) setMoveAnimal(null)
+                }}
+                onMoved={(animalId, cage) => {
+                    setAnimalsData((current) => current.map((animal) => (
+                        animal.id === animalId ? { ...animal, cage } : animal
+                    )))
+                    setMoveAnimal(null)
+                }}
+            />
             <AnimalsHeader
                 setOpen={setOpenAddAnimalDialog}
                 setFilterView={setFilterView}
@@ -356,6 +372,7 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
                 }
                 <AnimalsList
                     handleArchiveAnimalRow={handleArchiveAnimalRow}
+                    onMoveToCage={setMoveAnimal}
                     handleUnarchiveAnimalRow={handleUnarchiveAnimalRow}
                     handleUpdateDataPagination={handleUpdateDataPagination}
                     setSelectedAnimal={setSelectedAnimal}

@@ -33,6 +33,7 @@ export interface Animal {
     identifier: string;
     genotype?: string;
     location?: string;
+    cage?: { id: string; name: string } | null;
     strain?: string;
     origin?: string;
     name?: string;
