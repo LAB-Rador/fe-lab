@@ -1,8 +1,7 @@
 "use client"
 
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/src/components/ui/dropdown-menu"
 import type { Experiment, ExperimentAnimalRecordRow, ExperimentMetricsData, ExperimentTasksPagination } from "../types"
-import { ArrowLeft, Archive, ArchiveRestore, ChevronDown, Download, Edit, FileText, Share } from "lucide-react"
+import { ArrowLeft, Archive, ArchiveRestore } from "lucide-react"
 import type { ExperimentTaskAssigneeOption, ExperimentTaskUpsertPayload } from "./tabs/experiment-tasks-tab"
 import { Tabs, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
 import { ExperimentOverviewTab } from "./tabs/experiment-overview-tab"
@@ -140,32 +139,6 @@ export const ExperimentView = (props: ExperimentViewProps) => {
               </Button>
             )
           ) : null}
-          <Button variant="outline">
-            <Edit className="mr-2 h-4 w-4" />
-            Edit
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button>
-                <span>Actions</span>
-                <ChevronDown className="ml-2 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem>
-                <Share className="mr-2 h-4 w-4" />
-                Share
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Download className="mr-2 h-4 w-4" />
-                Export Data
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <FileText className="mr-2 h-4 w-4" />
-                Generate Report
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       </div>
 

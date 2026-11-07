@@ -5,7 +5,7 @@ import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId";
 import { getAnimalEnums } from "@/src/lib/cached/getAnimalEnums";
 import MeasurementsContainer from "./measurements.container";
 import { serverApiClient } from "@/src/lib/serverApiClient";
-import type { AnimalEnums } from "../../../types";
+import { recordTypeFromQuery, type AnimalEnums } from "../../../types";
 import type { PageProps } from "./types";
 
 const rows = 100;
@@ -15,6 +15,7 @@ export default async function Page({ params, searchParams }: PageProps) {
   const { labId, id: animalId } = await params;
   const sp = await searchParams;
   const experimentId = typeof sp.experimentId === "string" && sp.experimentId.length > 0 ? sp.experimentId : undefined;
+  const initialRecordType = recordTypeFromQuery(typeof sp.recordType === "string" ? sp.recordType : undefined);
   const userId = await getServerAuthenticatedUserId()
   
   const [animal, animalEnums ] = await Promise.all([
@@ -33,9 +34,11 @@ export default async function Page({ params, searchParams }: PageProps) {
 
   return (
     <MeasurementsContainer
+      key={`${experimentId ?? ""}-${initialRecordType}`}
       measurements={uniqueMeasurements}
       animalEnums={animalEnums.data as AnimalEnums}
       experimentId={experimentId}
+      initialRecordType={initialRecordType}
       animalId={animalId}
       userId={userId}
       labId={labId}

@@ -10,7 +10,7 @@ export interface PageProps {
         labId: string;
         id: string
     }>
-    searchParams: Promise<{ experimentId?: string }>
+    searchParams: Promise<{ experimentId?: string; recordType?: string }>
 }
 
 export interface MeasurementsViewProps {

@@ -9,6 +9,58 @@ import { useCallback, useState } from "react";
 import type { Experiment } from "./types";
 import { toast } from "sonner";
 
+function localDateKey(date: Date) {
+    const month = String(date.getMonth() + 1).padStart(2, "0")
+    const day = String(date.getDate()).padStart(2, "0")
+    return `${date.getFullYear()}-${month}-${day}`
+}
+
+function shiftDays(date: Date, days: number) {
+    const next = new Date(date)
+    next.setDate(next.getDate() + days)
+    return next
+}
+
+function dateWindow(filter: string) {
+    const today = new Date()
+    const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+    if (filter === "today") {
+        const key = localDateKey(startOfToday)
+        return { start: key, end: key }
+    }
+    if (filter === "this-week") {
+        const weekday = startOfToday.getDay()
+        const monday = shiftDays(startOfToday, weekday === 0 ? -6 : 1 - weekday)
+        return { start: localDateKey(monday), end: localDateKey(shiftDays(monday, 6)) }
+    }
+    if (filter === "this-month") {
+        const start = new Date(startOfToday.getFullYear(), startOfToday.getMonth(), 1)
+        const end = new Date(startOfToday.getFullYear(), startOfToday.getMonth() + 1, 0)
+        return { start: localDateKey(start), end: localDateKey(end) }
+    }
+    if (filter === "this-year") {
+        const year = startOfToday.getFullYear()
+        return { start: `${year}-01-01`, end: `${year}-12-31` }
+    }
+    return null
+}
+
+function experimentDateKey(value: string | undefined) {
+    if (!value) return ""
+    const date = new Date(value)
+    if (Number.isNaN(date.getTime())) return ""
+    return localDateKey(date)
+}
+
+function matchesDate(experiment: Experiment, filter: string) {
+    const window = dateWindow(filter)
+    if (!window) return true
+    const start = experimentDateKey(experiment.startDate)
+    if (!start) return false
+    const end = experimentDateKey(experiment.endDate) || "9999-12-31"
+    return start <= window.end && end >= window.start
+}
+
 interface ExperimentProps {
     experiments: Experiment[];
     animalEnums: AnimalEnums;
@@ -44,21 +96,15 @@ export default function ExperimentsContainer(props: ExperimentProps) {
     // Filter experiments based on search query and filters
     const filteredExperiments = experimentsData.filter((experiment) => {
         // Search filter
-        const matchesSearch =
-            experiment.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            experiment.description
+        const query = searchQuery.trim().toLowerCase()
+        const haystack = [experiment.title, experiment.description, experiment.createdBy?.email]
+            .filter(Boolean)
+            .join(" ")
             .toLowerCase()
-            .includes(searchQuery.toLowerCase()) ||
-            experiment.createdBy?.email.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesSearch = haystack.includes(query)
+        const matchesStatus = statusFilter === "all" || experiment.status === statusFilter
 
-        // Status filter
-        const matchesStatus =
-            statusFilter === "all" || experiment.status === statusFilter;
-
-        // Date filter (simplified for demo)
-        const matchesDate = dateFilter === "all"; // In a real app, implement proper date filtering
-
-        return matchesSearch && matchesStatus && matchesDate;
+        return matchesSearch && matchesStatus && matchesDate(experiment, dateFilter)
     });
 
     const handleCreateExperiment = useCallback(async (data: CreateExperimentType) => {

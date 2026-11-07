@@ -1,32 +1,96 @@
+"use client"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
 import { Button } from "@/src/components/ui/button"
 import { Badge } from "@/src/components/ui/badge"
-import { Calendar, Download, ExternalLink, Filter, Search, Users } from "lucide-react"
+import { Calendar, Download, ExternalLink, Search, Users } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
 import { Input } from "@/src/components/ui/input"
+import { useMemo, useState } from "react"
 import Link from "next/link"
 import type { AnimalExperimentParticipation } from "@/src/app/[labId]/animals/[id]/types"
+
+const EXPERIMENT_STATUSES = ["PLANNED", "ACTIVE", "PAUSED", "COMPLETED", "CANCELLED"] as const
 
 interface AnimalExperimentsProps {
   labId: string
   experiments: AnimalExperimentParticipation[]
 }
 
+function investigatorName(experiment: AnimalExperimentParticipation["experiment"]) {
+  return [experiment.createdBy?.firstName, experiment.createdBy?.lastName].filter(Boolean).join(" ").trim()
+}
+
+function statusLabel(status: string) {
+  return status ? status.charAt(0) + status.slice(1).toLowerCase().replace(/_/g, " ") : status
+}
+
+function csvCell(value: string) {
+  if (/[",\n]/.test(value)) return `"${value.replace(/"/g, '""')}"`
+  return value
+}
+
 export function AnimalExperiments({ labId, experiments }: AnimalExperimentsProps) {
+  const [search, setSearch] = useState("")
+  const [status, setStatus] = useState("all")
+  const visible = useMemo(() => {
+    const query = search.trim().toLowerCase()
+    return experiments.filter((row) => {
+      const experiment = row.experiment
+      if (status !== "all" && experiment.status !== status) return false
+      if (!query) return true
+      const haystack = [experiment.title, experiment.id, experiment.status, investigatorName(experiment)].join(" ").toLowerCase()
+      return haystack.includes(query)
+    })
+  }, [experiments, search, status])
+
+  const exportCsv = () => {
+    const header = ["ID", "Title", "Status", "Start", "End", "Principal Investigator"]
+    const lines = visible.map((row) => {
+      const experiment = row.experiment
+      const start = experiment.startDate ? new Date(experiment.startDate).toLocaleDateString() : ""
+      const end = experiment.endDate ? new Date(experiment.endDate).toLocaleDateString() : ""
+      return [experiment.id, experiment.title, statusLabel(experiment.status), start, end, investigatorName(experiment)]
+        .map(csvCell)
+        .join(",")
+    })
+    const blob = new Blob([[header.join(","), ...lines].join("\n")], { type: "text/csv;charset=utf-8" })
+    const url = URL.createObjectURL(blob)
+    const anchor = document.createElement("a")
+    anchor.href = url
+    anchor.download = "experiment-participation.csv"
+    anchor.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="relative w-full sm:w-64">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-          <Input type="search" placeholder="Search experiments..." className="w-full pl-8" />
+          <Input
+            type="search"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Search experiments..."
+            className="w-full pl-8"
+          />
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="flex items-center gap-2">
-            <Filter className="h-4 w-4" />
-            Filter
-          </Button>
-          <Button variant="outline" size="sm" className="flex items-center gap-2">
+          <Select value={status} onValueChange={setStatus}>
+            <SelectTrigger className="w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All statuses</SelectItem>
+              {EXPERIMENT_STATUSES.map((item) => (
+                <SelectItem key={item} value={item}>{statusLabel(item)}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button type="button" variant="outline" size="sm" className="flex items-center gap-2" disabled={visible.length === 0} onClick={exportCsv}>
             <Download className="h-4 w-4" />
             Export
           </Button>
@@ -56,10 +120,16 @@ export function AnimalExperiments({ labId, experiments }: AnimalExperimentsProps
                     This animal is not linked to any experiment yet.
                   </TableCell>
                 </TableRow>
+              ) : visible.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center text-sm text-gray-500 py-10">
+                    No experiments match this search.
+                  </TableCell>
+                </TableRow>
               ) : (
-                experiments.map((row) => {
+                visible.map((row) => {
                   const exp = row.experiment
-                  const pi = [exp.createdBy?.firstName, exp.createdBy?.lastName].filter(Boolean).join(" ").trim()
+                  const pi = investigatorName(exp)
                   const start = exp.startDate ? new Date(exp.startDate).toLocaleDateString() : "—"
                   const end = exp.endDate ? new Date(exp.endDate).toLocaleDateString() : "—"
                   return (
@@ -101,17 +171,6 @@ export function AnimalExperiments({ labId, experiments }: AnimalExperimentsProps
           </Table>
         </CardContent>
       </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Experiment Schedule</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-gray-500">
-            Procedure scheduling for experiments will appear here when available.
-          </p>
-        </CardContent>
-      </Card>
     </div>
   )
 }
@@ -121,39 +180,17 @@ interface ExperimentStatusBadgeProps {
 }
 
 function ExperimentStatusBadge({ status }: ExperimentStatusBadgeProps) {
-  const getStatusColor = (s: string) => {
-    switch (s.toUpperCase()) {
-      case "ACTIVE":
-        return "bg-green-100 text-green-800 hover:bg-green-100"
-      case "PLANNED":
-        return "bg-blue-100 text-blue-800 hover:bg-blue-100"
-      case "PAUSED":
-        return "bg-amber-100 text-amber-800 hover:bg-amber-100"
-      case "COMPLETED":
-        return "bg-gray-100 text-gray-800 hover:bg-gray-100"
-      case "CANCELLED":
-        return "bg-red-100 text-red-800 hover:bg-red-100"
-      default:
-        switch (s.toLowerCase()) {
-          case "active":
-            return "bg-green-100 text-green-800 hover:bg-green-100"
-          case "scheduled":
-            return "bg-blue-100 text-blue-800 hover:bg-blue-100"
-          case "completed":
-            return "bg-gray-100 text-gray-800 hover:bg-gray-100"
-          case "cancelled":
-            return "bg-red-100 text-red-800 hover:bg-red-100"
-          default:
-            return "bg-gray-100 text-gray-800 hover:bg-gray-100"
-        }
-    }
+  const color: Record<string, string> = {
+    ACTIVE: "bg-green-100 text-green-800 hover:bg-green-100",
+    PLANNED: "bg-blue-100 text-blue-800 hover:bg-blue-100",
+    PAUSED: "bg-amber-100 text-amber-800 hover:bg-amber-100",
+    COMPLETED: "bg-gray-100 text-gray-800 hover:bg-gray-100",
+    CANCELLED: "bg-red-100 text-red-800 hover:bg-red-100",
   }
 
-  const label = status ? status.charAt(0) + status.slice(1).toLowerCase().replace(/_/g, " ") : status
-
   return (
-    <Badge variant="outline" className={`${getStatusColor(status)}`}>
-      {label}
+    <Badge variant="outline" className={color[status.toUpperCase()] ?? "bg-gray-100 text-gray-800 hover:bg-gray-100"}>
+      {statusLabel(status)}
     </Badge>
   )
 }
