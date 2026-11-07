@@ -24,6 +24,7 @@ export interface MeasurementsContainerProps {
     animalEnums: AnimalEnums;
     measurements: AnimalRecordMeasurement[];
     experimentId?: string;
+    initialRecordType: RecordType;
     animalSummary: AnimalSummaryForRecord;
 }
 
@@ -44,7 +45,7 @@ export const formSchema = z.object({
     })).optional(),
 });
 
-export default function MeasurementsContainer({userId, labId, animalId, animalEnums, measurements, experimentId, animalSummary}: MeasurementsContainerProps) {
+export default function MeasurementsContainer({userId, labId, animalId, animalEnums, measurements, experimentId, initialRecordType, animalSummary}: MeasurementsContainerProps) {
     const dispatch = useAppDispatch()
     const [additionalParameters, setAdditionalParameters] = useState<CreateParameterData[] | []>(measurements.map((measurement: AnimalRecordMeasurement) => ({
         parameterName: measurement.parameter,
@@ -58,7 +59,7 @@ export default function MeasurementsContainer({userId, labId, animalId, animalEn
         resolver: zodResolver(formSchema),
         defaultValues: {
             recordTime: new Date().toTimeString().slice(0, 5),
-            recordType: RecordType.ROUTINE_CHECK,
+            recordType: initialRecordType,
             activityLevel: ActivityLevel.NORMAL,
             recordDate: new Date(),
             measurements: [{

@@ -1,8 +1,8 @@
 "use client"
 
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/src/components/ui/dropdown-menu"
-import { Beaker, Calendar, ChevronDown, Filter, MousePointer, Plus, Search, SlidersHorizontal } from "lucide-react"
+import { Beaker, Calendar, Filter, MousePointer, Plus, Search } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
+import { ExperimentStatus } from "../animals/types"
 import { Card, CardContent, CardFooter } from "@/src/components/ui/card"
 import { StatusBadge } from "@/src/components/status-badge"
 import { Checkbox } from "@/src/components/ui/checkbox"
@@ -14,6 +14,18 @@ import { Badge } from "@/src/components/ui/badge"
 import { Input } from "@/src/components/ui/input"
 import type { Experiment } from "./types"
 import Link from "next/link"
+
+const EXPERIMENT_STATUSES = [
+    ExperimentStatus.PLANNED,
+    ExperimentStatus.ACTIVE,
+    ExperimentStatus.PAUSED,
+    ExperimentStatus.COMPLETED,
+    ExperimentStatus.CANCELLED,
+]
+
+function statusLabel(status: string) {
+    return status.charAt(0) + status.slice(1).toLowerCase()
+}
 
 interface ExperimentsViewProps {
     setStatusFilter: Dispatch<SetStateAction<string>>;
@@ -70,11 +82,11 @@ export default function ExperimentsView(props: ExperimentsViewProps) {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
-                <SelectItem value="critical">Critical</SelectItem>
+                {EXPERIMENT_STATUSES.map((status) => (
+                  <SelectItem key={status} value={status}>
+                    {statusLabel(status)}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
   
@@ -89,29 +101,8 @@ export default function ExperimentsView(props: ExperimentsViewProps) {
                 <SelectItem value="this-week">This Week</SelectItem>
                 <SelectItem value="this-month">This Month</SelectItem>
                 <SelectItem value="this-year">This Year</SelectItem>
-                <SelectItem value="custom">Custom Range</SelectItem>
               </SelectContent>
             </Select>
-  
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="gap-1">
-                  <SlidersHorizontal className="h-4 w-4" />
-                  <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">More Filters</span>
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56">
-                <DropdownMenuLabel>Filter Options</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuItem>Lead Researcher</DropdownMenuItem>
-                  <DropdownMenuItem>Animal Type</DropdownMenuItem>
-                  <DropdownMenuItem>Department</DropdownMenuItem>
-                  <DropdownMenuItem>Funding Source</DropdownMenuItem>
-                </DropdownMenuGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
 
             <div className="flex items-center space-x-2 sm:items-center">
               <Checkbox
@@ -126,6 +117,9 @@ export default function ExperimentsView(props: ExperimentsViewProps) {
           </div>
         </div>
   
+        {filteredExperiments.length === 0 ? (
+          <p className="text-sm text-gray-500">No experiments match this search.</p>
+        ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredExperiments.map((experiment: Experiment) => (
             <Link href={`/${labId}/experiments/${experiment.id}`} key={experiment.id}>
@@ -172,6 +166,7 @@ export default function ExperimentsView(props: ExperimentsViewProps) {
             </Link>
           ))}
         </div>
+        )}
       </div>
     )
 }

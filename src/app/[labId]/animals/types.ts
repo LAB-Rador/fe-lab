@@ -114,6 +114,18 @@ export enum RecordType {
     SAMPLING = "SAMPLING",
 }
 
+export function recordTypeFromQuery(value: string | undefined): RecordType {
+    if (value && (Object.values(RecordType) as string[]).includes(value)) {
+        return value as RecordType
+    }
+    return RecordType.ROUTINE_CHECK
+}
+
+export function newAnimalRecordPath(labId: string, animalId: string, recordType?: RecordType) {
+    const path = `/${labId}/animals/${animalId}/measurements/new`
+    return recordType ? `${path}?recordType=${recordType}` : path
+}
+
 export enum ActivityLevel {
     VERY_HIGH = "VERY_HIGH",
     VERY_LOW = "VERY_LOW",

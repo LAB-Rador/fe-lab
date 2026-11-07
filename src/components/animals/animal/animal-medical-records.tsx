@@ -3,6 +3,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
 import type { MedicalRecord } from "@/src/app/[labId]/animals/[id]/types"
+import { RecordType, newAnimalRecordPath } from "@/src/app/[labId]/animals/types"
 import { Button } from "@/src/components/ui/button"
 import { Badge } from "@/src/components/ui/badge"
 import { Input } from "@/src/components/ui/input"
@@ -68,7 +69,7 @@ export function AnimalMedicalRecords({
                     />
                 </div>
                 <Button asChild size="sm" className="bg-blue-600 hover:bg-blue-700">
-                    <Link href={`/${labId}/animals/${animalId}/measurements/new`}>
+                    <Link href={newAnimalRecordPath(labId, animalId, RecordType.MEDICATION)}>
                         <Plus className="h-4 w-4" />
                         Add record
                     </Link>
