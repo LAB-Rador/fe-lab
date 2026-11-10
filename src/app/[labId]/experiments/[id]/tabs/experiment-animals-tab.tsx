@@ -111,20 +111,20 @@ export function ExperimentAnimalsTab(props: ExperimentAnimalsTabProps) {
           (experiment.animals ?? []).map((animal) => (
             <Card
               key={animal.id}
-              className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
+              className="overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md"
             >
               <CardContent className="p-0">
-                <div className="border-b border-gray-100 bg-gradient-to-b from-slate-50/90 to-white px-5 py-4">
+                <div className="border-b border-border bg-card px-5 py-4">
                   <div className="flex gap-3">
                     <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-blue-100 bg-blue-50">
                       <MousePointer className="h-5 w-5 text-blue-600" aria-hidden />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="truncate text-lg font-semibold tracking-tight text-gray-900">
+                      <h3 className="truncate text-lg font-semibold tracking-tight text-foreground">
                         {animal.name || animal.identifier}
                       </h3>
                       <p
-                        className="mt-1 truncate font-mono text-[11px] leading-snug text-gray-400"
+                        className="mt-1 truncate font-mono text-[11px] leading-snug text-muted-foreground"
                         title={animal.id}
                       >
                         {animal.id}
@@ -154,17 +154,17 @@ export function ExperimentAnimalsTab(props: ExperimentAnimalsTabProps) {
                   ).map((row) => (
                     <div
                       key={row.label}
-                      className="flex items-baseline justify-between gap-3 border-b border-gray-50 pb-2 text-sm last:border-0 last:pb-0"
+                      className="flex items-baseline justify-between gap-3 border-b border-border pb-2 text-sm last:border-0 last:pb-0"
                     >
-                      <span className="shrink-0 text-gray-500">{row.label}</span>
-                      <span className="truncate text-right font-medium text-gray-900">{row.value}</span>
+                      <span className="shrink-0 text-muted-foreground">{row.label}</span>
+                      <span className="truncate text-right font-medium text-foreground">{row.value}</span>
                     </div>
                   ))}
                 </div>
 
-                <div className="flex flex-wrap items-center justify-between gap-2 border-t border-gray-100 bg-gray-50/90 px-4 py-3">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border bg-muted/40 px-4 py-3">
                   <div className="flex flex-wrap gap-2">
-                    <Button variant="outline" size="sm" className="border-gray-200 bg-white shadow-none" asChild>
+                    <Button variant="outline" size="sm" className="border-border bg-card shadow-none" asChild>
                       <Link href={`/${labId}/animals/${animal.id}`}>View details</Link>
                     </Button>
                     <Button size="sm" className="bg-blue-600 hover:bg-blue-700" asChild>
@@ -180,7 +180,7 @@ export function ExperimentAnimalsTab(props: ExperimentAnimalsTabProps) {
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="shrink-0 text-red-600 hover:bg-red-50 hover:text-red-700"
+                      className="shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
                       onClick={() => onRemoveAnimal(animal.id)}
                       aria-label="Remove animal from experiment"
                     >

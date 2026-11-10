@@ -1,5 +1,8 @@
 "use client"
 
+import { ctaGlowClass } from "@/src/components/landing/cta-glow"
+import Magnet from "@/src/components/react-bits/magnet"
+import { ThemeToggle } from "@/src/components/theme-toggle"
 import { Button } from "@/src/components/ui/button"
 import { Microscope, Menu, X } from "lucide-react"
 import Link from "next/link"
@@ -12,42 +15,46 @@ export function Header() {
     const router = useRouter();
 
     return (
-        <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
             <div className="container mx-auto px-4 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     <Link href="/" className="flex items-center space-x-3" onClick={() => setIsMenuOpen(false)}>
-                        <div className="p-2 bg-[#2563EB] rounded-lg">
-                            <Microscope className="h-6 w-6 text-white" />
+                        <div className="rounded-xl bg-primary p-2">
+                            <Microscope className="h-6 w-6 text-primary-foreground" />
                         </div>
-                        <span className="text-2xl font-bold text-gray-900">LabAssist</span>
+                        <span className="text-2xl font-bold text-foreground">LabAssist</span>
                     </Link>
 
                     <div className="hidden md:flex items-center space-x-4">
-                        <Link href="/pricing" className="text-sm font-medium text-gray-700 hover:text-gray-900">
+                        <ThemeToggle />
+                        <Link href="/pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground">
                             Pricing
                         </Link>
-                        <Button onClick={() => router.push("/signin")} className="bg-[#2563EB] hover:bg-[#2563EB]/90 text-white">
-                            Sign in
-                        </Button>
+                        <Magnet padding={70} magnetStrength={5}>
+                            <Button onClick={() => router.push("/signin")} className={ctaGlowClass}>
+                                Sign in
+                            </Button>
+                        </Magnet>
                     </div>
 
-                    {/* Mobile Menu Button */}
-                    <button className="md:hidden p-2" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                        {isMenuOpen ? <X className="h-6 w-6 text-gray-600" /> : <Menu className="h-6 w-6 text-gray-600" />}
+                    <button className="md:hidden p-2" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Open menu">
+                        {isMenuOpen ? <X className="h-6 w-6 text-muted-foreground" /> : <Menu className="h-6 w-6 text-muted-foreground" />}
                     </button>
                 </div>
 
-                {/* Mobile Menu */}
                 {isMenuOpen && (
-                <div className="md:hidden border-t border-gray-200 py-4">
+                <div className="md:hidden border-t border-border py-4">
                     <nav className="flex flex-col space-y-4">
                         <div className="flex flex-col space-y-2 px-4">
-                            <Link href="/pricing" className="text-sm font-medium text-gray-700" onClick={() => setIsMenuOpen(false)}>
+                            <ThemeToggle />
+                            <Link href="/pricing" className="text-sm font-medium text-muted-foreground" onClick={() => setIsMenuOpen(false)}>
                                 Pricing
                             </Link>
-                            <Button onClick={() => router.push("/signin")} className="bg-[#2563EB] hover:bg-[#2563EB]/90 text-white justify-start">
-                                Sign in
-                            </Button>
+                            <Magnet padding={40} magnetStrength={5} wrapperClassName="w-full" innerClassName="w-full">
+                                <Button onClick={() => router.push("/signin")} className={`w-full justify-start ${ctaGlowClass}`}>
+                                    Sign in
+                                </Button>
+                            </Magnet>
                         </div>
                     </nav>
                 </div>

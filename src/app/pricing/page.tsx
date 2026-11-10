@@ -1,3 +1,4 @@
+import { PublicGlow } from "@/src/components/landing/public-glow"
 import { Footer } from "@/src/components/landing/footer"
 import { Header } from "@/src/components/landing/header"
 import { PricingView, type PricingPlan } from "./pricing.view"
@@ -68,7 +69,8 @@ async function getPlans(): Promise<{ plans: PricingPlan[]; error: string | null 
 export default async function PricingPage() {
     const { plans, error } = await getPlans()
     return (
-        <div className="min-h-screen bg-white">
+        <div className="relative min-h-screen bg-background text-foreground">
+            <PublicGlow />
             <Header />
             <main>
                 <PricingView plans={plans} error={error} />

@@ -30,33 +30,33 @@ export function Footer() {
     }
 
     return (
-        <footer className="bg-gray-900 text-white">
+        <footer className="border-t border-border bg-background text-foreground">
             <div className="container mx-auto px-4 lg:px-8 py-16">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
                     {/* Company Info */}
                     <div className="lg:col-span-2">
                         <Link href="/" className="flex items-center space-x-3 mb-6">
-                            <div className="p-2 bg-[#2563EB] rounded-lg">
-                                <Microscope className="h-6 w-6 text-white" />
+                            <div className="rounded-xl bg-primary p-2">
+                                <Microscope className="h-6 w-6 text-primary-foreground" />
                             </div>
                             <span className="text-2xl font-bold">LabAssist</span>
                         </Link>
-                        <p className="text-gray-400 mb-6 leading-relaxed">
+                        <p className="mb-6 leading-relaxed text-muted-foreground">
                             The leading platform for laboratory animal management, helping research institutions worldwide improve
                             animal care and research outcomes.
                         </p>
                         <div className="space-y-3">
                             <div className="flex items-center space-x-3">
-                                <Mail className="h-4 w-4 text-gray-400" />
-                                <span className="text-gray-400">kolevegov@gmail.com</span>
+                                <Mail className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-muted-foreground">kolevegov@gmail.com</span>
                             </div>
                             <div className="flex items-center space-x-3">
-                                <Phone className="h-4 w-4 text-gray-400" />
-                                <span className="text-gray-400">+1 (438) 497-7715</span>
+                                <Phone className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-muted-foreground">+1 (438) 497-7715</span>
                             </div>
                             <div className="flex items-center space-x-3">
-                                <MapPin className="h-4 w-4 text-gray-400" />
-                                <span className="text-gray-400">Calgary, AB</span>
+                                <MapPin className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-muted-foreground">Calgary, AB</span>
                             </div>
                         </div>
                     </div>
@@ -67,7 +67,7 @@ export function Footer() {
                         <ul className="space-y-2">
                             {footerLinks.product.map((link) => (
                                 <li key={link.name}>
-                                    <a href={link.href} className="text-gray-400 transition-colors">
+                                    <a href={link.href} className="text-muted-foreground transition-colors hover:text-foreground">
                                         {link.name}
                                     </a>
                                 </li>
@@ -80,7 +80,7 @@ export function Footer() {
                         <ul className="space-y-2">
                             {footerLinks.company.map((link) => (
                                 <li key={link.name}>
-                                    <a href={link.href} className={`${link.href.includes('https') ? 'text-white' : 'text-gray-400'} transition-colors`}>
+                                    <a href={link.href} className={`${link.href.includes('https') ? 'text-foreground' : 'text-muted-foreground'} transition-colors hover:text-foreground`}>
                                         {link.name}
                                     </a>
                                 </li>
@@ -93,7 +93,7 @@ export function Footer() {
                         <ul className="space-y-2">
                             {footerLinks.resources.map((link) => (
                                 <li key={link.name}>
-                                    <a href={link.href} className={`${link.href.includes('https') ? 'text-white' : 'text-gray-400'} transition-colors`}>
+                                    <a href={link.href} className={`${link.href.includes('https') ? 'text-foreground' : 'text-muted-foreground'} transition-colors hover:text-foreground`}>
                                         {link.name}
                                     </a>
                                 </li>
@@ -106,7 +106,7 @@ export function Footer() {
                         <ul className="space-y-2">
                             {footerLinks.legal.map((link) => (
                                 <li key={link.name}>
-                                    <Link href={link.href} className={`${link.href.includes('/') ? 'text-white' : 'text-gray-400'} transition-colors`}>
+                                    <Link href={link.href} className={`${link.href.includes('/') ? 'text-foreground' : 'text-muted-foreground'} transition-colors hover:text-foreground`}>
                                         {link.name}
                                     </Link>
                                 </li>
@@ -115,17 +115,17 @@ export function Footer() {
                     </div>
                 </div>
 
-                <div className="border-t border-gray-800 mt-12 pt-8">
+                <div className="mt-12 border-t border-border pt-8">
                     <div className="flex flex-col md:flex-row justify-between items-center">
-                        <p className="text-gray-400 text-sm">© 2026 LabAssist. All rights reserved.</p>
+                        <p className="text-sm text-muted-foreground">© 2026 LabAssist. All rights reserved.</p>
                         <div className="flex space-x-6 mt-4 md:mt-0">
-                            <Link href="/privacy" className=" text-white transition-colors text-sm">
+                            <Link href="/privacy" className="text-sm text-foreground transition-colors">
                                 Privacy
                             </Link>
-                            <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">
+                            <a href="#" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
                                 Terms
                             </a>
-                            <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">
+                            <a href="#" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
                                 Cookies
                             </a>
                         </div>

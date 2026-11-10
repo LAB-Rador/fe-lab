@@ -81,17 +81,17 @@ function getAssigneeDisplay(task: Task): { primary: string; secondary?: string }
 }
 
 const PRIORITY_BADGE_CLASS: Record<TaskPriority, string> = {
-  [TaskPriority.LOW]: "border-slate-200 bg-slate-50 text-slate-800 hover:bg-slate-50",
-  [TaskPriority.MEDIUM]: "border-amber-200 bg-amber-50 text-amber-950 hover:bg-amber-50",
-  [TaskPriority.HIGH]: "border-orange-300 bg-orange-50 text-orange-950 hover:bg-orange-50",
-  [TaskPriority.URGENT]: "border-red-300 bg-red-50 text-red-950 hover:bg-red-50",
+  [TaskPriority.LOW]: "border-slate-400/40 bg-slate-500/10 text-slate-800 hover:bg-slate-500/15 dark:text-slate-200",
+  [TaskPriority.MEDIUM]: "border-amber-500/40 bg-amber-400/15 text-amber-900 hover:bg-amber-400/20 dark:text-amber-200",
+  [TaskPriority.HIGH]: "border-orange-500/40 bg-orange-400/15 text-orange-900 hover:bg-orange-400/20 dark:text-orange-200",
+  [TaskPriority.URGENT]: "border-red-500/40 bg-red-500/15 text-red-900 hover:bg-red-500/20 dark:text-red-200",
 }
 
 const STATUS_SELECT_TRIGGER_CLASS: Record<TaskStatus, string> = {
-  [TaskStatus.PENDING]: "border-slate-300/90 bg-white text-slate-800 hover:bg-slate-50",
-  [TaskStatus.IN_PROGRESS]: "border-blue-400/70 bg-blue-50 text-blue-950 hover:bg-blue-50",
-  [TaskStatus.COMPLETED]: "border-green-500/70 bg-green-50 text-green-950 hover:bg-green-50",
-  [TaskStatus.CANCELLED]: "border-zinc-300 bg-zinc-100 text-zinc-700 hover:bg-zinc-100",
+  [TaskStatus.PENDING]: "border-border bg-muted text-foreground hover:bg-muted",
+  [TaskStatus.IN_PROGRESS]: "border-blue-500/40 bg-blue-500/15 text-blue-900 hover:bg-blue-500/20 dark:text-blue-200",
+  [TaskStatus.COMPLETED]: "border-green-500/40 bg-green-500/15 text-green-900 hover:bg-green-500/20 dark:text-green-200",
+  [TaskStatus.CANCELLED]: "border-border bg-muted text-muted-foreground hover:bg-muted",
 }
 
 function TaskQuickStatusSelect(props: {

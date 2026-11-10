@@ -50,7 +50,7 @@ export default async function DashboardLayout({
   
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen bg-gray-50">
+      <div className="clinical-app flex min-h-screen bg-gray-50">
         <Sidebar />
         <div className="flex flex-1 flex-col">
           <DashboardHeader

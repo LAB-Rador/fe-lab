@@ -39,13 +39,13 @@ const benefits = {
 
 export function BenefitsSection() {
     return (
-        <section className="py-20 bg-gray-50">
+        <section className="bg-card/40 py-20">
             <div className="container mx-auto px-4 lg:px-8">
                 <div className="text-center mb-16">
-                    <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+                    <h2 className="mb-4 text-3xl font-bold text-foreground lg:text-4xl">
                         Designed for Every Role in Your Laboratory
                     </h2>
-                    <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                    <p className="mx-auto max-w-3xl text-xl text-muted-foreground">
                         LabAssist adapts to the unique needs of each team member, from researchers to veterinarians, ensuring
                         everyone has the tools they need to excel.
                     </p>
@@ -73,7 +73,7 @@ export function BenefitsSection() {
 
                     {Object.entries(benefits).map(([role, benefitList]) => (
                         <TabsContent key={role} value={role}>
-                            <Card>
+                            <Card className="rounded-xl border-border">
                                 <CardHeader className="text-center">
                                     <CardTitle className="text-2xl capitalize">{role}</CardTitle>
                                     <CardDescription className="text-lg">
@@ -85,7 +85,7 @@ export function BenefitsSection() {
                                         {benefitList.map((benefit, index) => (
                                             <div key={index} className="flex items-center space-x-3">
                                                 <CheckCircle className="h-5 w-5 text-[#10B981] flex-shrink-0" />
-                                                <span className="text-gray-700">{benefit}</span>
+                                                <span className="text-foreground">{benefit}</span>
                                             </div>
                                         ))}
                                     </div>

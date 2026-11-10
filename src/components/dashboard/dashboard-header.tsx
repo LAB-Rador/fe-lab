@@ -24,6 +24,7 @@ import {
 } from "@/src/components/tasks/notifications"
 import { apiClient } from "@/src/lib/apiClient"
 import { AuthService } from "@/src/lib/auth"
+import { ThemeToggle } from "@/src/components/theme-toggle"
 import { Bell, Clock, Search } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -121,6 +122,7 @@ export function DashboardHeader({
         </form>
       </div>
       <div className="flex items-center gap-4">
+        <ThemeToggle />
         <div className="flex space-x-1">
           {laboratoryMembers.map((member) => {
             const initials = getInitials(member.user.firstName || "", member.user.lastName || "")

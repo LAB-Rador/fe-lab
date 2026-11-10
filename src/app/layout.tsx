@@ -1,9 +1,10 @@
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
+import { ThemeProvider } from "@/src/components/theme-provider"
+import { Toaster } from "@/src/components/ui/sonner"
 import CustomLayout from "./customLayout"
 import { Inter } from "next/font/google"
 import type { Metadata } from "next"
-import { Toaster } from "sonner"
 import type React from "react"
 import "@/src/app/globals.css"
 
@@ -26,18 +27,20 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/favicon.ico" type="image/x-icon" />
       </head>
       <body className={inter.className}>
-        <Toaster position="top-center" />
-        <Analytics />
-        <SpeedInsights />
-        <CustomLayout>
-          {children}
-        </CustomLayout>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
+          <Toaster position="top-center" />
+          <Analytics />
+          <SpeedInsights />
+          <CustomLayout>
+            {children}
+          </CustomLayout>
+        </ThemeProvider>
       </body>
     </html>
   )

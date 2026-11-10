@@ -17,10 +17,10 @@ export type TasksCalendarViewProps = {
 }
 
 const PRIORITY_BAR: Record<TaskPriority, string> = {
-  [TaskPriority.LOW]: "border-l-green-500 bg-green-50",
-  [TaskPriority.MEDIUM]: "border-l-amber-500 bg-amber-50",
-  [TaskPriority.HIGH]: "border-l-orange-500 bg-orange-50",
-  [TaskPriority.URGENT]: "border-l-red-600 bg-red-50",
+  [TaskPriority.LOW]: "border-l-green-600 bg-green-500/15 text-green-800 dark:text-green-300",
+  [TaskPriority.MEDIUM]: "border-l-amber-500 bg-amber-400/15 text-amber-900 dark:text-amber-200",
+  [TaskPriority.HIGH]: "border-l-orange-500 bg-orange-400/15 text-orange-900 dark:text-orange-200",
+  [TaskPriority.URGENT]: "border-l-red-600 bg-red-500/15 text-red-900 dark:text-red-200",
 }
 
 function dayKey(d: Date): string {
@@ -85,7 +85,7 @@ export default function TasksCalendarView(props: TasksCalendarViewProps) {
                 className={cn(
                   "flex min-h-[5.5rem] flex-col rounded-md border p-1 text-left",
                   inMonth ? "bg-background" : "bg-muted/40 text-muted-foreground",
-                  isToday && "ring-2 ring-primary ring-offset-2",
+                  isToday && "ring-2 ring-primary ring-offset-2 ring-offset-background",
                 )}
               >
                 <div className="flex items-start justify-between gap-1">
@@ -103,7 +103,7 @@ export default function TasksCalendarView(props: TasksCalendarViewProps) {
                       title={task.title}
                       className={cn(
                         "truncate rounded border-l-2 px-1 py-0.5 text-[10px] font-medium leading-tight sm:text-xs",
-                        PRIORITY_BAR[task.priority] ?? "border-l-slate-400 bg-slate-50",
+                        PRIORITY_BAR[task.priority] ?? "border-l-slate-400 bg-muted text-foreground",
                       )}
                     >
                       {task.title}
