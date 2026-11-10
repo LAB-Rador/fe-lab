@@ -1,5 +1,7 @@
 'use client';
 
+/* Copyright (c) 2026 David Haz. React Bits, MIT + Commons Clause. See ./LICENSE.md */
+
 import { useEffect, useRef, type HTMLAttributes, type ReactNode } from 'react';
 
 export type MagnetAxis = 'both' | 'x' | 'y';

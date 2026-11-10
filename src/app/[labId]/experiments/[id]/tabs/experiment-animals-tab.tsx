@@ -154,7 +154,7 @@ export function ExperimentAnimalsTab(props: ExperimentAnimalsTabProps) {
                   ).map((row) => (
                     <div
                       key={row.label}
-                      className="flex items-baseline justify-between gap-3 border-b border-gray-50 pb-2 text-sm last:border-0 last:pb-0"
+                      className="flex items-baseline justify-between gap-3 border-b border-border pb-2 text-sm last:border-0 last:pb-0"
                     >
                       <span className="shrink-0 text-muted-foreground">{row.label}</span>
                       <span className="truncate text-right font-medium text-foreground">{row.value}</span>
@@ -180,7 +180,7 @@ export function ExperimentAnimalsTab(props: ExperimentAnimalsTabProps) {
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="shrink-0 text-red-600 hover:bg-red-50 hover:text-red-700"
+                      className="shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
                       onClick={() => onRemoveAnimal(animal.id)}
                       aria-label="Remove animal from experiment"
                     >

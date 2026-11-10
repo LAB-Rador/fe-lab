@@ -49,11 +49,10 @@ export function TestimonialsSection() {
                     {testimonials.map((testimonial) => (
                         <SpotlightCard
                             key={testimonial.name}
-                            theme="dark"
                             spotlightColor="#8B5CF6"
                             intensity={0.35}
                             borderGlow={0.8}
-                            className="h-full !rounded-xl !p-6 border border-[#1E293B]"
+                            className="h-full !rounded-xl !p-6 border border-border"
                             style={spotlightSurface}
                         >
                             <div className="flex items-center mb-4">

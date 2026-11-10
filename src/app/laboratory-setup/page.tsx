@@ -152,19 +152,19 @@ export default function LaboratorySetupPage() {
                             </div>
 
                             {error ? (
-                                <div className="bg-red-50 border border-red-200 rounded-md p-4">
+                                <div className="rounded-md border border-destructive/30 bg-destructive/10 p-4">
                                     <div className="flex items-center">
-                                        <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
-                                        <p className="text-sm text-red-700">{error}</p>
+                                        <AlertCircle className="mr-2 h-5 w-5 text-destructive" />
+                                        <p className="text-sm text-destructive">{error}</p>
                                     </div>
                                 </div>
                             ) : null}
 
                             {success ? (
-                                <div className="bg-green-50 border border-green-200 rounded-md p-4">
+                                <div className="rounded-md border border-emerald-500/30 bg-emerald-500/10 p-4">
                                     <div className="flex items-center">
-                                        <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
-                                        <p className="text-sm text-green-700">{success}</p>
+                                        <CheckCircle className="mr-2 h-5 w-5 text-emerald-600 dark:text-emerald-300" />
+                                        <p className="text-sm text-emerald-800 dark:text-emerald-200">{success}</p>
                                     </div>
                                 </div>
                             ) : null}

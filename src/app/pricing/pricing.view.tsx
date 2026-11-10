@@ -29,7 +29,7 @@ export function PricingView({ plans, error }: { plans: PricingPlan[]; error: str
                 </div>
 
                 {error ? (
-                    <p className="text-center text-sm text-red-400">{error}</p>
+                    <p className="text-center text-sm text-destructive">{error}</p>
                 ) : (
                     <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-5">
                         {plans.map((plan) => (

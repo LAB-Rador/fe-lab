@@ -115,12 +115,11 @@ export function FeaturesSection() {
                     {features.map((feature, index) => (
                         <SpotlightCard
                             key={feature.title}
-                            theme="dark"
                             spotlightColor={index % 2 === 0 ? "#3B82F6" : "#8B5CF6"}
                             intensity={0.4}
                             borderGlow={0.85}
                             ambient
-                            className="h-full !rounded-xl !p-0 border border-[#1E293B]"
+                            className="h-full !rounded-xl !p-0 border border-border"
                             style={spotlightSurface}
                         >
                             <CardHeader>

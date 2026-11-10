@@ -4,7 +4,7 @@ import { FeaturesSection } from "@/src/components/landing/features-section"
 import { BenefitsSection } from "@/src/components/landing/benefits-section"
 import { TestimonialsSection } from "@/src/components/landing/testimonials-section"
 import { CTASection } from "@/src/components/landing/cta-section"
-import { PublicGlow } from "@/src/components/landing/public-glow"
+import { LandingGalaxy } from "@/src/components/landing/landing-galaxy"
 import { Footer } from "@/src/components/landing/footer"
 import type { LandingStatsPayload } from "@/src/types/landing-stats"
 
@@ -33,17 +33,19 @@ async function getLandingStats(): Promise<LandingStatsPayload | null> {
 export default async function LandingPage() {
     const stats = await getLandingStats()
     return (
-        <div className="relative min-h-screen bg-background text-foreground">
-            <PublicGlow />
-            <Header />
-            <main>
-                <HeroSection stats={stats} />
-                <FeaturesSection />
-                <BenefitsSection />
-                <TestimonialsSection />
-                <CTASection />
-            </main>
-            <Footer />
+        <div className="relative isolate min-h-screen text-foreground">
+            <LandingGalaxy />
+            <div className="relative z-10">
+                <Header />
+                <main>
+                    <HeroSection stats={stats} />
+                    <FeaturesSection />
+                    <BenefitsSection />
+                    <TestimonialsSection />
+                    <CTASection />
+                </main>
+                <Footer />
+            </div>
         </div>
     )
 }

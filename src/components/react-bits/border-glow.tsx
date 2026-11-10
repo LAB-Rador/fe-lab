@@ -1,6 +1,8 @@
 'use client';
 
-import { useRef, useCallback, useState, useEffect, type ReactNode } from 'react';
+/* Copyright (c) 2026 David Haz. React Bits, MIT + Commons Clause. See ./LICENSE.md */
+
+import { useRef, useCallback, useState, useEffect, useLayoutEffect, type ReactNode } from 'react';
 
 interface BorderGlowProps {
   children?: ReactNode;
@@ -80,6 +82,12 @@ function buildMeshGradients(colors: string[]): string[] {
 }
 
 function isLightColor(color: string): boolean {
+  const rgb = color.match(/rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:[,\s/]+([\d.]+%?))?/i);
+  if (rgb) {
+    const alpha = rgb[4] === undefined ? 1 : rgb[4].endsWith('%') ? Number(rgb[4]) / 100 : Number(rgb[4]);
+    if (alpha === 0) return false;
+    return Number(rgb[1]) * 0.2126 + Number(rgb[2]) * 0.7152 + Number(rgb[3]) * 0.0722 > 180;
+  }
   const value = color.trim().replace('#', '');
   if (!/^[\da-f]{3}([\da-f]{3})?$/i.test(value)) return false;
   const hex = value.length === 3 ? value.split('').map(char => char + char).join('') : value;
@@ -104,6 +112,7 @@ const BorderGlow: React.FC<BorderGlowProps> = ({
   fillOpacity = 0.5,
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
+  const [lightSurface, setLightSurface] = useState(() => isLightColor(backgroundColor));
   const [isHovered, setIsHovered] = useState(false);
   const [cursorAngle, setCursorAngle] = useState(45);
   const [edgeProximity, setEdgeProximity] = useState(0);
@@ -173,6 +182,16 @@ const BorderGlow: React.FC<BorderGlowProps> = ({
     };
   }, [animated]);
 
+  useLayoutEffect(() => {
+    const card = cardRef.current;
+    if (!card) return;
+    const read = () => setLightSurface(isLightColor(getComputedStyle(card).backgroundColor));
+    read();
+    const observer = new MutationObserver(read);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, [backgroundColor]);
+
   const colorSensitivity = edgeSensitivity + 20;
   const isVisible = isHovered || sweepActive;
   const borderOpacity = isVisible
@@ -186,7 +205,6 @@ const BorderGlow: React.FC<BorderGlowProps> = ({
   const borderBg = meshGradients.map(g => `${g} border-box`);
   const fillBg = meshGradients.map(g => `${g} padding-box`);
   const angleDeg = `${cursorAngle.toFixed(3)}deg`;
-  const lightSurface = isLightColor(backgroundColor);
 
   return (
     <div

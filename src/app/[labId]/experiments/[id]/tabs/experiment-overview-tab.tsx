@@ -133,7 +133,7 @@ export function ExperimentOverviewTab(props: ExperimentOverviewTabProps) {
           </CardHeader>
           <CardContent className="space-y-4">
             {experiment?.createdBy && (
-              <div className="flex items-center justify-between gap-2 rounded-md border border-gray-100 bg-gray-50/50 p-3">
+              <div className="flex items-center justify-between gap-2 rounded-md border border-border bg-muted/40 p-3">
                 <div className="flex min-w-0 items-center gap-3">
                   <Avatar className="h-10 w-10 shrink-0">
                     <AvatarFallback className="bg-blue-600 text-sm font-semibold text-white">
@@ -184,7 +184,7 @@ export function ExperimentOverviewTab(props: ExperimentOverviewTabProps) {
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="shrink-0 text-red-600 hover:bg-red-50 hover:text-red-700"
+                      className="shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
                       onClick={() => onRemoveMember(m.userId)}
                       aria-label="Remove member"
                     >

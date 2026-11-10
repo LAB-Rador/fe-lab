@@ -1,6 +1,9 @@
 'use client';
 
+/* Copyright (c) 2026 David Haz. React Bits, MIT + Commons Clause. See ./LICENSE.md */
+
 import React, { useEffect, useRef } from 'react';
+import { useTheme } from 'next-themes';
 
 export type SpotlightShape = 'circle' | 'beam';
 
@@ -95,15 +98,17 @@ const SpotlightCard = ({
   ambient = false,
   flare = true,
   grain = 0,
-  theme = 'dark',
+  theme,
   ...rest
 }: SpotlightCardProps) => {
+  const { resolvedTheme } = useTheme();
+  const mode = theme ?? (resolvedTheme === 'light' ? 'light' : 'dark');
   const rootRef = useRef<HTMLDivElement>(null);
   const lightRef = useRef<HTMLSpanElement>(null);
   const grainRef = useRef<HTMLSpanElement>(null);
   const edgeRef = useRef<HTMLSpanElement>(null);
   const wakeRef = useRef<(() => void) | null>(null);
-  const palette = THEMES[theme] ?? THEMES.dark;
+  const palette = THEMES[mode] ?? THEMES.dark;
   const color = spotlightColor ?? palette.light;
   const form = SHAPES.includes(shape) ? shape : 'circle';
   const settings: Settings = {
