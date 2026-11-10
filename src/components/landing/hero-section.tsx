@@ -1,6 +1,7 @@
 "use client"
 
 import { HeroLandingMetrics } from "@/src/components/landing/hero-landing-metrics"
+import { LandingGalaxy } from "@/src/components/landing/landing-galaxy"
 import { ctaGlowClass } from "@/src/components/landing/cta-glow"
 import type { LandingStatsPayload } from "@/src/types/landing-stats"
 import { CountUp } from "@/src/components/ui/count-up"
@@ -22,8 +23,9 @@ export function HeroSection({ stats }: HeroSectionProps) {
     const activePercent = stats?.activePercent
 
     return (
-        <section className="relative py-20 lg:py-32">
-            <div className="container mx-auto px-4 lg:px-8">
+        <section className="relative overflow-hidden py-20 lg:py-32">
+            <LandingGalaxy />
+            <div className="container relative z-10 mx-auto px-4 lg:px-8">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                     <div className="space-y-8">
                         <div className="space-y-4">

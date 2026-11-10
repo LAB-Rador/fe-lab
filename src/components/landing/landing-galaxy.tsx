@@ -10,7 +10,7 @@ export function LandingGalaxy() {
     return (
         <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
             <Galaxy
-                className="h-full min-h-screen"
+                className="h-full w-full"
                 transparent
                 lightMode={light}
                 clickWarp={false}
