@@ -16,7 +16,7 @@ export function LoginForm() {
 
     return (
         <>
-            <form action={formAction} className="mt-8 space-y-6">
+            <form action={formAction} className="space-y-6">
                 <div className="space-y-2">
                     <Label htmlFor="email">Email address</Label>
                     <Input
@@ -31,15 +31,15 @@ export function LoginForm() {
                     {state.fieldErrors?.email?.[0] ? (
                         <p className="text-sm text-red-500">{state.fieldErrors.email[0]}</p>
                     ) : null}
-                    <p className="text-sm text-gray-500">We will email you a one-time sign-in link.</p>
+                    <p className="text-sm text-muted-foreground">We will email you a one-time sign-in link.</p>
                 </div>
                 {state.error ? <p className="text-sm text-red-500">{state.error}</p> : null}
                 {state.success && state.message ? (
-                    <p className="text-sm text-green-700">{state.message}</p>
+                    <p className="text-sm text-emerald-400">{state.message}</p>
                 ) : null}
                 <LoginSubmitButton label="Email me a link" pendingLabel="Sending link..." />
             </form>
-            <form action={guestFormAction} className="mt-4">
+            <form action={guestFormAction}>
                 {guestState.error ? <p className="text-sm text-red-500">{guestState.error}</p> : null}
                 <LoginSubmitButton label="Guest access" pendingLabel="Signing in..." />
             </form>

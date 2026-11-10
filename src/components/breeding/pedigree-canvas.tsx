@@ -12,6 +12,7 @@ import {
 } from "@xyflow/react"
 import { animalLabel, type PedigreeAnimal } from "@/src/app/[labId]/breeding/types"
 import "@xyflow/react/dist/style.css"
+import { useTheme } from "next-themes"
 import Link from "next/link"
 
 type AnimalNodeData = {
@@ -36,6 +37,10 @@ function AnimalNode({ data }: NodeProps<Node<AnimalNodeData>>) {
 }
 
 const nodeTypes = { animal: AnimalNode }
+
+function flowColorMode(resolvedTheme: string | undefined) {
+    return resolvedTheme === "light" ? "light" : "dark"
+}
 
 function placeRow(animals: PedigreeAnimal[], y: number, labId: string, currentId: string): Node<AnimalNodeData>[] {
     const gap = 210
@@ -64,6 +69,7 @@ export function PairCanvas({
     father: PedigreeAnimal
     offspring: PedigreeAnimal[]
 }) {
+    const { resolvedTheme } = useTheme()
     const parents = placeRow([mother, father], 0, labId, "")
     const children = placeRow(offspring, 200, labId, "")
     const edges: Edge[] = offspring.flatMap((child) => [
@@ -73,7 +79,7 @@ export function PairCanvas({
 
     return (
         <div className="h-[420px] w-full overflow-hidden rounded-lg border bg-gray-50">
-            <ReactFlow nodes={[...parents, ...children]} edges={edges} nodeTypes={nodeTypes} fitView>
+            <ReactFlow colorMode={flowColorMode(resolvedTheme)} nodes={[...parents, ...children]} edges={edges} nodeTypes={nodeTypes} fitView>
                 <Background />
                 <Controls showInteractive={false} />
             </ReactFlow>
@@ -92,6 +98,8 @@ export function PedigreeCanvas({
     parents: PedigreeAnimal[]
     offspring: PedigreeAnimal[]
 }) {
+    const { resolvedTheme } = useTheme()
+
     if (parents.length === 0 && offspring.length === 0) {
         return <p className="text-sm text-gray-500">No parents or offspring are recorded for this animal.</p>
     }
@@ -116,7 +124,7 @@ export function PedigreeCanvas({
 
     return (
         <div className="h-[420px] w-full overflow-hidden rounded-lg border bg-gray-50">
-            <ReactFlow nodes={nodes} edges={edges} nodeTypes={nodeTypes} fitView>
+            <ReactFlow colorMode={flowColorMode(resolvedTheme)} nodes={nodes} edges={edges} nodeTypes={nodeTypes} fitView>
                 <Background />
                 <Controls showInteractive={false} />
             </ReactFlow>

@@ -266,7 +266,7 @@ export function ExperimentOverviewTab(props: ExperimentOverviewTabProps) {
           <div className="overflow-x-auto rounded-md border border-gray-100">
             <Table>
               <TableHeader>
-                <TableRow className="bg-gray-50/80 hover:bg-gray-50/80">
+                <TableRow className="bg-muted hover:bg-muted">
                   <TableHead className="whitespace-nowrap">Date</TableHead>
                   <TableHead>Animal</TableHead>
                   <TableHead className="whitespace-nowrap">Type</TableHead>

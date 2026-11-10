@@ -1,4 +1,6 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
+import { CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
+import SpotlightCard from "@/src/components/react-bits/spotlight-card"
+import BlurText from "@/src/components/react-bits/blur-text"
 import {
     Activity,
     Calendar,
@@ -13,6 +15,7 @@ import {
     ClipboardList,
     Settings,
 } from "lucide-react"
+import type { CSSProperties } from "react"
 
 const features = [
     {
@@ -25,7 +28,7 @@ const features = [
         icon: Calendar,
         title: "Breeding Management",
         description: "Comprehensive breeding protocols, genealogy tracking, and reproductive cycle management.",
-        color: "#2563EB",
+        color: "#3B82F6",
     },
     {
         icon: FileText,
@@ -55,7 +58,7 @@ const features = [
         icon: BarChart3,
         title: "Analytics Dashboard",
         description: "Comprehensive analytics and insights to optimize research outcomes and animal welfare.",
-        color: "#2563EB",
+        color: "#3B82F6",
     },
     {
         icon: Bell,
@@ -89,35 +92,49 @@ const features = [
     },
 ]
 
+const spotlightSurface = { "--spotlight-card-surface": "hsl(var(--card))" } as CSSProperties
+
 export function FeaturesSection() {
     return (
-        <section className="py-20 bg-white">
+        <section className="py-20">
             <div className="container mx-auto px-4 lg:px-8">
                 <div className="text-center mb-16">
-                    <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+                    <h2 className="mb-4 text-3xl font-bold text-foreground lg:text-4xl">
                         Everything You Need for Laboratory Animal Management
                     </h2>
-                    <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                        LabAssist provides comprehensive tools to streamline your research workflow while ensuring the highest
-                        standards of animal care and regulatory compliance.
-                    </p>
+                    <BlurText
+                        text="LabAssist provides comprehensive tools to streamline your research workflow while ensuring the highest standards of animal care and regulatory compliance."
+                        className="mx-auto max-w-3xl justify-center text-xl text-muted-foreground"
+                        animateBy="words"
+                        direction="bottom"
+                        delay={24}
+                    />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {features.map((feature, index) => (
-                        <Card key={index} className="border border-gray-200 hover:shadow-lg transition-shadow duration-300">
+                        <SpotlightCard
+                            key={feature.title}
+                            theme="dark"
+                            spotlightColor={index % 2 === 0 ? "#3B82F6" : "#8B5CF6"}
+                            intensity={0.4}
+                            borderGlow={0.85}
+                            ambient
+                            className="h-full !rounded-xl !p-0 border border-[#1E293B]"
+                            style={spotlightSurface}
+                        >
                             <CardHeader>
                                 <div className="flex items-center space-x-3">
-                                    <div className="p-2 rounded-lg" style={{ backgroundColor: `${feature.color}15` }}>
+                                    <div className="p-2 rounded-xl" style={{ backgroundColor: `${feature.color}22` }}>
                                         <feature.icon className="h-6 w-6" style={{ color: feature.color }} />
                                     </div>
-                                    <CardTitle className="text-lg">{feature.title}</CardTitle>
+                                    <CardTitle className="text-lg text-foreground">{feature.title}</CardTitle>
                                 </div>
                             </CardHeader>
                             <CardContent>
-                                <CardDescription className="text-gray-600 leading-relaxed">{feature.description}</CardDescription>
+                                <CardDescription className="leading-relaxed">{feature.description}</CardDescription>
                             </CardContent>
-                        </Card>
+                        </SpotlightCard>
                     ))}
                 </div>
             </div>
