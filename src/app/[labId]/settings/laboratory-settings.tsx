@@ -1,13 +1,11 @@
 "use client"
 
-import { NotificationSettings } from "@/src/components/settings/notification-settings"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
-import { UserRolesSettings } from "@/src/components/settings/user-roles-settings"
 import { PageHeader } from "@/src/components/settings/page-header"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState, type ReactNode } from "react"
 
-const SETTINGS_TABS = ["animal-types", "user-roles", "breeding", "notifications", "subscription"]
+const SETTINGS_TABS = ["animal-types", "breeding", "subscription"]
 
 function settingsTab(value: string | null | undefined) {
     return value && SETTINGS_TABS.includes(value) ? value : "animal-types"
@@ -42,11 +40,9 @@ export default function LaboratorySettings({
             <PageHeader title="Laboratory Settings" description="Manage your laboratory configuration and preferences" />
 
             <Tabs value={activeTab} onValueChange={selectTab} className="space-y-4">
-                <TabsList className="grid grid-cols-2 md:grid-cols-5 gap-2 mb-20 md:mb-0">
+                <TabsList className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-20 md:mb-0">
                     <TabsTrigger value="animal-types">Animal Types</TabsTrigger>
-                    <TabsTrigger value="user-roles">User Roles</TabsTrigger>
                     <TabsTrigger value="breeding">Breeding Protocols</TabsTrigger>
-                    <TabsTrigger value="notifications">Notifications</TabsTrigger>
                     <TabsTrigger value="subscription">Subscription</TabsTrigger>
                 </TabsList>
 
@@ -54,16 +50,8 @@ export default function LaboratorySettings({
                     {animalTypes}
                 </TabsContent>
 
-                <TabsContent value="user-roles">
-                    <UserRolesSettings />
-                </TabsContent>
-
                 <TabsContent value="breeding">
                     {breedingProtocols}
-                </TabsContent>
-
-                <TabsContent value="notifications">
-                    <NotificationSettings />
                 </TabsContent>
 
                 <TabsContent value="subscription">
