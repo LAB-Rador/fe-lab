@@ -97,7 +97,9 @@ export default function ReportsView({
     onExport,
     onPageChange,
     onPageSizeChange,
+    canSave,
 }: {
+    canSave: boolean
     reports: SavedReport[]
     fields: ReportField[]
     statuses: string[]
@@ -119,6 +121,7 @@ export default function ReportsView({
     onPageChange: (page: number) => void
     onPageSizeChange: (pageSize: number) => void
 }) {
+    const sourceOptions = canSave ? sources : sources.filter((source) => source.value === "ANIMAL")
     const totalCount = result?.rows.length ?? 0
     const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
     const currentPage = Math.min(page, totalPages)
@@ -147,7 +150,11 @@ export default function ReportsView({
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight">Reports</h1>
-                    <p className="text-gray-500">Build a table from laboratory animals, experiments, or tasks, then save it.</p>
+                    <p className="text-gray-500">
+                        {canSave
+                            ? "Build a table from laboratory animals, experiments, or tasks, then save it."
+                            : "Build a table from laboratory animals."}
+                    </p>
                 </div>
                 <Button type="button" onClick={onNew} className="bg-blue-600 hover:bg-blue-700">
                     <Plus className="mr-2 h-4 w-4" />
@@ -155,7 +162,8 @@ export default function ReportsView({
                 </Button>
             </div>
 
-            <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
+            <div className={cn("grid gap-6", canSave && "lg:grid-cols-[280px_1fr]")}>
+                {canSave ? (
                 <Card>
                     <CardHeader className="border-b border-gray-100">
                         <CardTitle className="text-lg">Saved reports</CardTitle>
@@ -184,6 +192,7 @@ export default function ReportsView({
                         ))}
                     </CardContent>
                 </Card>
+                ) : null}
 
                 <div className="space-y-6">
                     <Card>
@@ -192,6 +201,7 @@ export default function ReportsView({
                             <CardDescription>Pick a source, the columns to show, and an optional status.</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4 p-6">
+                            {canSave ? (
                             <div className="space-y-2">
                                 <Label htmlFor="report-name">Name</Label>
                                 <Input
@@ -201,6 +211,7 @@ export default function ReportsView({
                                     placeholder="Report name"
                                 />
                             </div>
+                            ) : null}
                             <div className="grid gap-4 md:grid-cols-2">
                                 <div className="space-y-2">
                                     <Label>Source</Label>
@@ -209,7 +220,7 @@ export default function ReportsView({
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {sources.map((source) => (
+                                            {sourceOptions.map((source) => (
                                                 <SelectItem key={source.value} value={source.value}>{source.label}</SelectItem>
                                             ))}
                                         </SelectContent>
@@ -249,6 +260,7 @@ export default function ReportsView({
                                     <Eye className="mr-2 h-4 w-4" />
                                     Preview
                                 </Button>
+                                {canSave ? (
                                 <Button
                                     type="button"
                                     onClick={onSave}
@@ -257,13 +269,14 @@ export default function ReportsView({
                                 >
                                     {draft.id ? "Save changes" : "Save report"}
                                 </Button>
-                                {result ? (
+                                ) : null}
+                                {canSave && result ? (
                                     <Button type="button" variant="outline" onClick={onExport}>
                                         <Download className="mr-2 h-4 w-4" />
                                         Export CSV
                                     </Button>
                                 ) : null}
-                                {draft.id ? (
+                                {canSave && draft.id ? (
                                     <Button type="button" variant="outline" onClick={onDelete} disabled={busy}>
                                         <Trash2 className="mr-2 h-4 w-4" />
                                         Delete

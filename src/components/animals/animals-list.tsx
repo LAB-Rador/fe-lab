@@ -12,6 +12,7 @@ import { Animal, AnimalStatus, Sex } from "./types"
 import { Button } from "@/src/components/ui/button"
 import { Badge } from "@/src/components/ui/badge"
 import { Card } from "@/src/components/ui/card"
+import { usePaidFeatures } from "@/src/components/plan-access"
 import { useParams } from "next/navigation"
 import { useState, useMemo } from "react"
 import Link from "next/link"
@@ -43,6 +44,7 @@ export function AnimalsList({
   const { view, setView } = useResponsiveTableGridView()
   const params = useParams();
   const labId = params.labId as string;
+  const paidFeatures = usePaidFeatures()
   
   const currentAnimals = animals
   const currentPage = animalPagination.currentPage
@@ -238,11 +240,11 @@ export function AnimalsList({
                                 Add measurement
                             </Link>
                           </DropdownMenuItem>
-                          {animal.archivedAt ? null : (
+                          {paidFeatures && !animal.archivedAt ? (
                             <DropdownMenuItem onClick={() => onMoveToCage(animal)}>
                               Move to cage
                             </DropdownMenuItem>
-                          )}
+                          ) : null}
                           <DropdownMenuSeparator />
                           {animal.archivedAt ? (
                             <DropdownMenuItem
@@ -451,11 +453,11 @@ export function AnimalsList({
                               Add measurement
                           </Link>
                       </DropdownMenuItem>
-                      {animal.archivedAt ? null : (
+                      {paidFeatures && !animal.archivedAt ? (
                         <DropdownMenuItem onClick={() => onMoveToCage(animal)}>
                           Move to cage
                         </DropdownMenuItem>
-                      )}
+                      ) : null}
                       <DropdownMenuSeparator />
                       {animal.archivedAt ? (
                         <DropdownMenuItem

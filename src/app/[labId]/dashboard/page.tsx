@@ -2,9 +2,10 @@
 
 import type { AppNotification } from "@/src/components/tasks/notifications";
 import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId";
+import { loadLaboratoryPlan } from "@/src/lib/paid-features";
 import { serverApiClient } from "@/src/lib/serverApiClient";
 import DashboardContainer from "./deshboard.container";
-import type { LaboratorySubscription, PageProps } from "./types";
+import type { PageProps } from "./types";
 
 export default async function Page ({params}: PageProps) {
   const {labId} = await params;
@@ -12,12 +13,16 @@ export default async function Page ({params}: PageProps) {
 
   const filters = JSON.stringify({})
   const notificationsQuery = new URLSearchParams({ limit: "10", labId }).toString()
+  const laboratorySubscription = await loadLaboratoryPlan(userId, labId)
+  const paidFeatures = laboratorySubscription.paidFeatures
 
   const [animals, experiments, tasks, notificationsRes] = await Promise.all([
     serverApiClient.get(`/api/animals/${userId}/${labId}/999999/1/${filters}`),
-    serverApiClient.get(`/api/experiments/${userId}/${labId}`),
-    serverApiClient.get(`/api/tasks/${userId}/${labId}`),
-    serverApiClient.get(`/api/users/${userId}/notifications?${notificationsQuery}`),
+    paidFeatures ? serverApiClient.get(`/api/experiments/${userId}/${labId}`) : Promise.resolve({ data: [] }),
+    paidFeatures ? serverApiClient.get(`/api/tasks/${userId}/${labId}`) : Promise.resolve({ data: [] }),
+    paidFeatures
+      ? serverApiClient.get(`/api/users/${userId}/notifications?${notificationsQuery}`)
+      : Promise.resolve(null),
   ])
 
   const notifications: AppNotification[] =
@@ -28,24 +33,6 @@ export default async function Page ({params}: PageProps) {
     Array.isArray(notificationsRes.data)
       ? notificationsRes.data
       : []
-
-  let laboratorySubscription: LaboratorySubscription = { memberCount: 0, subscription: null }
-  try {
-    const subscriptionRes = await serverApiClient.get(`/api/subscriptions/${userId}/${labId}`)
-    if (
-      subscriptionRes &&
-      typeof subscriptionRes === "object" &&
-      "success" in subscriptionRes &&
-      subscriptionRes.success &&
-      subscriptionRes.data &&
-      typeof subscriptionRes.data === "object" &&
-      "memberCount" in subscriptionRes.data
-    ) {
-      laboratorySubscription = subscriptionRes.data
-    }
-  } catch {
-    laboratorySubscription = { memberCount: 0, subscription: null }
-  }
 
   return (
     <DashboardContainer 

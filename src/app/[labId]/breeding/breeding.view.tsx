@@ -52,6 +52,7 @@ export default function BreedingView({
     onSelect,
     onCreate,
     onRecordLitter,
+    showLitters,
 }: {
     labId: string
     counts: { total: number; active: number; planned: number; offspring: number }
@@ -71,6 +72,7 @@ export default function BreedingView({
     onSelect: (id: string) => void
     onCreate: () => void
     onRecordLitter: () => void
+    showLitters: boolean
 }) {
     const stats = [
         { label: "Pairs", value: counts.total },
@@ -179,7 +181,7 @@ export default function BreedingView({
                 </CardHeader>
                 <CardContent className="space-y-4">
                     {selected?.notes ? <p className="text-sm text-gray-600">{selected.notes}</p> : null}
-                    {selected ? (
+                    {selected && showLitters ? (
                         <div className="space-y-3">
                             <p className="text-sm font-medium text-gray-900">Litters</p>
                             {selected.litters.length === 0 ? (

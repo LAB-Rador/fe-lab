@@ -1,6 +1,7 @@
 "use client"
 
 import { CreatePairDialog } from "@/src/components/breeding/create-pair-dialog"
+import { usePaidFeatures } from "@/src/components/plan-access"
 import { useMemo, useState } from "react"
 import { apiClient } from "@/src/lib/apiClient"
 import { toast } from "sonner"
@@ -25,6 +26,7 @@ export default function BreedingContainer({
     const [pupCount, setPupCount] = useState("")
     const [litterNotes, setLitterNotes] = useState("")
     const [recording, setRecording] = useState(false)
+    const showLitters = usePaidFeatures()
 
     const filtered = useMemo(() => {
         const query = search.trim().toLowerCase()
@@ -107,6 +109,7 @@ export default function BreedingContainer({
                 }}
                 onCreate={() => setCreateOpen(true)}
                 onRecordLitter={() => { void onRecordLitter() }}
+                showLitters={showLitters}
             />
             <CreatePairDialog
                 open={createOpen}

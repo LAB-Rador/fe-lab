@@ -22,6 +22,7 @@ import {
   notificationsQueryParams,
   typeIcon,
 } from "@/src/components/tasks/notifications"
+import { usePaidFeatures } from "@/src/components/plan-access"
 import { apiClient } from "@/src/lib/apiClient"
 import { AuthService } from "@/src/lib/auth"
 import { ThemeToggle } from "@/src/components/theme-toggle"
@@ -43,6 +44,7 @@ export function DashboardHeader({
   initialUnreadNotifications?: AppNotification[]
   unreadNotificationsCount?: number
 }) {
+  const paidFeatures = usePaidFeatures()
   const router = useRouter()
   const dispatch = useAppDispatch()
   const unreadFromRedux = useAppSelector((s) => s.notifications.unreadCount)
@@ -59,7 +61,7 @@ export function DashboardHeader({
   }, [initialUnreadNotifications])
 
   useEffect(() => {
-    if (!notifMenuOpen) return
+    if (!paidFeatures || !notifMenuOpen) return
     let cancelled = false
     async function loadUnread() {
       try {
@@ -79,7 +81,7 @@ export function DashboardHeader({
     return () => {
       cancelled = true
     }
-  }, [notifMenuOpen, userId, labId, dispatch])
+  }, [paidFeatures, notifMenuOpen, userId, labId, dispatch])
 
   const markRead = useCallback(
     async (notificationId: string) => {
@@ -163,6 +165,7 @@ export function DashboardHeader({
             )
           })}
         </div>
+        {paidFeatures ? (
         <DropdownMenu open={notifMenuOpen} onOpenChange={setNotifMenuOpen}>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="relative" type="button" aria-label="Notifications">
@@ -217,6 +220,7 @@ export function DashboardHeader({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        ) : null}
       </div>
     </header>
   )

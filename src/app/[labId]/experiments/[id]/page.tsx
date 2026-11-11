@@ -2,6 +2,8 @@
 
 import type { ExperimentAnimalRecordRow, ExperimentMetricsData, ExperimentTasksPagePayload } from "../types";
 import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId";
+import { PlanRequired } from "@/src/components/plan-required";
+import { loadLaboratoryPlan } from "@/src/lib/paid-features";
 import { ExperimentContainer } from "./experiment.container";
 import { serverApiClient } from "@/src/lib/serverApiClient";
 interface ExperimentDetailPageProps {
@@ -18,6 +20,8 @@ const initialTasksPageSize = 10
 export default async function ExperimentDetailPage({ params }: ExperimentDetailPageProps) {
   const { id: experimentId, labId } = await params;
   const userId = await getServerAuthenticatedUserId()
+  const plan = await loadLaboratoryPlan(userId, labId)
+  if (!plan.paidFeatures) return <PlanRequired feature="Experiments" />
 
   const filters = JSON.stringify({})
 

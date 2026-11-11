@@ -1,5 +1,7 @@
 import type { AppNotification } from "@/src/components/tasks/notifications"
 import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId"
+import { PlanRequired } from "@/src/components/plan-required"
+import { loadLaboratoryPlan } from "@/src/lib/paid-features"
 import { serverApiClient } from "@/src/lib/serverApiClient"
 import type { LaboratoryTasksPagePayload } from "./types"
 import type { InitialMembersTypes } from "../team/types"
@@ -12,6 +14,8 @@ type PageProps = {
 export default async function TasksPage({ params }: PageProps) {
   const { labId } = await params
   const userId = await getServerAuthenticatedUserId()
+  const plan = await loadLaboratoryPlan(userId, labId)
+  if (!plan.paidFeatures) return <PlanRequired feature="Tasks" />
   const initialTasksPageSize = 10
 
   const notificationsQuery = new URLSearchParams({

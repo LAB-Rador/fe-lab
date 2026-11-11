@@ -3,6 +3,8 @@
 import { DashboardHeader } from "@/src/components/dashboard/dashboard-header"
 import type { AppNotification } from "@/src/components/tasks/notifications"
 import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId"
+import { PlanAccessProvider } from "@/src/components/plan-access"
+import { loadLaboratoryPlan } from "@/src/lib/paid-features"
 import { SidebarProvider } from "@/src/components/sidebar-provider"
 import { serverApiClient } from "@/src/lib/serverApiClient"
 import { Sidebar } from "@/src/components/sidebar"
@@ -21,27 +23,31 @@ export default async function DashboardLayout({
   const {labId} = await params;
   const userId = await getServerAuthenticatedUserId()
   
-  const [laboratories, laboratoryMembers] = await Promise.all([
+  const [laboratories, laboratoryMembers, plan] = await Promise.all([
     serverApiClient.get(`/api/laboratories/${userId}`),
     serverApiClient.get(`/api/laboratory/${userId}/${labId}`),
+    loadLaboratoryPlan(userId, labId),
   ])
 
   const laboratory = await laboratories.data.find((laboratory: Laboratory) => laboratory.name === labId);
+  const paidFeatures = plan.paidFeatures
 
   let unreadNotificationsCount = 0
   let initialUnreadNotifications: AppNotification[] = []
-  try {
-    const notifQs = new URLSearchParams({ limit: "100", labId, onlyUnread: "true" }).toString()
-    const notifRes = (await serverApiClient.get(`/api/users/${userId}/notifications?${notifQs}`)) as
-      | { success?: boolean; data?: AppNotification[] }
-      | undefined
-    if (notifRes?.success && Array.isArray(notifRes.data)) {
-      initialUnreadNotifications = notifRes.data
-      unreadNotificationsCount = initialUnreadNotifications.length
+  if (paidFeatures) {
+    try {
+      const notifQs = new URLSearchParams({ limit: "100", labId, onlyUnread: "true" }).toString()
+      const notifRes = (await serverApiClient.get(`/api/users/${userId}/notifications?${notifQs}`)) as
+        | { success?: boolean; data?: AppNotification[] }
+        | undefined
+      if (notifRes?.success && Array.isArray(notifRes.data)) {
+        initialUnreadNotifications = notifRes.data
+        unreadNotificationsCount = initialUnreadNotifications.length
+      }
+    } catch {
+      unreadNotificationsCount = 0
+      initialUnreadNotifications = []
     }
-  } catch {
-    unreadNotificationsCount = 0
-    initialUnreadNotifications = []
   }
 
   if(!laboratory) {
@@ -49,6 +55,7 @@ export default async function DashboardLayout({
   }
   
   return (
+    <PlanAccessProvider paidFeatures={paidFeatures}>
     <SidebarProvider>
       <div className="clinical-app flex min-h-screen bg-gray-50">
         <Sidebar />
@@ -64,5 +71,6 @@ export default async function DashboardLayout({
         </div>
       </div>
     </SidebarProvider>
+    </PlanAccessProvider>
   )
 }

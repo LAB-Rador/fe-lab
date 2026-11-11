@@ -6,6 +6,7 @@ import { FileText, Microscope, Pill, Stethoscope, Weight } from "lucide-react"
 import { AddToExperimentDialog } from "@/src/components/animals/add-to-experiment-dialog"
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { RecordType, newAnimalRecordPath } from "@/src/app/[labId]/animals/types"
+import { usePaidFeatures } from "@/src/components/plan-access"
 import { Button } from "@/src/components/ui/button"
 import { useState } from "react"
 import Link from "next/link"
@@ -28,6 +29,7 @@ export function QuickActionPanel({
   onViewAllActivity,
 }: QuickActionPanelProps) {
   const [addToExperimentOpen, setAddToExperimentOpen] = useState(false)
+  const paidFeatures = usePaidFeatures()
 
   return (
     <div className="space-y-6">
@@ -50,6 +52,7 @@ export function QuickActionPanel({
             </Button>
           </Link>
 
+          {paidFeatures ? (
           <Button
             type="button"
             variant="outline"
@@ -59,7 +62,9 @@ export function QuickActionPanel({
             <Microscope className="mr-2 h-4 w-4 text-blue-600" />
             Add to Experiment
           </Button>
+          ) : null}
 
+          {paidFeatures ? (
           <AddToExperimentDialog
             open={addToExperimentOpen}
             onOpenChange={setAddToExperimentOpen}
@@ -68,6 +73,7 @@ export function QuickActionPanel({
             userId={userId}
             linkedExperimentIds={linkedExperimentIds}
           />
+          ) : null}
 
           <Link href={newAnimalRecordPath(labId, animalId, RecordType.TREATMENT)}>
             <Button variant="outline" className="w-full justify-start">

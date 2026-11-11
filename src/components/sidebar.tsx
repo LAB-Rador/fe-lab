@@ -1,5 +1,6 @@
 "use client"
 
+import { usePaidFeatures } from "@/src/components/plan-access"
 import { AuthService } from "@/src/lib/auth"
 import { useParams, usePathname, useRouter } from "next/navigation"
 import { useSidebar } from "@/src/components/sidebar-provider"
@@ -30,6 +31,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
 
+  const paidFeatures = usePaidFeatures()
   const handleLogOut = () => {
     void AuthService.logout()
   }
@@ -95,6 +97,7 @@ export function Sidebar() {
               isActive={pathname.startsWith(`/${labId}/animals`)}
               isOpen={isOpen}
             />
+            {paidFeatures ? (
             <NavItem
               href={`/${labId}/cages`}
               icon={Box}
@@ -102,6 +105,7 @@ export function Sidebar() {
               isActive={pathname.startsWith(`/${labId}/cages`)}
               isOpen={isOpen}
             />
+            ) : null}
             <NavItem
               href={`/${labId}/breeding`}
               icon={Dna}
@@ -109,6 +113,7 @@ export function Sidebar() {
               isActive={pathname.startsWith(`/${labId}/breeding`)}
               isOpen={isOpen}
             />
+            {paidFeatures ? (
             <NavItem
               href={`/${labId}/experiments`}
               icon={Flask}
@@ -116,6 +121,8 @@ export function Sidebar() {
               isActive={pathname.startsWith(`/${labId}/experiments`)}
               isOpen={isOpen}
             />
+            ) : null}
+            {paidFeatures ? (
             <NavItem
               href={`/${labId}/tasks`}
               icon={ClipboardList}
@@ -123,6 +130,7 @@ export function Sidebar() {
               isActive={pathname.startsWith(`/${labId}/tasks`)}
               isOpen={isOpen}
             />
+            ) : null}
             <NavItem
               href={`/${labId}/reports`}
               icon={FileBarChart}
