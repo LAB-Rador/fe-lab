@@ -1,4 +1,5 @@
 import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId"
+import { loadLaboratoryPlan } from "@/src/lib/paid-features"
 import { serverApiClient } from "@/src/lib/serverApiClient"
 import ReportsContainer from "./reports.container"
 import type { ReportsCatalog } from "./types"
@@ -10,9 +11,13 @@ export default async function ReportsPage({
 }) {
     const { labId } = await params
     const userId = await getServerAuthenticatedUserId()
+    const plan = await loadLaboratoryPlan(userId, labId)
 
     let catalog: ReportsCatalog | null = null
     let error: string | null = null
+    if (!plan.paidFeatures) {
+        return <ReportsContainer userId={userId} labId={labId} catalog={null} error={null} />
+    }
     try {
         const response = await serverApiClient.get(`/api/reports/${userId}/${labId}`)
         if (

@@ -1,10 +1,29 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { usePaidFeatures } from "@/src/components/plan-access"
 import { apiClient } from "@/src/lib/apiClient"
 import { toast } from "sonner"
 import ReportsView from "./reports.view"
 import type { ReportDraft, ReportResult, ReportSource, ReportsCatalog, SavedReport } from "./types"
+
+const basicAnimalFields = [
+    { key: "identifier", label: "Identifier" },
+    { key: "name", label: "Name" },
+    { key: "type", label: "Type" },
+    { key: "status", label: "Status" },
+    { key: "sex", label: "Sex" },
+    { key: "strain", label: "Strain" },
+    { key: "genotype", label: "Genotype" },
+    { key: "location", label: "Location" },
+    { key: "birthDate", label: "Birth date" },
+    { key: "acquisitionDate", label: "Acquisition date" },
+    { key: "lastRecordType", label: "Last record type" },
+    { key: "lastRecordDate", label: "Last record date" },
+    { key: "lastRecordNotes", label: "Last record notes" },
+]
+
+const basicAnimalStatuses = ["ACTIVE", "BREEDING", "QUARANTINE", "EXPERIMENT", "RETIRED", "DECEASED", "TRANSFERRED"]
 
 const defaultColumns: Record<ReportSource, string[]> = {
     ANIMAL: ["identifier", "name", "status", "lastRecordDate"],
@@ -40,6 +59,7 @@ export default function ReportsContainer({
     const [page, setPage] = useState(1)
     const [pageSize, setPageSize] = useState(10)
     const [busy, setBusy] = useState(false)
+    const canSave = usePaidFeatures()
 
     useEffect(() => {
         if (error) toast.error(error)
@@ -50,8 +70,8 @@ export default function ReportsContainer({
         setPage(1)
     }
 
-    const fields = catalog?.fields
-    const statuses = catalog?.statuses
+    const fields = canSave ? catalog?.fields : { ANIMAL: basicAnimalFields, EXPERIMENT: [], TASK: [] }
+    const statuses = canSave ? catalog?.statuses : { ANIMAL: basicAnimalStatuses, EXPERIMENT: [], TASK: [] }
     const base = `/api/reports/${userId}/${labId}`
 
     const body = {
@@ -191,21 +211,32 @@ export default function ReportsContainer({
         }
     }
 
-    const exportCsv = () => {
+    const exportCsv = async () => {
         if (!result) return
-        const header = result.columns.map((column) => csvCell(column.label)).join(",")
-        const lines = result.rows.map((row) => result.columns.map((column) => csvCell(row[column.key] ?? "")).join(","))
-        const blob = new Blob([[header, ...lines].join("\n")], { type: "text/csv;charset=utf-8" })
-        const url = URL.createObjectURL(blob)
-        const anchor = document.createElement("a")
-        anchor.href = url
-        anchor.download = `${(draft.name.trim() || "report").toLowerCase().replace(/\s+/g, "-")}.csv`
-        anchor.click()
-        URL.revokeObjectURL(url)
+        try {
+            const response = await apiClient.post(`${base}/export`, body) as {
+                success?: boolean
+                data?: { filename?: string; csv?: string }
+            }
+            if (!response?.data?.csv) {
+                fail("Could not export the report.")
+                return
+            }
+            const blob = new Blob([response.data.csv], { type: "text/csv;charset=utf-8" })
+            const url = URL.createObjectURL(blob)
+            const anchor = document.createElement("a")
+            anchor.href = url
+            anchor.download = response.data.filename || "report.csv"
+            anchor.click()
+            URL.revokeObjectURL(url)
+        } catch (cause) {
+            fail(messageFrom(cause, "Could not export the report."))
+        }
     }
 
     return (
         <ReportsView
+            canSave={canSave}
             reports={reports}
             fields={fields?.[draft.source] ?? []}
             statuses={statuses?.[draft.source] ?? []}
@@ -231,12 +262,7 @@ export default function ReportsContainer({
             onPreview={() => void preview()}
             onSave={() => void save()}
             onDelete={() => void remove()}
-            onExport={exportCsv}
+            onExport={() => { void exportCsv() }}
         />
     )
-}
-
-function csvCell(value: string) {
-    if (/[",\n]/.test(value)) return `"${value.replace(/"/g, '""')}"`
-    return value
 }
