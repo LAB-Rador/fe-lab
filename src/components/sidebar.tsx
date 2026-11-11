@@ -1,5 +1,6 @@
 "use client"
 
+import { AuthService } from "@/src/lib/auth"
 import { useParams, usePathname, useRouter } from "next/navigation"
 import { useSidebar } from "@/src/components/sidebar-provider"
 import { ScrollArea } from "@/src/components/ui/scroll-area"
@@ -25,12 +26,12 @@ import {
 export function Sidebar() {
   const { isOpen, toggle } = useSidebar();
   const params = useParams();
-  const { userId, labId } = params;
+  const { labId } = params;
   const pathname = usePathname();
   const router = useRouter();
 
   const handleLogOut = () => {
-    router.replace('/');
+    void AuthService.logout()
   }
 
   return (

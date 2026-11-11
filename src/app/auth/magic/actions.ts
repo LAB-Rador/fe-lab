@@ -39,7 +39,7 @@ export async function consumeMagicLinkFormAction(
         return { error: data.message ?? data.error ?? "This link is invalid or has expired." }
     }
 
-    await setAuthSessionCookies(data.accessToken, data.user.userId)
+    await setAuthSessionCookies(data.accessToken)
     const next = await takeAuthNext()
 
     if (data.joinedLaboratory?.name) {
