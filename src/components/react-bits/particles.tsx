@@ -2,6 +2,7 @@
 
 /* Copyright (c) 2026 David Haz. React Bits, MIT + Commons Clause. See ./LICENSE.md */
 
+import { elementOnScreen, useWebglCanvas } from '@/src/components/react-bits/webgl-canvas';
 import { useEffect, useRef, type CSSProperties } from 'react';
 
 export type ParticlesShape = 'circle' | 'square' | 'ring' | 'sparkle';
@@ -385,7 +386,7 @@ const Particles = ({
   style
 }: ParticlesProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { canvasRef, epoch, releasing, restartRef } = useWebglCanvas();
   const wakeRef = useRef<(() => void) | null>(null);
   const palette = (Array.isArray(particleColors) ? particleColors : [particleColors as unknown as string])
     .filter(Boolean)
@@ -433,11 +434,18 @@ const Particles = ({
       depth: false,
       stencil: false
     });
-    if (!container || !canvas || !gl) return undefined;
+    if (!container || !canvas) return undefined;
+    if (!gl) {
+      restartRef.current();
+      return undefined;
+    }
 
     const dots = link(gl, PARTICLE_VERTEX, PARTICLE_FRAGMENT);
     const lines = link(gl, LINE_VERTEX, LINE_FRAGMENT);
-    if (!dots || !lines) return undefined;
+    if (!dots || !lines) {
+      gl.getExtension('WEBGL_lose_context')?.loseContext();
+      return undefined;
+    }
 
     const corners = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, corners);
@@ -793,6 +801,11 @@ const Particles = ({
 
     const frame = (now: number) => {
       raf = 0;
+      if (gl.isContextLost()) {
+        restartRef.current();
+        return;
+      }
+      if (!visible && elementOnScreen(container)) visible = true;
       if (!visible || document.hidden) return;
       const s = settingsRef.current;
       const dt = last ? clamp((now - last) / 1000, 0.0005, 0.05) : 1 / 60;
@@ -844,6 +857,7 @@ const Particles = ({
       canvas.width = Math.max(1, Math.round(width * ratio));
       canvas.height = Math.max(1, Math.round(height * ratio));
       view.ratio = canvas.width / width;
+      if (elementOnScreen(container)) visible = true;
       render();
       wake();
     };
@@ -894,7 +908,8 @@ const Particles = ({
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(container);
     const intersection = new IntersectionObserver(entries => {
-      visible = entries.some(entry => entry.isIntersecting);
+      const entry = entries[entries.length - 1];
+      visible = entry.isIntersecting || elementOnScreen(container);
       if (visible) {
         last = 0;
         wake();
@@ -922,6 +937,7 @@ const Particles = ({
     };
 
     return () => {
+      releasing.current = true;
       cancelAnimationFrame(raf);
       wakeRef.current = null;
       resizeObserver.disconnect();
@@ -939,7 +955,7 @@ const Particles = ({
       gl.deleteVertexArray(lineVao);
       gl.getExtension('WEBGL_lose_context')?.loseContext();
     };
-  }, []);
+  }, [epoch, restartRef]);
 
   useEffect(() => {
     wakeRef.current?.();
@@ -951,7 +967,7 @@ const Particles = ({
       className={['relative h-full w-full overflow-hidden', className].filter(Boolean).join(' ')}
       style={style}
     >
-      <canvas ref={canvasRef} className="absolute inset-0 block h-full w-full" aria-hidden="true" />
+      <canvas key={epoch} ref={canvasRef} className="absolute inset-0 block h-full w-full" aria-hidden="true" />
     </div>
   );
 };

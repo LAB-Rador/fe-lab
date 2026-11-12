@@ -1,6 +1,7 @@
 'use client';
 
 /* Copyright (c) 2026 David Haz. React Bits, MIT + Commons Clause. See ./LICENSE.md */
+import { elementOnScreen, useWebglCanvas } from '@/src/components/react-bits/webgl-canvas';
 import { useEffect, useRef, type HTMLAttributes } from 'react';
 
 export type GalaxyDirection = 'forward' | 'backward';
@@ -335,7 +336,7 @@ const Galaxy = ({
   ...rest
 }: GalaxyProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { canvasRef, epoch, releasing, restartRef } = useWebglCanvas();
   const wakeRef = useRef<(() => void) | null>(null);
   const palette = Array.isArray(starColors) ? starColors.filter(Boolean).slice(0, MAX_COLORS) : [];
   const settings: Settings = {
@@ -380,7 +381,11 @@ const Galaxy = ({
       depth: false,
       stencil: false
     });
-    if (!container || !canvas || !gl) return undefined;
+    if (!container || !canvas) return undefined;
+    if (!gl) {
+      restartRef.current();
+      return undefined;
+    }
 
     const parallel = gl.getExtension('KHR_parallel_shader_compile');
     const programs = new Map<number, Variant>();
@@ -405,6 +410,7 @@ const Galaxy = ({
     const initial = settingsRef.current;
     if (!variant(initial.palette.length > 0, false, false, true)) {
       programs.forEach(found => found.program && gl.deleteProgram(found.program));
+      gl.getExtension('WEBGL_lose_context')?.loseContext();
       return undefined;
     }
 
@@ -505,6 +511,11 @@ const Galaxy = ({
 
     const frame = (now: number) => {
       raf = 0;
+      if (gl.isContextLost()) {
+        restartRef.current();
+        return;
+      }
+      if (!visible && elementOnScreen(container)) visible = true;
       if (!visible || document.hidden) return;
       const s = settingsRef.current;
       const dt = last ? clamp((now - last) / 1000, 0.0005, 0.05) : 1 / 60;
@@ -551,6 +562,7 @@ const Galaxy = ({
       const ratio = Math.min(s.dpr || window.devicePixelRatio || 1, 2);
       canvas.width = Math.max(1, Math.round(width * ratio));
       canvas.height = Math.max(1, Math.round(height * ratio));
+      if (elementOnScreen(container)) visible = true;
       render();
       wake();
     };
@@ -593,7 +605,8 @@ const Galaxy = ({
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(container);
     const intersection = new IntersectionObserver(entries => {
-      visible = entries.some(entry => entry.isIntersecting);
+      const entry = entries[entries.length - 1];
+      visible = entry.isIntersecting || elementOnScreen(container);
       if (visible) {
         last = 0;
         wake();
@@ -627,6 +640,7 @@ const Galaxy = ({
     };
 
     return () => {
+      releasing.current = true;
       cancelAnimationFrame(raf);
       wakeRef.current = null;
       resizeObserver.disconnect();
@@ -642,7 +656,7 @@ const Galaxy = ({
       gl.deleteVertexArray(vao);
       gl.getExtension('WEBGL_lose_context')?.loseContext();
     };
-  }, []);
+  }, [epoch, restartRef]);
 
   useEffect(() => {
     wakeRef.current?.();
@@ -655,7 +669,7 @@ const Galaxy = ({
       style={style}
       {...rest}
     >
-      <canvas ref={canvasRef} className="absolute inset-0 block h-full w-full" aria-hidden="true" />
+      <canvas key={epoch} ref={canvasRef} className="absolute inset-0 block h-full w-full" aria-hidden="true" />
     </div>
   );
 };
