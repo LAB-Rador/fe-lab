@@ -1,7 +1,7 @@
 'use client';
 
 /* Copyright (c) 2026 David Haz. React Bits, MIT + Commons Clause. See ./LICENSE.md */
-import { elementOnScreen, useWebglCanvas } from '@/src/components/react-bits/webgl-canvas';
+import { useWebglCanvas } from '@/src/components/react-bits/webgl-canvas';
 import { useEffect, useRef, type HTMLAttributes } from 'react';
 
 export type GalaxyDirection = 'forward' | 'backward';
@@ -382,7 +382,7 @@ const Galaxy = ({
       stencil: false
     });
     if (!container || !canvas) return undefined;
-    if (!gl) {
+    if (!gl || gl.isContextLost()) {
       restartRef.current();
       return undefined;
     }
@@ -511,11 +511,6 @@ const Galaxy = ({
 
     const frame = (now: number) => {
       raf = 0;
-      if (gl.isContextLost()) {
-        restartRef.current();
-        return;
-      }
-      if (!visible && elementOnScreen(container)) visible = true;
       if (!visible || document.hidden) return;
       const s = settingsRef.current;
       const dt = last ? clamp((now - last) / 1000, 0.0005, 0.05) : 1 / 60;
@@ -562,7 +557,6 @@ const Galaxy = ({
       const ratio = Math.min(s.dpr || window.devicePixelRatio || 1, 2);
       canvas.width = Math.max(1, Math.round(width * ratio));
       canvas.height = Math.max(1, Math.round(height * ratio));
-      if (elementOnScreen(container)) visible = true;
       render();
       wake();
     };
@@ -606,7 +600,7 @@ const Galaxy = ({
     resizeObserver.observe(container);
     const intersection = new IntersectionObserver(entries => {
       const entry = entries[entries.length - 1];
-      visible = entry.isIntersecting || elementOnScreen(container);
+      visible = entry.isIntersecting;
       if (visible) {
         last = 0;
         wake();

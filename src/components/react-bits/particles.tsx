@@ -2,7 +2,7 @@
 
 /* Copyright (c) 2026 David Haz. React Bits, MIT + Commons Clause. See ./LICENSE.md */
 
-import { elementOnScreen, useWebglCanvas } from '@/src/components/react-bits/webgl-canvas';
+import { useWebglCanvas } from '@/src/components/react-bits/webgl-canvas';
 import { useEffect, useRef, type CSSProperties } from 'react';
 
 export type ParticlesShape = 'circle' | 'square' | 'ring' | 'sparkle';
@@ -435,7 +435,7 @@ const Particles = ({
       stencil: false
     });
     if (!container || !canvas) return undefined;
-    if (!gl) {
+    if (!gl || gl.isContextLost()) {
       restartRef.current();
       return undefined;
     }
@@ -801,11 +801,6 @@ const Particles = ({
 
     const frame = (now: number) => {
       raf = 0;
-      if (gl.isContextLost()) {
-        restartRef.current();
-        return;
-      }
-      if (!visible && elementOnScreen(container)) visible = true;
       if (!visible || document.hidden) return;
       const s = settingsRef.current;
       const dt = last ? clamp((now - last) / 1000, 0.0005, 0.05) : 1 / 60;
@@ -857,7 +852,6 @@ const Particles = ({
       canvas.width = Math.max(1, Math.round(width * ratio));
       canvas.height = Math.max(1, Math.round(height * ratio));
       view.ratio = canvas.width / width;
-      if (elementOnScreen(container)) visible = true;
       render();
       wake();
     };
@@ -909,7 +903,7 @@ const Particles = ({
     resizeObserver.observe(container);
     const intersection = new IntersectionObserver(entries => {
       const entry = entries[entries.length - 1];
-      visible = entry.isIntersecting || elementOnScreen(container);
+      visible = entry.isIntersecting;
       if (visible) {
         last = 0;
         wake();
