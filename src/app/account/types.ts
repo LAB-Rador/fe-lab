@@ -51,6 +51,7 @@ export interface Laboratory {
     accessEndDate: Date | null
     accessStatus: AccessStatus
     name: string
+    slug: string
     username: string
     position: string
     description: string | null

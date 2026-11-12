@@ -23,13 +23,16 @@ export default async function DashboardLayout({
   const {labId} = await params;
   const userId = await getServerAuthenticatedUserId()
   
-  const [laboratories, laboratoryMembers, plan] = await Promise.all([
-    serverApiClient.get(`/api/laboratories/${userId}`),
+  const laboratories = await serverApiClient.get(`/api/laboratories/${userId}`)
+  const laboratory = laboratories.data.find((item: Laboratory) => item.slug === labId)
+  if (!laboratory) {
+    redirect("/account")
+  }
+
+  const [laboratoryMembers, plan] = await Promise.all([
     serverApiClient.get(`/api/laboratory/${userId}/${labId}`),
     loadLaboratoryPlan(userId, labId),
   ])
-
-  const laboratory = await laboratories.data.find((laboratory: Laboratory) => laboratory.name === labId);
   const paidFeatures = plan.paidFeatures
 
   let unreadNotificationsCount = 0
@@ -50,15 +53,11 @@ export default async function DashboardLayout({
     }
   }
 
-  if(!laboratory) {
-    redirect('/account');
-  }
-  
   return (
     <PlanAccessProvider paidFeatures={paidFeatures}>
     <SidebarProvider>
       <div className="clinical-app flex min-h-screen bg-gray-50">
-        <Sidebar />
+        <Sidebar laboratoryName={laboratory.name} />
         <div className="flex flex-1 flex-col">
           <DashboardHeader
             laboratoryMembers={laboratoryMembers.data}
