@@ -15,7 +15,7 @@ type ConsumeResult = {
     accessToken?: string
     user?: { userId: string; firstName?: string | null }
     laboratory?: unknown
-    joinedLaboratory?: { id: string; name: string } | null
+    joinedLaboratory?: { slug: string } | null
 }
 
 export async function consumeMagicLinkFormAction(
@@ -42,8 +42,8 @@ export async function consumeMagicLinkFormAction(
     await setAuthSessionCookies(data.accessToken)
     const next = await takeAuthNext()
 
-    if (data.joinedLaboratory?.name) {
-        redirect(`/${encodeURIComponent(data.joinedLaboratory.name)}/dashboard`)
+    if (data.joinedLaboratory?.slug) {
+        redirect(`/${data.joinedLaboratory.slug}/dashboard`)
     }
 
     if (!data.user.firstName) {

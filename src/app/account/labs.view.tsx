@@ -186,7 +186,7 @@ export default function LaboratoriesView(
                     <Card
                         key={lab.id}
                         className="hover:shadow-md transition-shadow duration-200 cursor-pointer group"
-                        onClick={() => handleLabClick(lab.name)}
+                        onClick={() => handleLabClick(lab.slug)}
                     >
                         <CardHeader className="pb-3">
                             <div className="flex items-start justify-between">
