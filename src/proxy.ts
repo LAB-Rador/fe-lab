@@ -42,7 +42,6 @@ export async function proxy(request: NextRequest) {
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set('x-user-id', data.user.userId);
     requestHeaders.set('x-user-email', data.user.email);
-    requestHeaders.set('x-user-role', data.user.role);
     requestHeaders.set('x-user-confirmed-email', data.user.confirmedEmail);
     requestHeaders.set('x-user-created-at', data.user.createdAt);
     
