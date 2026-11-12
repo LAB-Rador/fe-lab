@@ -2,7 +2,7 @@
 
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts"
 import { ChartContainer, ChartTooltipContent } from "@/src/components/ui/chart"
-import type { Animal } from "@/src/app/[labId]/dashboard/types"
+import type { AnimalStatusCount } from "@/src/app/[labId]/dashboard/types"
 import { useMemo } from "react"
 
 const statusMapping = {
@@ -15,34 +15,23 @@ const statusMapping = {
   DECEASED: { label: "Deceased", color: "#EF4444" },
 } as const
 
-function processStatusData(animals: Animal[]) {
-  if (!animals || animals.length === 0) {
+function processStatusData(byStatus: AnimalStatusCount[]) {
+  if (!byStatus || byStatus.length === 0) {
     return []
   }
 
-  const statusCounts = animals.reduce((acc, animal) => {
-    const status = animal.status
-    if (!acc[status]) {
-      acc[status] = 0
-    }
-    acc[status]++
-    return acc
-  }, {} as Record<string, number>)
-
-  const chartData = Object.entries(statusCounts)
-    .map(([status, count]) => ({
-      name: statusMapping[status as keyof typeof statusMapping]?.label || status,
-      value: count,
-      color: statusMapping[status as keyof typeof statusMapping]?.color || "#6B7280",
-      status: status
+  return byStatus
+    .map((item) => ({
+      name: statusMapping[item.status]?.label || item.status,
+      value: item.count,
+      color: statusMapping[item.status]?.color || "#6B7280",
+      status: item.status,
     }))
     .sort((a, b) => b.value - a.value)
-  
-  return chartData
 }
 
-export function StatusStatisticsChart({animals}: {animals: Animal[]}) {
-  const chartData = useMemo(() => processStatusData(animals), [animals])
+export function StatusStatisticsChart({byStatus}: {byStatus: AnimalStatusCount[]}) {
+  const chartData = useMemo(() => processStatusData(byStatus), [byStatus])
 
   const config = useMemo(() => {
     if (!chartData || chartData.length === 0) return {}

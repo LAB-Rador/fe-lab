@@ -1,5 +1,5 @@
 import type { AppNotification } from "@/src/components/tasks/notifications"
-import type { AnimalStatus, AnimalType, ExperimentStatus, Laboratory, Sex } from "../../account/types";
+import type { AnimalStatus, ExperimentStatus } from "../../account/types";
 
 export interface PageProps {
     params: {
@@ -8,23 +8,22 @@ export interface PageProps {
     }
 }
 
-export interface Animal {
-    newAnimalType?: AnimalType;
-    acquisitionDate: string;
-    animalType: AnimalType;
-    laboratory: Laboratory;
+export interface AnimalPopulationPoint {
+    date: string;
+    animalType: string;
+    count: number;
+}
+
+export interface AnimalStatusCount {
     status: AnimalStatus;
-    animalTypeId: string;
-    laboratoryId: string;
-    birthDate?: string;
-    identifier: string;
-    genotype?: string;
-    location?: string;
-    strain?: string;
-    origin?: string;
-    name?: string;
-    id?: string;
-    sex?: Sex;
+    count: number;
+}
+
+export interface AnimalSummary {
+    total: number;
+    acquiredPreviousMonth: number;
+    byStatus: AnimalStatusCount[];
+    population: AnimalPopulationPoint[];
 }
 export interface Experiment {
     status?: ExperimentStatus;
@@ -84,7 +83,7 @@ export interface DashboardViewProps {
     notifications: AppNotification[];
     upcomingEvents: UpcomingEvent[];
     experiments: Experiment[];
-    animals: Animal[];
+    animalSummary: AnimalSummary;
     tasks: Task[];
     previousMonthData?: {
         experiments: number;
@@ -97,7 +96,7 @@ export interface DashboardContainerProps {
     laboratorySubscription: LaboratorySubscription;
     notifications: AppNotification[];
     experiments: Experiment[];
-    animals: Animal[];
+    animalSummary: AnimalSummary;
     tasks: Task[];
     previousMonthData?: {
         experiments: number;

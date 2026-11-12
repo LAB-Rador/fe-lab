@@ -1,6 +1,6 @@
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { ChartContainer, ChartTooltipContent } from "@/src/components/ui/chart"
-import type { Animal } from "@/src/app/[labId]/dashboard/types"
+import type { AnimalPopulationPoint } from "@/src/app/[labId]/dashboard/types"
 import { useMemo } from "react"
 
 const colors = [
@@ -14,41 +14,18 @@ const colors = [
   "hsl(24, 100%, 50%)",
 ]
 
-function processAnimalData(animals: Animal[]): { chartData: any[], animalTypes: string[] } {
-  if (!animals || animals.length === 0) {
+function processAnimalData(population: AnimalPopulationPoint[]): { chartData: any[], animalTypes: string[] } {
+  if (!population || population.length === 0) {
     return { chartData: [], animalTypes: [] }
   }
 
-  const thirtyDaysAgo = new Date()
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-
-  const recentAnimals = animals.filter(animal => {
-    const acquisitionDate = new Date(animal.acquisitionDate)
-    return acquisitionDate >= thirtyDaysAgo
-  })
-
-  if (recentAnimals.length === 0) {
-    return { chartData: [], animalTypes: [] }
-  }
-
-  const animalsByDate = recentAnimals.reduce((acc, animal) => {
-    const date = new Date(animal.acquisitionDate)
-    const dateKey = date.toISOString().split('T')[0] // YYYY-MM-DD format
-    
-    if (!acc[dateKey]) {
-      acc[dateKey] = {}
-    }
-    
-    const animalType = animal.animalType.name
-    if (!acc[dateKey][animalType]) {
-      acc[dateKey][animalType] = 0
-    }
-    
-    acc[dateKey][animalType]++
+  const animalsByDate = population.reduce((acc, point) => {
+    if (!acc[point.date]) acc[point.date] = {}
+    acc[point.date][point.animalType] = point.count
     return acc
   }, {} as Record<string, Record<string, number>>)
 
-  const allAnimalTypes = Array.from(new Set(recentAnimals.map(a => a.animalType.name)))
+  const allAnimalTypes = Array.from(new Set(population.map((point) => point.animalType)))
   
   const dateRange = []
   for (let i = 29; i >= 0; i--) {
@@ -75,8 +52,8 @@ function processAnimalData(animals: Animal[]): { chartData: any[], animalTypes: 
   return { chartData, animalTypes: allAnimalTypes }
 }
 
-export function AnimalPopulationChart({animals}: {animals: Animal[]}) {
-  const { chartData, animalTypes } = useMemo(() => processAnimalData(animals), [animals])
+export function AnimalPopulationChart({population}: {population: AnimalPopulationPoint[]}) {
+  const { chartData, animalTypes } = useMemo(() => processAnimalData(population), [population])
 
   const config = useMemo(() => animalTypes.reduce((acc: Record<string, { label: string; color: string }>, type: string, index: number) => {
     acc[type] = {
