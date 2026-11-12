@@ -13,7 +13,6 @@ import type { InitialMembersTypes } from "@/src/app/[labId]/team/types"
 import { decreaseUnread, setUnreadCount } from "@/src/redux/slices/notificationsSlice"
 import { useAppDispatch, useAppSelector } from "@/src/lib/hooks"
 import { Button } from "@/src/components/ui/button"
-import { Input } from "@/src/components/ui/input"
 import { Badge } from "@/src/components/ui/badge"
 import { getInitials } from "@/src/lib/utils"
 import type { AppNotification } from "@/src/components/tasks/notifications"
@@ -26,7 +25,7 @@ import { usePaidFeatures } from "@/src/components/plan-access"
 import { apiClient } from "@/src/lib/apiClient"
 import { AuthService } from "@/src/lib/auth"
 import { ThemeToggle } from "@/src/components/theme-toggle"
-import { Bell, Clock, Search } from "lucide-react"
+import { Bell, Clock } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useCallback, useEffect, useLayoutEffect, useState } from "react"
@@ -110,19 +109,7 @@ export function DashboardHeader({
   )
 
     return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 md:px-6">
-      <div className="flex flex-1 items-center gap-4 md:gap-8">
-        <form className="hidden md:block md:flex-1">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-            <Input
-              type="search"
-              placeholder="Search..."
-              className="w-full appearance-none bg-gray-50 pl-8 shadow-none md:w-2/3 lg:w-1/3"
-            />
-          </div>
-        </form>
-      </div>
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-end border-b border-gray-200 bg-white px-4 md:px-6">
       <div className="flex items-center gap-4">
         <ThemeToggle />
         <div className="flex space-x-1">
