@@ -1,6 +1,6 @@
 "use client"
 
-import type { Animal, DashboardContainerProps, Experiment, Task, UpcomingEvent } from "./types";
+import type { DashboardContainerProps, Experiment, Task, UpcomingEvent } from "./types";
 import DashboardView from "./deshboard.view";
 import { useMemo, useState } from "react";
 
@@ -43,26 +43,15 @@ function upcomingEventsFrom(experiments: Experiment[], tasks: Task[]): UpcomingE
     return events.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 }
 
-const DashboardContainer = ({animals, experiments, tasks, notifications, laboratorySubscription}: DashboardContainerProps) => {
+const DashboardContainer = ({animalSummary, experiments, tasks, notifications, laboratorySubscription}: DashboardContainerProps) => {
     const [experimentsData, setExperimentsData] = useState<Experiment[] | []>(experiments);
-    const [animalsData, setAnimalsData] = useState<Animal[] | []>(animals);
     const [tasksData, setTasksData] = useState<Task[] | []>(tasks);
 
     const now = new Date();
 
     const previousMonthData = useMemo(() => {
             return {
-                animals: animalsData.filter(animal => {
-                if (!animal?.acquisitionDate) return false;
-                const acquisitionDate = new Date(animal.acquisitionDate);
-                if (isNaN(acquisitionDate.getTime())) return false;
-                
-                const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-                const prevMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0);
-                
-                return acquisitionDate >= prevMonth && acquisitionDate <= prevMonthEnd;
-            }).length,
-            
+            animals: animalSummary.acquiredPreviousMonth,
             experiments: experimentsData.filter(experiment => {
                 if (!experiment?.startDate) return false;
                 const startDate = new Date(experiment.startDate);
@@ -84,7 +73,7 @@ const DashboardContainer = ({animals, experiments, tasks, notifications, laborat
                 return dueDate.toDateString() === yesterday.toDateString();
             }).length
         }
-    }, [animalsData, experimentsData, tasksData, now]);
+    }, [animalSummary.acquiredPreviousMonth, experimentsData, tasksData, now]);
 
     const upcomingEvents = upcomingEventsFrom(experimentsData, tasksData);
 
@@ -95,7 +84,7 @@ const DashboardContainer = ({animals, experiments, tasks, notifications, laborat
             notifications={notifications}
             upcomingEvents={upcomingEvents}
             experiments={experimentsData}
-            animals={animalsData}
+            animalSummary={animalSummary}
             tasks={tasksData}
         />
     )

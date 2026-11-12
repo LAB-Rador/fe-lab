@@ -11,13 +11,12 @@ export default async function Page ({params}: PageProps) {
   const {labId} = await params;
   const userId = await getServerAuthenticatedUserId()
 
-  const filters = JSON.stringify({})
   const notificationsQuery = new URLSearchParams({ limit: "10", labId }).toString()
   const laboratorySubscription = await loadLaboratoryPlan(userId, labId)
   const paidFeatures = laboratorySubscription.paidFeatures
 
-  const [animals, experiments, tasks, notificationsRes] = await Promise.all([
-    serverApiClient.get(`/api/animals/${userId}/${labId}/999999/1/${filters}`),
+  const [animalSummary, experiments, tasks, notificationsRes] = await Promise.all([
+    serverApiClient.get(`/api/animals/${userId}/${labId}/summary`),
     paidFeatures ? serverApiClient.get(`/api/experiments/${userId}/${labId}`) : Promise.resolve({ data: [] }),
     paidFeatures ? serverApiClient.get(`/api/tasks/${userId}/${labId}`) : Promise.resolve({ data: [] }),
     paidFeatures
@@ -39,7 +38,7 @@ export default async function Page ({params}: PageProps) {
       laboratorySubscription={laboratorySubscription}
       notifications={notifications}
       experiments={experiments.data}
-      animals={animals.data}
+      animalSummary={animalSummary.data}
       tasks={tasks.data}
     />
   )

@@ -1,11 +1,11 @@
-import type { Animal, Experiment, Task } from "@/src/app/[labId]/dashboard/types"
+import type { Experiment, Task } from "@/src/app/[labId]/dashboard/types"
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { Beaker, MousePointer, ClipboardList, AlertTriangle } from "lucide-react"
 import { useMemo } from "react"
 
 interface DashboardStatusProps {
   experiments: Experiment[];
-  animals: Animal[];
+  animalCount: number;
   tasks: Task[];
   previousMonthData?: {
     experiments: number;
@@ -105,10 +105,10 @@ function formatPercentageText(current: number, previous: number, type: 'animals'
   };
 }
 
-export function DashboardStatus({animals, experiments, tasks, previousMonthData}: DashboardStatusProps) {
+export function DashboardStatus({animalCount, experiments, tasks, previousMonthData}: DashboardStatusProps) {
   const animalsChange = useMemo(() => previousMonthData ?
-    formatPercentageText(animals.length, previousMonthData.animals, 'animals') : 
-    { text: "No previous data", className: "text-xs text-gray-500" }, [animals, previousMonthData]);
+    formatPercentageText(animalCount, previousMonthData.animals, 'animals') : 
+    { text: "No previous data", className: "text-xs text-gray-500" }, [animalCount, previousMonthData]);
 
   const experimentsChange = useMemo(() => previousMonthData ? 
     formatPercentageText(experiments.length, previousMonthData.experiments, 'experiments') : 
@@ -126,7 +126,7 @@ export function DashboardStatus({animals, experiments, tasks, previousMonthData}
           <MousePointer className="h-4 w-4 text-blue-600" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{animals.length}</div>
+          <div className="text-2xl font-bold">{animalCount}</div>
           <p className={animalsChange.className}>{animalsChange.text}</p>
         </CardContent>
       </Card>
