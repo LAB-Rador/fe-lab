@@ -19,8 +19,8 @@ import Link from "next/link"
 
 interface AnimalsListProps {
   handleUpdateDataPagination: (data: {page?: number, pageSize?: number}) => void;
-  handleUnarchiveAnimalRow: (animalId: string) => void | Promise<void>;
-  handleArchiveAnimalRow: (animalId: string) => void | Promise<void>;
+  handleUnarchiveAnimalRow: (animalIds: string[]) => void | Promise<void>;
+  handleArchiveAnimalRow: (animalIds: string[]) => void | Promise<void>;
   onMoveToCage: (animal: Animal) => void;
   setPagination: (pagination: AnimalPagination) => void;
   setSelectedAnimal: (animal: Animal) => void;
@@ -41,6 +41,7 @@ export function AnimalsList({
   setOpen,
 }: AnimalsListProps) {
   const [selectedAnimals, setSelectedAnimals] = useState<string[]>([])
+  const [selectionPending, setSelectionPending] = useState(false)
   const { view, setView } = useResponsiveTableGridView()
   const params = useParams();
   const labId = params.labId as string;
@@ -67,12 +68,27 @@ export function AnimalsList({
     return pages
   }, [currentPage, totalPages])
 
-  const toggleAnimalSelection = (id: string) => {
-    setSelectedAnimals((prev) => (prev.includes(id) ? prev.filter((animalId) => animalId !== id) : [...prev, id]))
+  const pageIds = currentAnimals.flatMap((animal) => (animal.id ? [animal.id] : []))
+  const selectedOnPage = currentAnimals.filter((animal) => animal.id && selectedAnimals.includes(animal.id))
+  const selectedOnPageCount = selectedOnPage.length
+  const allSelected = pageIds.length > 0 && selectedOnPageCount === pageIds.length
+
+  const setAnimalSelected = (id: string, selected: boolean) => {
+    if (!id) return
+    setSelectedAnimals((prev) => (
+      selected ? (prev.includes(id) ? prev : [...prev, id]) : prev.filter((animalId) => animalId !== id)
+    ))
   }
 
-  const toggleAllAnimals = () => {
-    setSelectedAnimals((prev) => (prev.length === currentAnimals.length ? [] : currentAnimals.map((animal) => animal.id || "")))
+  const runSelection = async (ids: string[], action: (ids: string[]) => void | Promise<void>) => {
+    if (ids.length === 0 || selectionPending) return
+    setSelectionPending(true)
+    setSelectedAnimals((prev) => prev.filter((id) => !ids.includes(id)))
+    try {
+      await action(ids)
+    } finally {
+      setSelectionPending(false)
+    }
   }
 
   const handlePageChange = (page: number) => {
@@ -133,8 +149,40 @@ export function AnimalsList({
     <Card>
       <div className="flex items-center justify-between border-b border-gray-200 p-4">
         <div className="flex items-center gap-2">
-          <Checkbox checked={selectedAnimals.length === currentAnimals.length && currentAnimals.length > 0} onCheckedChange={toggleAllAnimals} />
-          <span className="text-sm text-gray-500">{selectedAnimals.length} selected</span>
+          <Checkbox
+            checked={allSelected ? true : selectedOnPageCount > 0 ? "indeterminate" : false}
+            onCheckedChange={(checked) => {
+              setSelectedAnimals(checked === true ? pageIds : [])
+            }}
+            aria-label="Select all animals"
+          />
+          <span className="text-sm text-gray-500">{selectedOnPageCount} selected</span>
+          {selectedOnPage.some((animal) => !animal.archivedAt) ? (
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={selectionPending}
+              onClick={() => void runSelection(
+                selectedOnPage.flatMap((animal) => (animal.id && !animal.archivedAt ? [animal.id] : [])),
+                handleArchiveAnimalRow,
+              )}
+            >
+              Archive selected
+            </Button>
+          ) : null}
+          {selectedOnPage.some((animal) => animal.archivedAt) ? (
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={selectionPending}
+              onClick={() => void runSelection(
+                selectedOnPage.flatMap((animal) => (animal.id && animal.archivedAt ? [animal.id] : [])),
+                handleUnarchiveAnimalRow,
+              )}
+            >
+              Unarchive selected
+            </Button>
+          ) : null}
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -178,11 +226,12 @@ export function AnimalsList({
             </TableHeader>
             <TableBody>
               {currentAnimals.map((animal) => (
-                <TableRow key={animal.id}>
+                <TableRow key={animal.id} data-state={animal.id && selectedAnimals.includes(animal.id) ? "selected" : undefined}>
                   <TableCell>
                     <Checkbox
-                      checked={selectedAnimals.includes(animal.id || "")}
-                      onCheckedChange={() => toggleAnimalSelection(animal.id || "")}
+                      checked={Boolean(animal.id && selectedAnimals.includes(animal.id))}
+                      onCheckedChange={(checked) => setAnimalSelected(animal.id ?? "", checked === true)}
+                      aria-label={`Select ${animal.identifier}`}
                     />
                   </TableCell>
                   <TableCell className="font-medium">{animal.identifier}</TableCell>
@@ -248,8 +297,9 @@ export function AnimalsList({
                           <DropdownMenuSeparator />
                           {animal.archivedAt ? (
                             <DropdownMenuItem
+                              disabled={selectionPending}
                               onClick={() => {
-                                if (animal.id) void handleUnarchiveAnimalRow(animal.id)
+                                if (animal.id) void runSelection([animal.id], handleUnarchiveAnimalRow)
                               }}
                             >
                               Unarchive animal
@@ -257,8 +307,9 @@ export function AnimalsList({
                           ) : (
                             <DropdownMenuItem
                               className="text-red-600 focus:text-red-600"
+                              disabled={selectionPending}
                               onClick={() => {
-                                if (animal.id) void handleArchiveAnimalRow(animal.id)
+                                if (animal.id) void runSelection([animal.id], handleArchiveAnimalRow)
                               }}
                             >
                               Archive animal
@@ -372,11 +423,12 @@ export function AnimalsList({
         <>
           <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {currentAnimals.map((animal) => (
-              <div key={animal.id} className="relative rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+              <div key={animal.id} className={`relative rounded-lg border border-gray-200 p-4 shadow-sm ${animal.id && selectedAnimals.includes(animal.id) ? "bg-muted" : "bg-white"}`}>
                 <div className="absolute right-2 top-2">
                   <Checkbox
-                    checked={selectedAnimals.includes(animal.id || "")}
-                    onCheckedChange={() => toggleAnimalSelection(animal.id || "")}
+                    checked={Boolean(animal.id && selectedAnimals.includes(animal.id))}
+                    onCheckedChange={(checked) => setAnimalSelected(animal.id ?? "", checked === true)}
+                    aria-label={`Select ${animal.identifier}`}
                   />
                 </div>
                 <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-blue-50">
@@ -461,8 +513,9 @@ export function AnimalsList({
                       <DropdownMenuSeparator />
                       {animal.archivedAt ? (
                         <DropdownMenuItem
+                          disabled={selectionPending}
                           onClick={() => {
-                            if (animal.id) void handleUnarchiveAnimalRow(animal.id)
+                            if (animal.id) void runSelection([animal.id], handleUnarchiveAnimalRow)
                           }}
                         >
                           Unarchive animal
@@ -470,8 +523,9 @@ export function AnimalsList({
                       ) : (
                         <DropdownMenuItem
                           className="text-red-600 focus:text-red-600"
+                          disabled={selectionPending}
                           onClick={() => {
-                            if (animal.id) void handleArchiveAnimalRow(animal.id)
+                            if (animal.id) void runSelection([animal.id], handleArchiveAnimalRow)
                           }}
                         >
                           Archive animal
