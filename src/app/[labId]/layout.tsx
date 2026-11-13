@@ -22,17 +22,19 @@ export default async function DashboardLayout({
 }) {
   const {labId} = await params;
   const userId = await getServerAuthenticatedUserId()
-  
-  const laboratories = await serverApiClient.get(`/api/laboratories/${userId}`)
-  const laboratory = laboratories.data.find((item: Laboratory) => item.slug === labId)
-  if (!laboratory) {
+
+  const [laboratories, laboratoryMembers] = await Promise.all([
+    serverApiClient.get(`/api/laboratories/${userId}`).catch(() => null),
+    serverApiClient.get(`/api/laboratory/${userId}/${labId}`).catch(() => null),
+  ])
+  const laboratory = Array.isArray(laboratories?.data)
+    ? laboratories.data.find((item: Laboratory) => item.slug === labId)
+    : undefined
+  if (laboratories && !laboratory) {
     redirect("/account")
   }
 
-  const [laboratoryMembers, plan] = await Promise.all([
-    serverApiClient.get(`/api/laboratory/${userId}/${labId}`),
-    loadLaboratoryPlan(userId, labId),
-  ])
+  const plan = await loadLaboratoryPlan(userId, labId)
   const paidFeatures = plan.paidFeatures
 
   let unreadNotificationsCount = 0
@@ -57,10 +59,10 @@ export default async function DashboardLayout({
     <PlanAccessProvider paidFeatures={paidFeatures}>
     <SidebarProvider>
       <div className="clinical-app flex min-h-screen bg-gray-50">
-        <Sidebar laboratoryName={laboratory.name} />
+        <Sidebar laboratoryName={laboratory?.name ?? labId} />
         <div className="flex flex-1 flex-col">
           <DashboardHeader
-            laboratoryMembers={laboratoryMembers.data}
+            laboratoryMembers={Array.isArray(laboratoryMembers?.data) ? laboratoryMembers.data : []}
             unreadNotificationsCount={unreadNotificationsCount}
             initialUnreadNotifications={initialUnreadNotifications}
             userId={userId}
