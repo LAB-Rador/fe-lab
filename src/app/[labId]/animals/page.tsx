@@ -2,6 +2,7 @@
 
 import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId";
 import { getAnimalEnums } from "@/src/lib/cached/getAnimalEnums";
+import { animalListPath } from "@/src/lib/animal-list-path";
 import { serverApiClient } from "@/src/lib/serverApiClient";
 import AnimalContainer from "./animal.container";
 import type { AnimalEnums } from "./types";
@@ -14,10 +15,8 @@ export default async function AnimalsPage({params}: PageProps) {
   const {labId} = await params;
   const userId = await getServerAuthenticatedUserId()
 
-  const filters = JSON.stringify({})
-
   const [animals, animalTypes, animalEnums] = await Promise.all([
-    serverApiClient.get(`/api/animals/${userId}/${labId}/${rows}/${page}/${filters}`),
+    serverApiClient.get(animalListPath(userId, labId, rows, page)),
     serverApiClient.get(`/api/animals/types/${userId}/${labId}`),
     getAnimalEnums(),
   ])

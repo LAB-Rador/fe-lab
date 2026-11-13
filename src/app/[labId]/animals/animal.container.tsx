@@ -11,6 +11,7 @@ import { MoveToCageDialog } from "@/src/components/animals/move-to-cage-dialog";
 import { AnimalsList } from "@/src/components/animals/animals-list";
 import { useMediaQuery } from "@/src/components/sidebar-provider";
 import { AnimalStatus } from "../../account/types";
+import { animalListPath } from "@/src/lib/animal-list-path";
 import { apiClient } from "@/src/lib/apiClient";
 import type { Animal } from "./types";
 import { v4 as uuidv4 } from "uuid";
@@ -23,6 +24,10 @@ type OptimisticAnimalAction =
 
 const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, animalPagination}: AnimalTypes) => {
     const [animalTypesData, setAnimalTypesData] = useState<AnimalType[]>(animalTypes)
+
+    useEffect(() => {
+        setAnimalTypesData(animalTypes)
+    }, [animalTypes])
     const [pagination, setPagination] = useState<AnimalPagination>(animalPagination)
     const [newAnimalType, setNewAnimalType] = useState<AnimalType | null>(null)
     const [includeArchivedAnimals, setIncludeArchivedAnimals] = useState(false)
@@ -69,7 +74,7 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
         } else {
             delete mergedForRequest.includeArchived
         }
-        const response = await apiClient.get(`/api/animals/${userId}/${labId}/${data.pageSize || pagination.pageSize}/${data.page || pagination.currentPage}/${JSON.stringify(mergedForRequest)}`)
+        const response = await apiClient.get(animalListPath(userId, labId, data.pageSize || pagination.pageSize, data.page || pagination.currentPage, mergedForRequest))
         setPagination(response.pagination)
         setAnimalsData(response.data)
         if (data.filters !== undefined) {
@@ -88,7 +93,7 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
                     delete mergedForRequest.includeArchived
                 }
                 const response = await apiClient.get(
-                    `/api/animals/${userId}/${labId}/${pagination.pageSize}/1/${JSON.stringify(mergedForRequest)}`,
+                    animalListPath(userId, labId, pagination.pageSize, 1, mergedForRequest),
                 )
                 setPagination(response.pagination)
                 setAnimalsData(response.data)
@@ -258,40 +263,53 @@ const AnimalContainer = ({animals, animalEnums, userId, labId, animalTypes, anim
     }, [userId, labId, newAnimalType, animalsData, applyOptimisticAnimal])
 
     const handleArchiveAnimalRow = useCallback(
-        async (animalId: string) => {
+        async (animalIds: string[]) => {
+            const unique = [...new Set(animalIds.filter((id) => id.length > 0))]
+            if (unique.length === 0) return
             startTransition(() => {
-                applyOptimisticAnimal({ type: "remove", id: animalId })
-                setAnimalsData((prev) => prev.filter((animal) => animal.id !== animalId))
-            })
-            
-            try {
-                const res = await apiClient.post(`/api/animals/animal/${userId}/${labId}/${animalId}/archive`, {})
-                if (res?.success) {
-                    toast.success("Animal archived")
-                    await handleUpdateDataPagination({})
-                } else {
-                    toast.error((res as { message?: string })?.message ?? "Failed to archive")
+                for (const id of unique) {
+                    applyOptimisticAnimal({ type: "remove", id })
                 }
-            } catch {
-                toast.error("Failed to archive")
+                setAnimalsData((prev) => prev.filter((animal) => !animal.id || !unique.includes(animal.id)))
+            })
+            let failed = false
+            for (const animalId of unique) {
+                try {
+                    const res = await apiClient.post(`/api/animals/animal/${userId}/${labId}/${animalId}/archive`, {})
+                    if (!res?.success) failed = true
+                } catch {
+                    failed = true
+                }
             }
+            if (failed) {
+                toast.error("Failed to archive")
+            } else {
+                toast.success(unique.length === 1 ? "Animal archived" : "Animals archived")
+            }
+            await handleUpdateDataPagination({})
         },
         [userId, labId, handleUpdateDataPagination, applyOptimisticAnimal],
     )
 
     const handleUnarchiveAnimalRow = useCallback(
-        async (animalId: string) => {
-            try {
-                const res = await apiClient.post(`/api/animals/animal/${userId}/${labId}/${animalId}/unarchive`, {})
-                if (res?.success) {
-                    toast.success("Animal unarchived")
-                    await handleUpdateDataPagination({})
-                } else {
-                    toast.error((res as { message?: string })?.message ?? "Failed to unarchive")
+        async (animalIds: string[]) => {
+            const unique = [...new Set(animalIds.filter((id) => id.length > 0))]
+            if (unique.length === 0) return
+            let failed = false
+            for (const animalId of unique) {
+                try {
+                    const res = await apiClient.post(`/api/animals/animal/${userId}/${labId}/${animalId}/unarchive`, {})
+                    if (!res?.success) failed = true
+                } catch {
+                    failed = true
                 }
-            } catch {
-                toast.error("Failed to unarchive")
             }
+            if (failed) {
+                toast.error("Failed to unarchive")
+            } else {
+                toast.success(unique.length === 1 ? "Animal unarchived" : "Animals unarchived")
+            }
+            await handleUpdateDataPagination({})
         },
         [userId, labId, handleUpdateDataPagination],
     )

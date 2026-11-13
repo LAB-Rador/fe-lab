@@ -8,6 +8,7 @@ import { Button } from "@/src/components/ui/button"
 import { Textarea } from "@/src/components/ui/textarea"
 import { Label } from "@/src/components/ui/label"
 import { Input } from "@/src/components/ui/input"
+import { animalListPath } from "@/src/lib/animal-list-path"
 import { apiClient } from "@/src/lib/apiClient"
 import { useEffect, useState, type FormEvent } from "react"
 
@@ -61,7 +62,7 @@ export function CreatePairDialog({
         if (!open) return
         let cancelled = false
         setError("")
-        apiClient.get(`/api/animals/${userId}/${labId}/200/1/null`).then((response) => {
+        apiClient.get(animalListPath(userId, labId, 200, 1)).then((response) => {
             if (cancelled) return
             const rows = Array.isArray(response?.data) ? response.data : []
             setAnimals(rows.map((animal: BreedingAnimalOption & { animalType?: { id?: string } }) => ({

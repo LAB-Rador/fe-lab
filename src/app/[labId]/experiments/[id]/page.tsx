@@ -5,6 +5,7 @@ import { getServerAuthenticatedUserId } from "@/src/lib/serverUserId";
 import { PlanRequired } from "@/src/components/plan-required";
 import { loadLaboratoryPlan } from "@/src/lib/paid-features";
 import { ExperimentContainer } from "./experiment.container";
+import { animalListPath } from "@/src/lib/animal-list-path";
 import { serverApiClient } from "@/src/lib/serverApiClient";
 interface ExperimentDetailPageProps {
   params: Promise<{
@@ -23,8 +24,6 @@ export default async function ExperimentDetailPage({ params }: ExperimentDetailP
   const plan = await loadLaboratoryPlan(userId, labId)
   if (!plan.paidFeatures) return <PlanRequired feature="Experiments" />
 
-  const filters = JSON.stringify({})
-
   const [
     experimentRes,
     laboratoryMembersRes,
@@ -35,9 +34,7 @@ export default async function ExperimentDetailPage({ params }: ExperimentDetailP
   ] = await Promise.all([
     serverApiClient.get(`/api/experiments/unique/${userId}/${labId}/${experimentId}`),
     serverApiClient.get(`/api/laboratory/${userId}/${labId}`),
-    serverApiClient.get(
-      `/api/animals/${userId}/${labId}/${labAnimalsRows}/${labAnimalsPage}/${filters}`,
-    ),
+    serverApiClient.get(animalListPath(userId, labId, labAnimalsRows, labAnimalsPage)),
     serverApiClient.get(`/api/experiments/unique/${userId}/${labId}/${experimentId}/metrics`).catch(() => ({
       success: false as const,
     })),
