@@ -1,0 +1,92 @@
+import { expect, type Page, test } from "@playwright/test"
+import { createLaboratory, setPlan, signIn, testEmail } from "./session"
+
+function nav(page: Page, name: string) {
+    return page.getByRole("navigation").getByRole("link", { name, exact: true })
+}
+
+async function addAnimal(page: Page, identifier: string, sex: "FEMALE" | "MALE") {
+    await page.getByRole("button", { name: "Add Animal" }).click()
+    const dialog = page.getByRole("dialog", { name: "Add New Animal" })
+    await dialog.getByLabel(/Identifier/).fill(identifier)
+    await dialog.getByLabel(/Animal Type/).click()
+    await page.getByRole("option", { name: "Mouse", exact: true }).click()
+    await dialog.getByLabel("Sex").click()
+    await page.getByRole("option", { name: sex, exact: true }).click()
+    await dialog.getByRole("button", { name: "Add Animal" }).click()
+    await expect(page.getByText(identifier).first()).toBeVisible()
+}
+
+test("a paid laboratory moves an animal between cages and records a litter", async ({ page }) => {
+    await signIn(page, testEmail("colony"))
+    const slug = await createLaboratory(page, "E2E Paid Lab")
+    await setPlan(slug, "Starter")
+    await page.goto(`/${slug}/dashboard`)
+    await expect(nav(page, "Cages")).toBeVisible()
+
+    await nav(page, "Settings").click()
+    await page.getByLabel("Name").fill("Mouse")
+    await page.getByRole("button", { name: "Add type" }).click()
+    await expect(page.getByRole("cell", { name: "Mouse" })).toBeVisible()
+
+    await nav(page, "Animals").click()
+    await addAnimal(page, "F-1", "FEMALE")
+    await addAnimal(page, "M-1", "MALE")
+    await addAnimal(page, "M-2", "MALE")
+
+    await nav(page, "Cages").click()
+    await page.locator("#cage-name").fill("A-01")
+    await page.getByRole("button", { name: "Create cage" }).click()
+    await expect(page.getByRole("link", { name: /A-01/ })).toBeVisible()
+    await page.locator("#cage-name").fill("B-01")
+    await expect(page.getByRole("button", { name: "Create cage" })).toBeEnabled()
+    await page.getByRole("button", { name: "Create cage" }).click()
+    await expect(page.getByRole("link", { name: /B-01/ })).toBeVisible()
+
+    await nav(page, "Animals").click()
+    const animal = page.getByRole("row", { name: "F-1" })
+    await animal.getByRole("button", { name: "Open menu" }).click()
+    await page.getByRole("menuitem", { name: "Move to cage" }).click()
+    await page.getByRole("dialog", { name: "Move to cage" }).getByRole("combobox").click()
+    await page.getByRole("option", { name: /A-01/ }).click()
+    await page.getByRole("button", { name: "Move" }).click()
+    await animal.getByRole("button", { name: "Open menu" }).click()
+    await page.getByRole("menuitem", { name: "Move to cage" }).click()
+    await page.getByRole("dialog", { name: "Move to cage" }).getByRole("combobox").click()
+    await page.getByRole("option", { name: /B-01/ }).click()
+    await page.getByRole("button", { name: "Move" }).click()
+
+    await nav(page, "Cages").click()
+    await page.getByRole("link", { name: /A-01/ }).click()
+    await expect(page.getByText("No animals in this cage.")).toBeVisible()
+    await nav(page, "Cages").click()
+    await page.getByRole("link", { name: /B-01/ }).click()
+    await expect(page.getByRole("link", { name: /F-1/ })).toBeVisible()
+
+    await nav(page, "Breeding").click()
+    await page.getByRole("button", { name: "New pair" }).click()
+    const pair = page.getByRole("dialog", { name: "New breeding pair" })
+    await pair.getByLabel("Mother").click()
+    await page.getByRole("option", { name: /F-1/ }).click()
+    await pair.getByLabel("Father").click()
+    await page.getByRole("option", { name: /M-1/ }).click()
+    await pair.getByLabel("Started").fill("2026-04-02")
+    await pair.getByRole("button", { name: "Save pair" }).click()
+    await expect(page.getByRole("row", { name: /F-1/ })).toBeVisible()
+    await page.getByRole("row", { name: /F-1/ }).click()
+    await page.getByLabel("Birth date").fill("2026-04-02")
+    await page.getByLabel("Pups").fill("4")
+    await page.getByRole("button", { name: "Record litter" }).click()
+    await expect(page.getByText("4 pups")).toBeVisible()
+
+    await page.getByRole("button", { name: "New pair" }).click()
+    const males = page.getByRole("dialog", { name: "New breeding pair" })
+    await males.getByLabel("Mother").click()
+    await page.getByRole("option", { name: /M-1/ }).click()
+    await males.getByLabel("Father").click()
+    await page.getByRole("option", { name: /M-2/ }).click()
+    await males.getByLabel("Started").fill("2026-04-02")
+    await males.getByRole("button", { name: "Save pair" }).click()
+    await expect(males.getByText("This pair could not be saved.")).toBeVisible()
+    await expect(page.getByRole("row", { name: /M-2/ })).toHaveCount(0)
+})

@@ -2,7 +2,8 @@
 
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/src/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
-import { Sex, AnimalStatus, type CreateAnimalData, type AnimalType, type Animal } from "./types"
+import { editAnimalFormSchema, type EditAnimalFormValues } from "./animal-form-schema"
+import { type CreateAnimalData, type AnimalType, type Animal } from "./types"
 import { Popover, PopoverContent, PopoverTrigger } from "@/src/components/ui/popover"
 import type { AnimalEnums } from "@/src/app/[labId]/animals/types"
 import { Calendar } from "@/src/components/ui/calendar"
@@ -15,7 +16,6 @@ import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { cn } from "@/src/lib/utils"
 import { format } from "date-fns"
-import * as z from "zod"
 import {
     Dialog,
     DialogContent,
@@ -25,22 +25,6 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/src/components/ui/dialog'
-
-const formSchema = z.object({
-    id: z.string(),
-    identifier: z.string().min(1, "Identifier is required").max(50, "Identifier must be less than 50 characters"),
-    name: z.string().optional(),
-    animalTypeId: z.string().min(1, "Animal type is required"),
-    laboratoryId: z.string().min(1, "Laboratory is required"),
-    birthDate: z.date().optional(),
-    acquisitionDate: z.date().optional(),
-    sex: z.nativeEnum(Sex).optional(),
-    strain: z.string().optional(),
-    genotype: z.string().optional(),
-    status: z.nativeEnum(AnimalStatus).optional(),
-    location: z.string().optional(),
-    origin: z.string().optional(),
-})
 
 interface AddAnimalDialogProps {
     onAddAnimalType: (typeName: string) => Promise<string>
@@ -73,8 +57,8 @@ export function EditAnimalDialog({
     const [newTypeValue, setNewTypeValue] = useState("")
 
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<EditAnimalFormValues>({
+    resolver: zodResolver(editAnimalFormSchema),
     defaultValues: {
       laboratoryId: labId,
       status: undefined,
@@ -122,7 +106,7 @@ export function EditAnimalDialog({
     }
   }, [selectedAnimal]);
 
-  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+  const handleSubmit = async (values: EditAnimalFormValues) => {
     setIsSubmitting(true)
     setOpen(false)
     form.reset()

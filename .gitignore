@@ -5,6 +5,7 @@
 
 # next.js
 /.next/
+/.next-e2e/
 /out/
 
 # production
@@ -26,3 +27,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .cursor
+
+# playwright
+/test-results/
+/playwright-report/
+/e2e/.inbox/
